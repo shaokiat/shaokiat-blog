@@ -8,8 +8,8 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Shao Kiat's Blog",
   tagline: "A leetcode a day keeps unemployment away - Unknown",
-  url: "https://your-docusaurus-test-site.com",
-  baseUrl: "/",
+  url: "https://shaokiat.github.io",
+  baseUrl: "/shaokiat-blog/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
