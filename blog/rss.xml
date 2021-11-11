@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title>Shao Kiat's Blog Blog</title>
+        <link>https://shaokiat.github.io/blog</link>
+        <description>Shao Kiat's Blog Blog</description>
+        <lastBuildDate>Thu, 11 Nov 2021 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Why am I writing this blog?]]></title>
+            <link>https://shaokiat.github.io/blog/Welcome</link>
+            <guid>Welcome</guid>
+            <pubDate>Thu, 11 Nov 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[This marks the start of my very first blog post and the start of my journey to reach for greater heights.]]></description>
+            <content:encoded><![CDATA[<p>This marks the start of my very first blog post and the start of my journey to reach for greater heights.
+I want to pen down my thoughts through my job search journey as a software engineer and whoever is reading this (yes that&#x27;s you :flushed:) will
+serve as witness and reminder for me to hold myself accountable :bulb:.</p><h3>About me</h3><p>As of writing this blog post, I am in my third year of NUS, majoring in Computer Science.</p><h3>Goals</h3><ul><li>Securing a 2022 Summer Internship at a <a href="http://elijames.org/the-two-tiers-of-singapores-tech-companies/">Good</a> company</li><li>Overseas Exchange at University of California</li><li>Securing job at a <a href="http://elijames.org/the-two-tiers-of-singapores-tech-companies/">Good</a> company (SV/SG)</li></ul><p>I had just received an offer to exchange at University of California, a dream come true, yet at the same time feeling uneasy.
+Things hasn&#x27;t been easy with my internship search and I am beginning to doubt my ability as a SWE.</p>]]></content:encoded>
+        </item>
+    </channel>
+</rss>
