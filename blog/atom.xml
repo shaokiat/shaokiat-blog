@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://shaokiat.github.io/blog</id>
+    <id>https://shaokiat.github.io/shaokiat-blog/blog</id>
     <title>Shao Kiat's Blog Blog</title>
     <updated>2021-11-11T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://shaokiat.github.io/blog"/>
+    <link rel="alternate" href="https://shaokiat.github.io/shaokiat-blog/blog"/>
     <subtitle>Shao Kiat's Blog Blog</subtitle>
-    <icon>https://shaokiat.github.io/img/favicon.ico</icon>
+    <icon>https://shaokiat.github.io/shaokiat-blog/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[Why am I writing this blog?]]></title>
         <id>Welcome</id>
-        <link href="https://shaokiat.github.io/blog/Welcome"/>
+        <link href="https://shaokiat.github.io/shaokiat-blog/blog/Welcome"/>
         <updated>2021-11-11T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[This marks the start of my very first blog post and the start of my journey to reach for greater heights.]]></summary>
         <content type="html"><![CDATA[<p>This marks the start of my very first blog post and the start of my journey to reach for greater heights.

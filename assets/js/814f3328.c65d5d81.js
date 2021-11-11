@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksk_blog=self.webpackChunksk_blog||[]).push([[535],{5641:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Why am I writing this blog?","permalink":"/shaokiat-blog/blog/Welcome"}]}')}}]);
