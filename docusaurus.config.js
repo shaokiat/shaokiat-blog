@@ -24,13 +24,12 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
-          editUrl: "https://github.com/facebook/docusaurus/edit/main/website/",
+          editUrl: "https://github.com/shaokiat/shaokiat-blog/tree/main/",
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
-          editUrl:
-            "https://github.com/facebook/docusaurus/edit/main/website/blog/",
+          editUrl: "https://github.com/shaokiat/shaokiat-blog/tree/main/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -46,7 +45,7 @@ const config = {
         title: "Shao Kiat",
         logo: {
           alt: "My Site Logo",
-          src: "img/logo.svg",
+          src: "img/moon.png",
         },
         items: [
           {
@@ -57,8 +56,13 @@ const config = {
           },
           { to: "/blog", label: "Blog", position: "left" },
           {
-            href: "https://github.com/shaokiat",
-            label: "GitHub",
+            to: "/projects",
+            label: "Projects",
+            position: "right",
+          },
+          {
+            label: "Resume",
+            href: "https://shaokiat.github.io/shaokiat-blog/resume.pdf",
             position: "right",
           },
         ],
@@ -84,19 +88,32 @@ const config = {
             ],
           },
           {
-            title: "Contact Me",
+            title: "Discover",
             items: [
               {
                 label: "Porfolio Website",
-                href: "https://www.shaokiat.ml",
+                to: "https://www.shaokiat.ml",
               },
               {
                 label: "GitHub",
-                href: "https://github.com/shaokiat",
+                to: "https://github.com/shaokiat",
               },
+            ],
+          },
+          {
+            title: "Contact Me",
+            items: [
               {
                 label: "LinkedIn",
-                href: "https://linkedin.com/in/shaokiat",
+                to: "https://linkedin.com/in/shaokiat",
+              },
+              {
+                label: "Email",
+                href: "mailto:shaokiat@u.nus.edu",
+              },
+              {
+                label: "Resume",
+                href: "https://shaokiat.github.io/shaokiat-blog/resume.pdf",
               },
             ],
           },
