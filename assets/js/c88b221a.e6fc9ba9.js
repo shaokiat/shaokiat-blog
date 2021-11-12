@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunksk_blog=self.webpackChunksk_blog||[]).push([[241],{6392:function(e){e.exports=JSON.parse('{"permalink":"/shaokiat-blog/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"previousPage":null,"nextPage":null,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

@@ -2,11 +2,24 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shaokiat.github.io/shaokiat-blog/blog</id>
     <title>Shao Kiat's Blog Blog</title>
-    <updated>2021-11-11T00:00:00.000Z</updated>
+    <updated>2021-11-12T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shaokiat.github.io/shaokiat-blog/blog"/>
     <subtitle>Shao Kiat's Blog Blog</subtitle>
     <icon>https://shaokiat.github.io/shaokiat-blog/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Thoughts on (The Two Tiers of Singapore's Tech Companies)]]></title>
+        <id>good-company</id>
+        <link href="https://shaokiat.github.io/shaokiat-blog/blog/good-company"/>
+        <updated>2021-11-12T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Here is an article by Eli James on Singapore's Tech Companies and it has inspired me to think deep about the company]]></summary>
+        <content type="html"><![CDATA[<p>Here is an article by Eli James on Singapore&#x27;s Tech Companies and it has inspired me to think deep about the company
+I would want to work at.</p><p>:::tip TIP</p><p>Read the full article here if you haven&#x27;t done so!</p><p><strong><a href="http://elijames.org/the-two-tiers-of-singapores-tech-companies/">http://elijames.org/the-two-tiers-of-singapores-tech-companies/</a></strong></p><p>:::</p>]]></content>
+        <author>
+            <name>Lim Shao Kiat</name>
+            <uri>https://www.shaokiat.ml</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Why am I writing this blog?]]></title>
         <id>Welcome</id>
@@ -15,8 +28,7 @@
         <summary type="html"><![CDATA[This marks the start of my very first blog post and the start of my journey to reach for greater heights.]]></summary>
         <content type="html"><![CDATA[<p>This marks the start of my very first blog post and the start of my journey to reach for greater heights.
 I want to pen down my thoughts through my job search journey as a software engineer and whoever is reading this (yes that&#x27;s you :flushed:) will
-serve as witness and reminder for me to hold myself accountable :bulb:.</p><h3>About me</h3><p>As of writing this blog post, I am in my third year of NUS, majoring in Computer Science.</p><h3>Goals</h3><ul><li>Securing a 2022 Summer Internship at a <a href="http://elijames.org/the-two-tiers-of-singapores-tech-companies/">Good</a> company</li><li>Overseas Exchange at University of California</li><li>Securing job at a <a href="http://elijames.org/the-two-tiers-of-singapores-tech-companies/">Good</a> company (SV/SG)</li></ul><p>I had just received an offer to exchange at University of California, a dream come true, yet at the same time feeling uneasy.
-Things hasn&#x27;t been easy with my internship search and I am beginning to doubt my ability as a SWE.</p>]]></content>
+serve as witness and reminder for me to hold myself accountable :bulb:.</p><h3>About me</h3><p>As of writing this blog post, I am in my third year of NUS, majoring in Computer Science.</p><h3>Goals</h3><ul><li>Securing a 2022 Summer Internship at a <a href="/blog/good-company">Good</a> company</li><li>Overseas Exchange at University of California</li><li>Securing job at a <a href="/blog/good-company">Good</a> company (SV/SG)</li></ul><p>I had just received an offer to exchange at University of California, a dream come true, yet at the same time feeling uneasy.</p>]]></content>
         <author>
             <name>Lim Shao Kiat</name>
             <uri>https://www.shaokiat.ml</uri>
