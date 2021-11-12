@@ -3,3 +3,30 @@ sidebar_position: 1
 ---
 
 # Binary Search
+
+:::tip TIP 
+
+Inspired by https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/detailedbinarysearch
+
+:::
+
+### Iterative Binary Search
+```py 
+def binarySearch(nums, target):
+    left, right = 0, len(nums)-1
+
+    while left <= right: # Search interval = [left, right]
+        mid = (left + right) // 2
+
+        if nums[mid] == target:
+            return mid
+        elif nums[mid] < target: # recurse right -> [mid+1, right]
+            left = mid + 1
+        elif nums[mid] > target: # recurse left -> [left, mid-1]
+            right = mid - 1
+    
+    # Target not found -> return -1
+    return -1
+```
+
+### Find Left Border
