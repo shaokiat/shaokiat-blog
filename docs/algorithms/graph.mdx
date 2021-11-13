@@ -1,0 +1,110 @@
+---
+sidebar_position: 3
+---
+
+# Graphs
+
+My second nemesis 🥵!
+
+### Topological Sort (Detecting cycle in directed graph)
+
+:::tip TIP
+If you have not tried these questions, please give it a go first! 👾 <br />
+https://leetcode.com/problems/course-schedule/ <br />
+https://leetcode.com/problems/course-schedule-ii/
+:::
+
+:::important Source
+One of the [**best explanation**](https://leetcode.com/problems/course-schedule/discuss/441722/Python-99-time-and-100-space.-Collection-of-solutions-with-explanation) by hxuanhung
+:::
+
+**Method 1: DFS with stack**
+
+```py
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        visited = set()
+        graph = self.buildAdj(numCourses, prerequisites)
+
+        def hasCycle(v, stack):
+            if v in visited: # why check this?
+                if v in stack:
+                    # Cycle exists
+                    return True
+                # Visited but not in stack -> already checked before
+                return False
+
+            # Not visited
+            visited.add(v)
+            stack.append(v)
+
+            for d in graph[v]: # Check all descendants
+                if hasCycle(d, stack):
+                    return True
+
+            # Remove v from stack
+            stack.pop()
+            return False
+
+        for i in range(numCourses):
+            if hasCycle(i, []):
+                return False
+
+        return True
+
+    # Build adjacency matrix: prereq: [modules]
+    def buildAdj(self, n, p):
+        graph = [[] for i in range(n)]
+        for a, b in p: # b -> a : take course b first
+            graph[b].append(a)
+        return graph
+
+```
+
+**Method 2: BFS (Kanh's Algorithm)**
+
+```py
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        return self.BFS(numCourses, prerequisites)
+
+
+    def BFS(self, n, p):
+        graph = self.buildAdj(n,p)
+        queue = []
+        topoOrder = []
+
+        # Store number of income edges for each vertex
+        inOrder = [0] * n
+        for a, b in p:
+            inOrder[a] += 1
+
+        # Add vertex with no incoming edges to queue
+        for v in range(n):
+            if inOrder[v] == 0:
+                queue.append(v)
+
+        count = 0
+        topoOrder = []
+        while queue:
+            v = queue.pop(0)
+            topoOrder.append(v)
+            count += 1
+
+            for d in graph[v]:
+                inOrder[d] -= 1
+                if inOrder[d] == 0:
+                    queue.append(d)
+
+        if count == n:
+            return True
+        else:
+            return False
+
+    # Build adjacency matrix: prereq: [modules]
+    def buildAdj(self, n, p):
+        graph = [[] for i in range(n)]
+        for a, b in p: # b -> a : take course b first
+            graph[b].append(a)
+        return graph
+```

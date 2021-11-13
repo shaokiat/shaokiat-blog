@@ -1,0 +1,96 @@
+---
+sidebar_position: 2
+---
+
+# Dynamic Programming(Top Down)
+
+Dynamic programming has been my nemesis for awhile now and it is about time I tackle dynamic programming
+using the same approach for dynamic programming.
+
+### What is Dynamic Programming
+
+Find out all possible solutions, then pick out best solution.
+
+Recursive in nature.
+
+**Principle of Optimality:** A problem can be solved by taking a sequence of decisions to get the optimal solution.
+
+### Top Down Approach
+
+- Memoization
+- Iterative function calls
+- **Identify recurrence relation**
+
+:::tip TIP
+Fantastic [explanation](https://www.youtube.com/watch?v=5dRGRueKU3M) by [Abdul Bari](https://www.youtube.com/channel/UCZCFT11CWBi3MHNlGf019nw)
+on Top Down Approach using Fibonacci example.
+:::
+
+## Example 1: Road Trip
+
+:::note Context
+Below is a question I encountered during one of the technical assessment that _tripped_ me.
+:::
+You are going on a road trip. You are going to get in your trusty car and drive to Panglossia, where
+you will spend a nice vacation by the beach. Your car holds C litre of petrol and gets _m_ km per litre. You are handed a list of the n petrol stations
+are on the road and the price they sell petrol.
+
+Let distance[i] be the distance of the i-th gas station from Start, let cost[i] be the cost of petrol per litre
+at the i-th station. Furthermore, you can assume that for any two stations i and j, the distance |distance[i] - distance[j]|
+between them is divisible by _m_. You start out with an empty tank at station 1. Your final destination is station _n_.
+
+:::important Hint
+Hardest part is identifying the recurrence relation
+:::
+
+### Recurrence Relation
+
+<img src="/img/algo/dp-road-trip.png" alt="roadtrip" width="600" />
+
+```
+for each possible i:
+C(station j, k) = C(station j+1, k - d + i) + cost(station j) * i
+
+C(station j, k): minimum cost to reach destination from station j, with k litre in tank
+k: k litre of fuel
+d: distance from station j to station j+1
+i: amount of fuel topped up
+```
+
+### Approach
+
+You can observe that if you have already solved the problem for all j' > j, then it is not hard
+to compute _C(station j, k)_.
+
+If you start with _k_ litres and it is _d_ km from the next station, then for all _i_,
+lookup the already computed _C(station j+1, k - d + i)_, which tells you the minimum cost for
+arriving at station _j+1_ with _k - d + i_ litres of petrol. Add this cost per litre at station j times _i_,
+and choose the _i_ that is the cheapest.
+
+Work in reverse until you get to the first station, and you will eventually find the cheapest way
+to reach destination.
+
+### Solution
+
+```py
+def minimumCost(distance, n, C, cost, m):
+  dp = [[0 for i in range(C)] for j in range(n)]
+  for j in range(n - 2, -1, -1): # Traverse all stations in reverse
+    for k in range(C): # How much fuel in tank starting from station j
+      d_next = (distance[j+1] - distance[j]) // m
+      min_ = float('inf')
+      for i in range(C-k): # How much fuel topped up
+        if k + i >= d_next:
+          min_ = min(min_, dp[j+1][k - d_next + i] + cost[j] * i)
+      dp[j][k] = min_
+  print(dp)
+  return (dp[0][0])
+
+C = 10 # Capacity of petrol; starts with 0
+n = 3
+cost = [10,1,1]
+d = [0, 20, 100] # distance of ith station from start
+m = 10 # km/litre
+
+minimumCost(d, n, C, cost, m)
+```

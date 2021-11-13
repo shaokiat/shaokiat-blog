@@ -65,7 +65,7 @@ const config = {
           },
           {
             label: "Resume",
-            href: "https://shaokiat.github.io/shaokiat-blog/resume.pdf",
+            href: "https://shaokiat.github.io/shaokiat-blog/pdf/resume.pdf",
             position: "right",
           },
         ],
