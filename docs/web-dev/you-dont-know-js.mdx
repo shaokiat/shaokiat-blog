@@ -1,0 +1,62 @@
+# You-Dont-Know-JS
+
+I am diving deeper into JS and want to share my learning points from the beautifully written book on JS.
+
+:::note Source
+https://github.com/getify/You-Dont-Know-JS
+:::
+
+**JavaScript's Multi-Paradigms**
+
+- Procedural style: Top-down, linear progression through pre-determined set of operations.
+
+- Object Oriented style: Organize code by collecting logic and data together into units called classes.
+- Functional Programming style: Organizes code into functions, and the adaptations of those functions as values.
+
+<br />
+
+### Backwards Compatability
+
+One major JS foundational principle is the preservation of backwards compatibility.
+
+:::important Backward compatibility
+Any code written previously should still be working in today's JS engine.
+
+AKA: _Old code able to run in new engine_.
+:::
+
+:::tip forward compatibility
+Being forward-compatible means that including a new feature to the language in a program will not cause the program to break if
+it was running in an older JS engine.
+
+AKA: _Old engine able to run new code_. <br/>
+Examples: `HTML`, `CSS`
+:::
+
+**Solutions for forward compatibility**
+
+[**Transpiler**](https://scotch.io/tutorials/javascript-transpilers-what-they-are-why-we-need-them): A special software to translate source code of a program from one form to another.
+
+For example, [`Babel`](https://babeljs.io/) converts newer JS syntax version to an equivalent older syntax.
+
+[**Polyfill**](https://javascript.info/polyfills#polyfills): A script that updates and adds new or missing implementations to old JS engines.
+
+<br />
+
+### Each JS File is a Program
+
+**Error Handling**
+
+Since JS Files are treated as programs, failing to process one file would not necessarily prevent the next file from
+being processed.
+
+:::note Note
+Many projects use build process tools that end up combining separate files into a single JS file, allowing
+the file to be treated as a single program. (Does React do this?)
+:::
+
+**How does multiple standalone JS file act as a single program?** <br/>
+By sharing state via the "global scope".
+
+**Module**: A collection of state and publicly exposed methods to operate on that state <br/>
+Importing a module into another allows runtime interoperation between them
