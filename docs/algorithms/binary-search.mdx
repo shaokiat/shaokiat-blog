@@ -4,29 +4,58 @@ sidebar_position: 1
 
 # Binary Search
 
-:::tip TIP 
+:::tip TIP
 
 Inspired by https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/detailedbinarysearch
 
 :::
 
-### Iterative Binary Search
-```py 
+## Iterative Binary Search
+
+This is the common binary search where a sorted array `nums` is given and we are tasked to find `target` in that array. <br/>
+Returns the `index` of the target if it exist in the array, else returns `-1`.
+
+**Time Complexity**: `O(logn)` <br/>
+**Space Complexity**: `O(1)` <br/>
+Time complexity is O(logn) as the search range is halved every iteration until target is found. The iterative approach will
+give a O(1) space complexity.
+
+:::important Binary Search
+Recurrerence Relation: `T(N) = T(N/2) + O(1)`
+:::
+
+```py
 def binarySearch(nums, target):
     left, right = 0, len(nums)-1
-
     while left <= right: # Search interval = [left, right]
         mid = (left + right) // 2
-
-        if nums[mid] == target:
+        if nums[mid] == target: # target found! Return index
             return mid
         elif nums[mid] < target: # recurse right -> [mid+1, right]
             left = mid + 1
         elif nums[mid] > target: # recurse left -> [left, mid-1]
             right = mid - 1
-    
     # Target not found -> return -1
     return -1
 ```
 
-### Find Left Border
+### Search Interval
+
+```py
+while left <= right:...
+```
+
+This gives us a closed interval of `[left, right]` to search from where both the left and right boundaries are included. This
+also means that our initial `right` boundary would have to be `len(arr) - 1`.
+
+**Case 1:** `nums[mid] < target`<br />
+Target lies on the right side of `mid` and we would have to set our search interval
+to `[mid + 1, right]`. To do so, we have to set our left interval to `mid + 1`.
+
+**Case 2:** `nums[mid] > target` <br/>
+Target lies on the left side of `mid` and we would have to set our search interval to `[left, mid - 1]`. To do so,
+we have to set our right interval to `mid - 1`.
+
+The terminating condition for this while loop would be when `left > right`.
+
+## Find Left Border
