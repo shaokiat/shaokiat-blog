@@ -21,19 +21,6 @@ I would want to work at.</p><p>:::tip TIP</p><p>Read the full article here if yo
         </author>
     </entry>
     <entry>
-        <title type="html"><![CDATA[Reading List]]></title>
-        <id>reading-list</id>
-        <link href="https://shaokiat.github.io/shaokiat-blog/blog/reading-list"/>
-        <updated>2021-11-12T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Zen and the Art of Motorcycle Maintenance: An Inquiry Into Values]]></summary>
-        <content type="html"><![CDATA[<p>Zen and the Art of Motorcycle Maintenance: An Inquiry Into Values</p><p><a href="https://github.com/getify/You-Dont-Know-JS">You Dont Know JS</a>
-by getify</p>]]></content>
-        <author>
-            <name>Lim Shao Kiat</name>
-            <uri>https://www.shaokiat.ml</uri>
-        </author>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[Why am I writing this blog?]]></title>
         <id>Welcome</id>
         <link href="https://shaokiat.github.io/shaokiat-blog/blog/Welcome"/>
