@@ -60,3 +60,52 @@ By sharing state via the "global scope".
 
 **Module**: A collection of state and publicly exposed methods to operate on that state <br/>
 Importing a module into another allows runtime interoperation between them
+
+<br />
+
+### Equality in JS
+
+:::tip
+Be sure to check out an excellent blog article by a good friend of mine on this topic of Equality.<br/>
+[**Where is the Equality in JavaScript?**](https://siawsam.wordpress.com/2020/08/16/equality-in-javascript/)
+:::
+
+**Structural Equality** vs **Identity Equality**
+
+For object values, JS define `===` as identity equality instead of structural equality.
+In JS, all object values are held by reference, assigned and passed by reference-copy.
+
+<!-- TODO Elaborate on Values vs Reference -->
+
+:::important Identity Equality
+Identity determines whether two objects share the same memory address. (Comparison of reference to address)
+:::
+
+Structural equality comparison on the other hand, has to be manually configured and is tedious to implement its checks.
+
+:::note Structural equality
+How to determine if two functions are "structurally equivalent"? How to take into consideration scoping and closure?
+:::
+
+<br />
+
+**Coercive Comparison**
+
+:::caution Avoid
+"Loose equality" operator `==`
+:::
+
+Between same value type, `==` behaves the same way as `===`. Prefers numerical comparison.
+
+Consider:
+
+```js
+27 == "27"; // True
+1 == true; // True
+
+"" == 0; //True
+0 == false; //True
+```
+
+In the cases above, the value types are different and the generally non-numerical value types are coverted to numbers before comparison is made. <br/>
+[See also: why](https://stackoverflow.com/questions/7605011/why-is-0-true-in-javascript) `"" == 0` is True.
