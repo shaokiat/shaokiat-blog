@@ -1,0 +1,114 @@
+# LRU Cache
+
+:::tip
+Try out the question on LeetCode <br/>https://leetcode.com/problems/lru-cache/
+:::
+
+## Problem Requirements
+
+Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+
+Implement the `LRUCache` class:
+
+- `LRUCache(int capacity)` Initialize the LRU cache with positive size `capacity`.
+- `int get(int key)` Return the value of the key if the `key` exists, otherwise return `-1`.
+- `void put(int key, int value)` Update the value of the `key` if the `key` exists. Otherwise, add the `key-value` pair to the cache. If the number of keys exceeds the `capacity` from this operation, evict the least recently used key.
+
+The functions get and put must each run in `O(1)` average time complexity.
+
+## Data Stuctures Required
+
+- **`Doubly linked-list`**: For `O(1)` insertion and deletion of nodes
+
+- **`Hashmap`**: For `O(1)` searching of keys of node
+
+- `left` and `right` node to indicate LRU and MRU
+
+## Solution
+
+### `Node` class:
+
+A Node class which stores the key-value pair, previous and next node in the linked list.
+This forms the doubly linked-list.
+
+```py
+class Node:
+    def __init__(self, key, val):
+        self.key = key
+        self.val = val
+        self.prev = self.next = None
+```
+
+### Initialization of `LRUCache`
+
+Initialization of the hashmap `cache` which stores `(key, node)`.
+
+`self.left` to indicate Least Recently Used node.
+`self.right` to indicate Most Recetnly Used node.
+
+```
+[ ] <-> [node 1] <-...->[node n] <-> [ ]
+ ^         ^               ^          ^
+ |         |               |          |
+left      LRU             MRU       right
+```
+
+```py
+class LRUCache:
+    def __init__(self, capacity):
+        self.cap = capacity
+        self.cache = {} # hashmap, maps key to node
+
+        # Left=LRU, right=MRU
+        self.left, self.right = Node(0,0), Node(0,0)
+        self.left.next, self.right.prev = self.right, self.left
+```
+
+### Helper functions
+
+In order to move a node to the Most Recently Used, we need this pair of function `remove` and `insert`. This pair of functions will
+be used in `get` and `put` later on.
+
+```py
+# Remove node from list
+def remove(self, node):
+    prev, nxt = node.prev, node.next
+    prev.next, nxt.prev = nxt, prev
+
+
+# Insert node to right (MRU)
+def insert(self, node):
+    prev, nxt = self.right.prev, self.right
+    prev.next = nxt.prev = node
+    node.prev, node.next = prev, nxt
+```
+
+### `get` and `put`
+
+```py
+def get(self, key):
+    if key in self.cache:
+        node = self.cache[key]
+        self.remove(node)
+        self.insert(node)
+        return node.val
+    # Not found
+    else:
+        return -1
+
+def put(self, key, value):
+    # Remove node from list
+    if key in self.cache:
+        self.remove(self.cache[key])
+
+    # Insert new node to list
+    self.cache[key] = Node(key, value)
+    self.insert(self.cache[key])
+
+    # Capacity exceed -> remove LRU
+    if len(self.cache) > self.cap:
+        lru = self.left.next
+        self.remove(lru)
+        # Delete key from cache
+        del self.cache[lru.key]
+```
