@@ -59,11 +59,6 @@ const config = {
           },
           { to: "/blog", label: "Blog", position: "left" },
           {
-            to: "/projects",
-            label: "Projects",
-            position: "right",
-          },
-          {
             label: "Resume",
             href: "https://shaokiat.github.io/shaokiat-blog/pdf/resume.pdf",
             position: "right",
