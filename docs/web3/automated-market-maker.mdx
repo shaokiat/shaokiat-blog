@@ -1,0 +1,104 @@
+# Automated Market Maker (AMM)
+
+https://academy.binance.com/en/articles/what-is-an-automated-market-maker-amm
+
+## First of all, What is a [Market Maker](https://www.investopedia.com/terms/m/marketmaker.asp#:~:text=The%20term%20market%20maker%20refers,in%20the%20bid%2Dask%20spread.)?
+
+:::tip market maker
+The term market maker refers to a firm (often centralized) or individual who actively quotes two-sided markets
+in a particular asset, providing bids and asks along with the market size of each. Market makers provide liquidity and depth
+to markets and profit from the difference in the bid-ask spread.
+:::
+
+<div align="center">
+  <img
+    src="/shaokiat-blog/img/web/marketmaker.jpg"
+    alt="evolution"
+    width="700"
+  />
+</div>
+<div align="center" width="700" textAlign="left" style={{}}>
+  Source:
+  <a href="https://blog.aax.com/en/2019/04/25/market-makers/"> AAX</a>
+</div>
+
+If you have experience in trading securities, you would have encountered the bids and asks as shown by your brokerage firms,
+which are often the market makers as well. Once the market maker receives an order from a buyer, they immediately sell off their
+position of shares from their own inventory, completing the order.
+
+Market making facilitates a smoother flow of financial markets by making it easier
+for investors and traders to buy and sell. These market makers are an essential part of the stock market as
+they keep the financial markets liquid.
+
+For further details on market makers, head over to [Investopedia](https://www.investopedia.com/terms/m/marketmaker.asp#:~:text=The%20term%20market%20maker%20refers,in%20the%20bid%2Dask%20spread.).
+
+## So what is an [Automated Market Maker](https://academy.binance.com/en/articles/what-is-an-automated-market-maker-amm) (AMM)?
+
+I am sure many of us is wondering, how is the price of a cryptocurrency on a [Decentralized Finance](<https://www.investopedia.com/decentralized-finance-defi-5113835#:~:text=Decentralized%20finance%20(DeFi)%20is%20an,to%20those%20used%20by%20cryptocurrencies.&text=It%20eliminates%20the%20fees%20that,keeping%20it%20in%20a%20bank.>)
+(DeFi) determined without the help of a centralized exchange that serves as its market maker?
+
+The answer to this question is the adoption of **Automated Market Makers**.
+
+<!-- not only does it allow trading of cryptocurrencies, but also
+the ability to provide liquidity to a [liquidity pool](#liquidity-pool-and-liquidity-provider-lp). This essentially allows anyone to become a market maker on an exchange and earn
+fees for providing liquidity. -->
+
+:::tip automated market maker
+An automated market maker (AMM) is a type of [decentralized exchange](https://en.wikipedia.org/wiki/Decentralized_exchange) (DEX) protocol that relies on a mathematical formula to price assets.
+Instead of using an order book like a traditional exchange, assets are priced according to a [**pricing algorithm**](#pricing-algorithm-in-amm).
+:::
+
+### How does Automated Market Maker work?
+
+An AMM work similarly to an order book exchange in that there are trading pairs. However, the difference is that there is no need
+for a counterparty on the other side to complete a trade. Instead, traders interact with the AMM which is a smart contract that acts
+as the market maker. Binance Academy refers to this as [_peer-to-contract (P2C)_](https://academy.binance.com/en/articles/what-is-an-automated-market-maker-amm).
+
+### Liquidity Pool and Liquidity Provider (LP)
+
+#### What is a liquidity pool?
+
+Liquidity pools represent different trading pairs, for example, ETH/BNB. AMM uses these liquidity pools to facilitate trading. As mentioned previously,
+trading on the Decentralized Exchange (DEX) is basically making a trade with the smart contract which holds these liquidity pools.
+
+#### Who are the liquidity providers (LP)?
+
+Liquidity providers (LP) provide funds to liquidity pools, in exchange for fees from the trades that happen in the pools. This serves
+as an incentive for more liquidity providers, which will in turn reduce the price impact and [slippage](#slippage), a key criteria for the AMM.
+
+### Pricing algorithm in AMM
+
+I will be using the most popular DEX protocol as of date, [Uniswap](https://uniswap.org/) as an example.
+See also: [UniswapV2 Pricing](https://docs.uniswap.org/protocol/V2/concepts/advanced-topics/pricing).
+
+<div align="center">
+  <img
+    src="/shaokiat-blog/img/web/pricing-algo.png"
+    alt="pricing-algo"
+    width="600"
+  />
+</div>
+<div align="center" width="700" textAlign="left" style={{}}>
+  Source:
+  <a href="https://doc.openswap.xyz/support-and-faq/swapping-guide">
+    {" "}
+    OpenSwap
+  </a>
+</div>
+
+The AMM allows anyone to deposit or withdraw tokens from them, but only according to very specific rules set in the smart contract.
+One such rule is the [**constant product formula**](https://docs.uniswap.org/protocol/V2/concepts/advanced-topics/pricing): `x * y = const`,
+where x and y are the reserves of two tokens in the liquidity pool.
+
+:::important trade
+In order to withdraw some amount ot token X, one must deposit a proportional amount of token Y to maintain the constant `k`.
+The price is determined by the ratio between these two tokens.
+:::
+
+#### Slippage
+
+To be continued...
+
+### Impermanent Loss
+
+To be continued...
