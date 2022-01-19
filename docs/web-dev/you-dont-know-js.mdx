@@ -92,7 +92,9 @@ How to determine if two functions are "structurally equivalent"? How to take int
 **Coercive Comparison**
 
 :::caution Avoid
-"Loose equality" operator `==`
+Avoid using "Loose equality" operator `==`.
+
+Always use `===` for equality comparison.
 :::
 
 Between same value type, `==` behaves the same way as `===`. Prefers numerical comparison.
@@ -107,5 +109,8 @@ Consider:
 0 == false; //True
 ```
 
-In the cases above, the value types are different and the generally non-numerical value types are coverted to numbers before comparison is made. <br/>
-[See also: why](https://stackoverflow.com/questions/7605011/why-is-0-true-in-javascript) `"" == 0` is True.
+In the cases above, the value types are different and the generally non-numerical value types are **coverted to numbers** before comparison is made.
+
+[See also: ](https://stackoverflow.com/questions/7605011/why-is-0-true-in-javascript) why `"" == 0` is True.
+
+### Classes vs Modules

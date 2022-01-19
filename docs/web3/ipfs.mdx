@@ -1,0 +1,75 @@
+# InterPlanetary File System (IPFS)
+
+:::tip official website
+Check out [**IPFS Official Website**](https://ipfs.io/)!
+
+[**IPFS Complete Guide by Simple as Water**](https://simpleaswater.com/ipfs/)
+:::
+
+## What is this all about?
+
+The main reason why I am looking into IPFS is because of the rise of [NFTs](https://www.theverge.com/22310188/nft-explainer-what-is-blockchain-crypto-art-faq).
+As you all know it, an image of your favorite pasttime meme can now be [sold](https://mashable.com/article/classic-memes-sold-nft-prices) for thousands if not millions of dollars.
+And due to the decentralized nature of blockchain which NFTs operate on, I was wondering how are the images and videos being hosted and distributed?
+
+Turns out many NFTs are turning to InterPlanetary File System, a peer-to-peer hypermedia protocol that powers the Distributed Web.
+
+## Shared Responsibility
+
+### Traditional Hosting
+
+Traditional hosting of hypermedia is by a single domain owner, where they have to keep servers running to ensure that the files remain online.
+For example, [Instagram](https://www.instagram.com/) stores all your images and instagram stories onto their servers and have the sole responsibility to keep them running.
+This also mean that they have the power to take down and remove your files and images from the web at any point in time.
+
+:::caution Server(e) Outage 🤭
+Many services rely heavily on Amazon Web Service data center to keep their servers running. On 22nd December 2021, AWS faced its [third outage](https://www.datacenterdynamics.com/en/news/aws-has-another-east-coast-cloud-outage/)
+of the month which impacted many major services with huge user base such as Coinbase and Fortnite.
+:::
+
+### Distributed Hosting on IPFS
+
+IPFS utilizes distributed peer-to-peer (P2P) network to host hypermedia, resulting in a multitude of hosts instead of a single domain owner.
+As long as someone on the IPFS network is hosting the file, it will be available to the rest of the network.
+This is similar to the P2P Torrent concept that some of us are familiar with.
+
+#### The Test of Time
+
+IPFS claims that this method of storing files can stand the test of time, while files on centralized network may only last as long as the hosting company.
+This is with the assumption that the IPFS is universally adopted with every piece of file hosted by at least someone.
+
+## Locating a File
+
+### Location Based Addressing
+
+URLs (Uniform Resource Locators) as the name implies, are the address to look for data on the centralized web. URLs are based
+on the location where the data is stored, and this is called [**Location Addressing**](https://simpleaswater.com/location-addressing/).
+
+Let's say we are accessing data using the url, `https://www.kitty.com/kittens.jpg`. We would first access the domain name, `kitty.com`,
+before referencing to the location where data we are looking for, `kittens.jpg` is stored. In this case, `kitten.jpg` does not have to be
+an image of kittens and could even be an image of babies. This shows that there is no relationship between the image and the location where
+it is stored, thus location-based addressing.
+
+:::note
+This makes it easy to store duplicated files and images as each host can store the same files under different addresses - leading to a lot of **redundancy**.
+:::
+
+### Content Based Addressing
+
+[**Content addressing**](https://simpleaswater.com/ipfs-cids/) on the other hand, is a way to find data in a network using its content instead of
+its location. This is done by taking the content of a file and hashing it, producing its **Content Identifier (CID)**.
+The `CID` can then be used to access files and data on the IPFS network that matches the hash.
+
+Benefits of Content Addressing:
+
+- Censorship resistant
+- Reduced load time
+- Lesser redundancy
+
+<!-- Immutable datastorage
+Versioning
+
+Limitations:
+No seeders to distribute files
+
+Application: -->
