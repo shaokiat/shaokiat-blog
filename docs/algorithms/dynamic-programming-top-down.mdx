@@ -13,9 +13,11 @@ Recursive in nature.
 
 ### Top Down Approach
 
-- Memoization
-- Iterative function calls
-- **Identify recurrence relation**
+1. Identify **recurrence relation**
+2. Recursive solution (top-down)
+3. Recursive + Memoization (top-down)
+4. Iterative + Memoization (bottom-up)
+5. Iterative + N variables (bottom-up)
 
 :::tip TIP
 Fantastic [explanation](https://www.youtube.com/watch?v=5dRGRueKU3M) by [Abdul Bari](https://www.youtube.com/channel/UCZCFT11CWBi3MHNlGf019nw)
@@ -25,7 +27,7 @@ on Top Down Approach using Fibonacci example.
 ## Example 1: Road Trip
 
 :::note Context
-Below is a question I encountered during one of the technical assessment that _tripped_ me.
+Below is a question I had encountered during one of the technical assessment that _tripped_ me.
 :::
 You are going on a road trip. You are going to get in your trusty car and drive to Panglossia, where
 you will spend a nice vacation by the beach. Your car holds C litre of petrol and gets _m_ km per litre. You are handed a list of the n petrol stations
@@ -41,20 +43,22 @@ Hardest part is identifying the recurrence relation
 
 ### Recurrence Relation
 
-<img
-  src="/shaokiat-blog/img/algo/dp-road-trip.png"
-  alt="roadtrip"
-  width="600"
-/>
+<div style={{ textAlign: "center" }}>
+  <img
+    src="/shaokiat-blog/img/algo/dp-road-trip.png"
+    alt="roadtrip"
+    width="600"
+  />
+</div>
 
 ```
-for each possible i:
-C(station j, k) = C(station j+1, k - d + i) + cost(station j) * i
+for each possible i: C(station j, k) = C(station j+1, k - d + i) + cost(station j) * i
 
 C(station j, k): minimum cost to reach destination from station j, with k litre in tank
 k: k litre of fuel
 d: distance from station j to station j+1
 i: amount of fuel topped up
+
 ```
 
 ### Approach
@@ -94,3 +98,42 @@ m = 10 # km/litre
 
 minimumCost(d, n, C, cost, m)
 ```
+
+## Example 2: [House Robber](https://leetcode.com/problems/house-robber/)
+
+### Recurrence Relation
+
+Robber has 2 options: (Knap-sack problems)
+
+- Rob current house
+- Don't rob current house
+
+Robber has to maximize profits using these 2 scenarios:
+
+- Rob current house + loot from houses before the previous
+- Loot from the previous house and those before that
+
+```
+rob(i) = max(rob(i - 2) + i, rob(i - 1))
+```
+
+### Solution
+
+Let `rob1 = i - 2` and `rob2 = i - 1`.
+
+```py
+# [rob1, rob2, i, i+1, ...]
+
+def rob(nums):
+  rob1 = rob2 = 0
+  for i in nums:
+    temp = max(rob1 + i, rob2)
+    # Shift rob variable forward
+    rob1 = rob2
+    rob2 = temp
+  return rob2
+```
+
+**Space Complexity**: `O(1)` as there are always only 2 variables (rob1, rob2) used.
+
+**Time Complexity**: `O(n)` as there is only one loop through the nums array.
