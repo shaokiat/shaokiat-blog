@@ -32,8 +32,8 @@ For further details on market makers, head over to [Investopedia](https://www.in
 
 ## So what is an [Automated Market Maker](https://academy.binance.com/en/articles/what-is-an-automated-market-maker-amm) (AMM)?
 
-I am sure many of us is wondering, how is the price of a cryptocurrency on a [Decentralized Finance](<https://www.investopedia.com/decentralized-finance-defi-5113835#:~:text=Decentralized%20finance%20(DeFi)%20is%20an,to%20those%20used%20by%20cryptocurrencies.&text=It%20eliminates%20the%20fees%20that,keeping%20it%20in%20a%20bank.>)
-(DeFi) determined without the help of a centralized exchange that serves as its market maker?
+I am sure many of us are wondering, how is the price of a cryptocurrency on a [Decentralized Finance](<https://www.investopedia.com/decentralized-finance-defi-5113835#:~:text=Decentralized%20finance%20(DeFi)%20is%20an,to%20those%20used%20by%20cryptocurrencies.&text=It%20eliminates%20the%20fees%20that,keeping%20it%20in%20a%20bank.>)
+(DeFi) determined, without the help of a centralized exchange that serves as its market maker?
 
 The answer to this question is the adoption of **Automated Market Makers**.
 
@@ -89,14 +89,34 @@ One such rule is the [**constant product formula**](https://docs.uniswap.org/pro
 where x and y are the reserves of two tokens in the liquidity pool.
 
 :::important trade
-In order to withdraw some amount ot token X, one must deposit a proportional amount of token Y to maintain the constant `k`.
+In order to withdraw some amount of token X, one must deposit (buy with) a proportional amount of token Y to maintain the constant `k`.
 The price is determined by the ratio between these two tokens.
 :::
 
 #### Slippage
 
-To be continued...
+As mentioned earlier, pricing is determined by an algorithm, which also means that it is determined by how much the ratio between the
+tokens in the liquidity pool changes after a trade. If the ratio changes by a large amount, there is going to be a large amount of slippage.
 
-### Impermanent Loss
+Tokens in liquidity pool with low liquidity is likely to suffer from **high slippage**, as the ratio is easily affected by the trades.
+On the other hand, tokens in liquidity pool with high liquidity is likely to have **low slippage**, which is desirable for traders and investors
+as they can more accurately determine their trade price.
 
-To be continued...
+### [Impermanent Loss](https://academy.binance.com/en/articles/impermanent-loss-explained)
+
+:::caution pitfall of liquidity provider (LP)
+Impermanent loss is a misleading term which can be very **costly** for liquidity providers (LPs) and LPs will need to keep this concept
+dear to them. It is called impermanent loss as the losses only became realized once you withdraw your tokens from the liquidity pools, much like unrealized loss.
+:::
+
+Impermanent loss happens when you provide liquidity to a liquidity pool, and the price of your deposited tokens _changes_ compared to when you
+deposited them. The _bigger_ the change, the _bigger_ the impermanent loss.
+
+For example, if you provided 10% liquidity to a liquidity pool and the ratio of token X and Y is `1:10`, when the ratio of token X and Y changes to let's
+say `1:5`, you will receive the same 10% liquidity of the liquidity pool at the ratio `1:5` when you withdraw your liquidity.
+
+This can lead to scenarios where it is better off to _HODL_ the tokens instead of staking them in the liquidity pools.
+
+:::tip
+Binance Academy has a [**wonderful illustration**](https://academy.binance.com/en/articles/impermanent-loss-explained) of this impermanent loss.
+:::
