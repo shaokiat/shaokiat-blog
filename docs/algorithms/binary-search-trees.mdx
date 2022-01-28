@@ -1,0 +1,52 @@
+# Binary Search Trees (BST)
+
+https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/
+
+:::note questions
+[Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/submissions/)
+
+:::
+
+<div align="center">
+  <img src="/shaokiat-blog/img/algo/bst.png" alt="bst" width="600" />
+</div>
+
+<div align="center" width="700" textAlign="left" style={{}}>
+  Source:
+  <a href="https://medium.com/@konduruharish/binary-search-tree-in-typescript-and-c-25fa5107cc5d">
+    Medium
+  </a>
+</div>
+
+### In-order Traversal
+
+Returns a sorted list.
+
+```
+Algorithm for In-order:
+    1. Traverse left subtree -> call Inorder(node.left)
+    2. Visit node
+    3. Traverse right subtree -> call Inorder(node.right)
+```
+
+### Pre-order Traversal
+
+Used to create a copy of the tree.
+
+```
+Algorithm for Pre-order:
+    1. Visit node
+    2. Traverse left subtree -> call Preorder(node.left)
+    3. Traverse right subtree -> call Preorder(node.right)
+```
+
+### Post-order Traversal
+
+Used to delete a tree.
+
+```
+Algorithm for Post-order:
+    1. Traverse left subtree -> call Postorder(node.left)
+    2. Traverse right subtree -> call Postorder(node.right)
+    3. Visit node
+```
