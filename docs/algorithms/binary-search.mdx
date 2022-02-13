@@ -55,3 +55,48 @@ we have to set our right interval to `mid - 1`.
 The terminating condition for this while loop would be when `left > right`.
 
 ## Find Left Border
+
+```py
+def bsLeftBorder(nums, target):
+    if not nums:
+        return -1
+    left = 0
+    right = len(nums)
+    while left < right: # [left, right)
+        mid = (left + right) // 2
+        if nums[mid] == target: # [left, mid)
+            right = mid
+        elif nums[mid] < target: # [mid + 1, right)
+            left = mid + 1
+        elif nums[mid] > target: # [left, mid)
+            right = mid
+
+    print(left) # left => number of elements smaller than target
+
+    # If we want to return -1 when target not found
+    if left >= len(nums) or nums[left] != target:
+        return -1
+    return left # returns index of left border
+```
+
+## Find Right Border
+
+```py
+def bsRightBorder(nums, target):
+    if not nums:
+        return -1
+    left = 0
+    right = len(nums)
+    while left < right: # [left, right), terminating condition: left == right
+        mid = (left + right) // 2
+        if nums[mid] == target: # [mid + 1, right)
+            left = mid + 1
+        elif nums[mid] < target: # [mid + 1, right)
+            left = mid + 1
+        elif nums[mid] > target: # [left, mid)
+            right = mid
+    # nums[left-1] may be the target
+    if left == 0 or nums[left-1] != target:
+        return -1
+    return left - 1
+```
