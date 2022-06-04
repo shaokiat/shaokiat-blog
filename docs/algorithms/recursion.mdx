@@ -88,3 +88,23 @@ def backtrack(self, nums, track, res):
         self.backtrack(nums, track, res)
         track.pop()
 ```
+
+### [Subsets II](https://leetcode.com/problems/subsets-ii/)
+
+#### Solution: Backtracking
+
+```py
+def subsetsWithDup(nums):
+    res = []
+    nums.sort() # Sort to get power of set
+    self.backtrack(nums)
+
+def backtrack(nums, start, track, res):
+    res.append(track)
+    for i in range(start, len(nums)):
+        if i > start and nums[i] == nums[i-1]: # IMPT: Skips over duplicate subsets
+            continue
+        track.append(nums[i])
+        self.backtrack(nums, i + 1, track, res)
+        track.pop()
+```
