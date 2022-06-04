@@ -1,0 +1,90 @@
+# Recursion and Backtracking
+
+:::note Common Questions
+[Subsets](https://leetcode.com/problems/subsets/) <br/>
+[Combinations](https://leetcode.com/problems/combinations/) <br/>
+[Permutation](https://leetcode.com/problems/permutations/) <br/>
+[N Queen Problem](https://leetcode.com/problems/n-queens/) <br/>
+:::
+
+Backtracking Template from [labuladong](https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/subset_permutation_combination)
+
+```py
+def backtrack(nums, start, track):
+    # End condition
+    if (end condition):
+        result.add(track)
+        return
+    for i in nums[start:]:
+        track.append(i)
+        backtrack(nums, i+1, track)
+        track.pop()
+```
+
+Time Complexity: `O(N!)`.
+
+Space Complexity: `O(n)`.
+
+:::tip
+For more details on time and space complexity, read this post: https://stackoverflow.com/questions/65526515/how-to-identify-time-and-space-complexity-of-recursive-backtracking-algorithms-w
+:::
+
+## Example Solutions
+
+### [Combinations](https://leetcode.com/problems/combinations/)
+
+#### Solution: Backtracking
+
+<div style={{ textAlign: "center" }}>
+  <img
+    src="/shaokiat-blog/img/algo/combinations.png"
+    alt="combinations"
+    width="700"
+  />
+</div>
+
+```py
+def combine(self, n, k):
+    res = []
+    self.backtrack(n, k, 1, res)
+    return res
+
+def backtrack(self, n, k, start, track, res):
+    if len(track) == k:
+        res.append(track)
+        return
+    for i in range(start, n+1): # Order matters, increasing
+        track.append(i)
+        self.backtrack(n, k, i + 1, track, res)
+        track.pop()
+```
+
+### [Permutations](https://leetcode.com/problems/permutations/)
+
+#### Solution: Backtracking
+
+<div style={{ textAlign: "center" }}>
+  <img
+    src="/shaokiat-blog/img/algo/permutations.png"
+    alt="permutations"
+    width="700"
+  />
+</div>
+
+```py
+def permute(self, nums):
+    res = []
+    self.backtrack(nums, [], res)
+    return res
+
+def backtrack(self, nums, track, res):
+    if len(track) == len(nums):
+        res.append(track)
+        return
+    for i in nums: # Order does not matter so we loop through entire array
+        if i in track: # Exclude numbers already in track
+            continue
+        track.append(i)
+        self.backtrack(nums, track, res)
+        track.pop()
+```
