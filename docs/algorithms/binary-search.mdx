@@ -100,3 +100,37 @@ def bsRightBorder(nums, target):
         return -1
     return left - 1
 ```
+
+### [Search In Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+
+:::important good question
+This leetcode question will test your true understanding of binary search.
+:::
+
+#### Solution:
+
+```py
+def search(self, nums):
+    l = 0
+    r = len(nums)
+    while l < r: # [l, r), terminating condition: l == r
+        mid = (l + r) // 2
+        if nums[mid] == target:
+            return mid
+        # target and mid on same side
+        if (nums[mid] < nums[0]) == (target < nums[0]):
+            # perform binary search
+            if nums[mid] < target: # [mid + 1, r)
+                l = mid + 1
+            elif nums[mid] > target: # [l, mid)
+                r = mid
+        # target on right side, search right
+        elif (target < nums[0]): # [mid + 1, r)
+            l = mid + 1
+        # target on left side, search left
+        else: # [l, mid)
+            r = mid
+    # Not found
+    return -1
+
+```
