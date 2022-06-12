@@ -42,27 +42,27 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({    
-      // algolia: {
-      //   // The application ID provided by Algolia
-      //   appId: 'R2IYF7ETH7',
+      algolia: {
+        // The application ID provided by Algolia
+        appId: 'YRKN607I5H',
 
-      //   // Public API key: it is safe to commit it
-      //   apiKey: '599cec31baffa4868cae4e79f180729b',
+        // Public API key: it is safe to commit it
+        apiKey: 'bdb6aa62b2026122db267ff4d72a786c',
 
-      //   indexName: 'docsearch',
+        indexName: 'shaokiat_blog',
 
-      //   // Optional: see doc section below
-      //   contextualSearch: true,
+        // Optional: see doc section below
+        // contextualSearch: true,
 
-      //   // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-      //   externalUrlRegex: 'external\\.com|domain\\.com',
+        // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+        externalUrlRegex: 'external\\.com|domain\\.com',
 
-      //   // Optional: Algolia search parameters
-      //   searchParameters: {},
+        // Optional: Algolia search parameters
+        searchParameters: {},
 
-      //   // Optional: path for search page that enabled by default (`false` to disable it)
-      //   searchPagePath: 'search',
-      // },
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        searchPagePath: 'search',
+      },
       metadata: [{name: 'shao kiat', content: 'shao kiat, blog'}],
       colorMode: {
         defaultMode: "dark",
