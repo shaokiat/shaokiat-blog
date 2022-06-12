@@ -62,6 +62,9 @@ const config = {
 
         // Optional: path for search page that enabled by default (`false` to disable it)
         searchPagePath: 'search',
+
+        // Run this command to crawl page and update algolia
+        // docker run -it --env-file=.env -e "CONFIG=$(cat /Users/shaokiat/Desktop/shaokiat-blog/config.json | jq -r tostring)" algolia/docsearch-scraper
       },
       metadata: [{name: 'shao kiat', content: 'shao kiat, blog'}],
       colorMode: {
