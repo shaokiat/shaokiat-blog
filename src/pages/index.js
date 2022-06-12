@@ -31,17 +31,17 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
+      title={`${siteConfig.title}`}
+      description="Technical blog for algorithms and computer science concepts"
     >
       <Head>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-VS62WFN2SY"></script>
+      {/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-VS62WFN2SY"></script>
       <script>
         {`window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-VS62WFN2SY');`}
-      </script>
+      </script> */}
       </Head>
       <HomepageHeader />
       <main>
