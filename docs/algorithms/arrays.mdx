@@ -8,6 +8,18 @@
 [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
 :::
 
+## Time Complexity
+
+| Operation             | Big-O     | Note                                                                                                 |
+| --------------------- | --------- | ---------------------------------------------------------------------------------------------------- |
+| Access                | O(1)      |                                                                                                      |
+| Search                | O(n)      |                                                                                                      |
+| Search (sorted array) | O(log(n)) | Binary Search                                                                                        |
+| Insert                | O(n)      | Insertion would require shifting all the subsequent elements to the right by one and that takes O(n) |
+| Insert (at the end)   | O(1)      | Special case of insertion where no other element needs to be shifted                                 |
+| Remove                | O(n)      | Removal would require shifting all the subsequent elements to the left by one and that takes O(n)    |
+| Remove (at the end)   | O(1)      | Special case of removal where no other element needs to be shifted                                   |
+
 ## Common Approaches to Arrays and Subarrays Questions
 
 ### Prefix Sum
