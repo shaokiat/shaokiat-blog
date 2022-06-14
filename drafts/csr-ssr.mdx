@@ -1,0 +1,45 @@
+# NextJS Client-side vs Server-side
+
+:::tip
+https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation
+:::
+
+## Server-side rendering
+
+These 3 methods will only be running on the server-side. Allowing us to fetch data directly in pages instead of from the `api` folder.
+The code will not be sent to the client-side.
+
+`getStaticProps`(Satic Generation): Fetch data at build time.
+
+`getStaticPaths`(Static Generation): Specify dynamic routes to pre-render based on data.
+
+`getServerSideProps`(Server-side rendering): Fetch data on each request.
+
+### `getStaticProps`(Satic Generation)
+
+Make database call upon building. Get data and render it once and make information `static`.
+No continuous call to backend database. Refreshing page does not fetch data from database.
+
+When to use:
+
+-
+
+`unstable_revalidate: [seconds]`: re-fetch data every `seconds` and update data.
+
+### `getStaticPaths`(Static Generation)
+
+Tells NextJS which **dynamic routes** to pre-load and pre-create pages for.
+
+`fallback: [boolean]`: In the background, Next.js will statically generate the requested path HTML and JSON. This includes running `getStaticProps`.
+
+### `getServerSideProps`(Server-side rendering)
+
+When to use:
+
+- Every refresh of the page will call `getServerSideProps`.
+- To be used on pages that require data to be fetched before rendering.
+
+When not to use:
+
+- Pages that does not require call to database.
+- Data that does not change often.
