@@ -12,9 +12,9 @@ const config = {
   baseUrl: "/shaokiat-blog/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
-  organizationName: "shaokiat", // Usually your GitHub org/user name.
-  projectName: "shaokiat-blog", // Usually your repo name.
+  favicon: "img/moon.ico",
+  organizationName: "shaokiat",
+  projectName: "shaokiat-blog",
 
   presets: [
     [
@@ -73,7 +73,7 @@ const config = {
       navbar: {
         title: "Shao Kiat",
         logo: {
-          alt: "My Site Logo",
+          alt: "Shao Kiat blog logo",
           src: "img/moon.png",
         },
         items: [
@@ -84,10 +84,16 @@ const config = {
             label: "Docs",
           },
           { to: "/blog", label: "Blog", position: "left" },
+          // {
+          //   label: "Resume",
+          //   href: "https://shaokiat.github.io/shaokiat-blog/pdf/resume.pdf",
+          //   position: "right",
+          // },
           {
-            label: "Resume",
-            href: "https://shaokiat.github.io/shaokiat-blog/pdf/resume.pdf",
-            position: "right",
+            href: 'https://github.com/shaokiat',
+            position: 'right',
+            className: 'header-github-link',
+            'aria-label': 'GitHub repository',
           },
         ],
       },
