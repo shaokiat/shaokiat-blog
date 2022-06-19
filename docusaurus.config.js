@@ -7,7 +7,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/nightOwl");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Shao Kiat's Blog",
-  tagline: "A leetcode a day keeps unemployment away - Unknown",
+  tagline: "A leetcode a day keeps unemployment away",
   url: "https://shaokiat.github.io",
   baseUrl: "/shaokiat-blog/",
   onBrokenLinks: "throw",

@@ -1,0 +1,87 @@
+# Linked List
+
+A linear collection of data elements whose order is not given by their physical placement in memory. Memory storage does not have to be
+contiguous as each element contains an address to the next element.
+
+:::note Common Questions
+[Reverse Linked list](https://leetcode.com/problems/reverse-linked-list/) <br/>
+[Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/) <br/>
+[Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/) <br/>
+:::
+
+## Time Complexity
+
+| Operation | Big-O | Note                                      |
+| --------- | ----- | ----------------------------------------- |
+| Access    | O(n)  | Must traverse from start                  |
+| Search    | O(n)  |                                           |
+| Insert    | O(1)  | Assuming you are at the node of insertion |
+| Remove    | O(1)  | Assuming you are at the node of deletion  |
+
+## Common Approaches to Linked List Questions
+
+- Counting number of nodes in the linked list O(n)
+- Reversing a linked list in-place
+- Merging two linked lists together
+- Finding the middle node of the linked list using two pointers
+
+### Corner cases
+
+- Empty linked list
+- Cycles in linked list
+
+## Example Solutions
+
+### [Reverse Linked list](https://leetcode.com/problems/reverse-linked-list/)
+
+#### Solution 1: Recursive Approach
+
+```py
+# linkedList = [1, 2, 3, 4, 5]
+
+def reverseList(self, head):
+    # Base case: if 0 or 1 element return that element
+    if not head or not head.next:
+        return head
+    last = self.reverseList(head.next) # [5, 4, 3, 2]
+    head.next.next = head # [2] -> [1]
+    head.next = None # [1] -> None
+    return last # [5, 4, 3, 2, 1]
+```
+
+Time Complexity: `O(n)` for looping through the linked list.
+
+Space Complexity: `O(n)` for recursive stack of size `n`.
+
+<br />
+
+#### Solution 2: Iterative Approach <mark>(Prefered Solution)</mark>
+
+```py
+def reverseList(self, head):
+    prev = None
+    while head:
+        curr = head # curr = [1]
+        head = head.next # head = [2]
+        curr.next = prev # [1](curr) -> None(prev)
+        prev = curr # prev = [1]
+    return prev
+```
+
+Time Complexity: `O(n)` for looping through the linked list.
+
+Space Complexity: `O(1)` for constant variables.
+
+<br />
+
+<!-- ### [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
+
+#### Solution 1: Sliding Window
+
+```py
+def maxArea(self, height):
+```
+
+Time Complexity: `O(n)` for looping through the `height` array.
+
+Space Complexity: `O(1)` for 3 variables `max_area` and `left` and `right`. -->
