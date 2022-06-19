@@ -4,7 +4,7 @@
   <ShortName>Shao Kiat&#39;s Blog</ShortName>
   <Description>Search Shao Kiat&#39;s Blog</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/x-icon">https://shaokiat.github.io/shaokiat-blog/img/favicon.ico</Image>
+  <Image width="16" height="16" type="image/x-icon">https://shaokiat.github.io/shaokiat-blog/img/moon.ico</Image>
   <Url type="text/html" method="get" template="https://shaokiat.github.io/shaokiat-blog/search?q={searchTerms}"/>
   <Url type="application/opensearchdescription+xml" rel="self" template="https://shaokiat.github.io/shaokiat-blog/opensearch.xml" />
   <moz:SearchForm>https://shaokiat.github.io/shaokiat-blog/</moz:SearchForm>
