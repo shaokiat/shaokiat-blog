@@ -70,7 +70,13 @@ const config = {
       colorMode: {
         defaultMode: "dark",
       },
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
+      },
       navbar: {
+        hideOnScroll: true,
         title: "Shao Kiat",
         logo: {
           alt: "Shao Kiat blog logo",
