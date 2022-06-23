@@ -3,7 +3,7 @@
 A linear collection of data elements whose order is not given by their physical placement in memory. Memory storage does not have to be
 contiguous as each element contains an address to the next element.
 
-:::note Common Questions
+:::tip Common Questions
 [Reverse Linked list](https://leetcode.com/problems/reverse-linked-list/) <br/>
 [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/) <br/>
 [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/) <br/>
@@ -74,14 +74,32 @@ Space Complexity: `O(1)` for constant variables.
 
 <br />
 
-<!-- ### [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
+### [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
 
-#### Solution 1: Sliding Window
+#### Solution: Two Pointers
 
 ```py
-def maxArea(self, height):
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+def hasCycle(self, head):
+    fast = slow = head
+    while fast and fast.next: # only need to check fast pointer as it is in front of slow pointer
+        fast = fast.next.next
+        slow = slow.next
+        if fast == slow:
+            return True
+    return False
 ```
 
-Time Complexity: `O(n)` for looping through the `height` array.
+Time Complexity: `O(n)`. [_See here_](https://leetcode.com/problems/linked-list-cycle/discuss/44758/How-about-the-space-complexity)
 
-Space Complexity: `O(1)` for 3 variables `max_area` and `left` and `right`. -->
+- Case 1: No cycle
+  - _Fast_ pointer reaches the end in `n/2` steps => O(n)
+- Case 2: Cycle exists
+  - Once the slower node reaches the cycle, the faster node catches up to the slower node in `k` steps, where `k` is the length of cycle. O((n - k) + k) => O(n)
+
+Space Complexity: `O(1)` for 2 constant variables `fast` and `slow`.
