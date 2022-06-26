@@ -5,7 +5,7 @@ authors: [shaokiat]
 tags: []
 ---
 
-Zen and the Art of Motorcycle Maintenance: An Inquiry Into Values
-
-[You Dont Know JS](https://github.com/getify/You-Dont-Know-JS)
-by getify
+- Zen and the Art of Motorcycle Maintenance: An Inquiry Into Values
+- [You Dont Know JS](https://github.com/getify/You-Dont-Know-JS) by getify
+- Algorithms to Live By
+- C.O.D.E
