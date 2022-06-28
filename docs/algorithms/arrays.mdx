@@ -1,11 +1,14 @@
 # Arrays and Subarrays
 
 :::tip Common Questions
-[Maximum Subarray](https://leetcode.com/problems/maximum-subarray/) <br/>
-[Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/) <br/>
-[Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/) <br/>
-[Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/) <br/>
-[Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
+
+- [Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
+- [Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
+- [Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)
+- [Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)
+- [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
+- [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+
 :::
 
 ## Time Complexity
@@ -111,3 +114,53 @@ def maxArea(self, height):
 Time Complexity: `O(n)` for looping through the `height` array.
 
 Space Complexity: `O(1)` for 3 variables `max_area` and `left` and `right`.
+
+### [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+
+#### Solution 1: Sliding Window (Easier to understand)
+
+```py
+def trap(self, height):
+    water = 0
+    i, j = 0, len(height) - 1
+    lmax, rmax = height[i], height[j]
+    while i <= j: # Terminates when i > j
+        lmax = max(lmax, height[i])
+        rmax = max(rmax, height[j])
+        if lmax <= rmax:
+            water += lmax - height[i] # Add height difference from lmax
+            i += 1
+        else:
+            water += rmax - height[j] # Add height difference from rmax
+            j -= 1
+    return water
+```
+
+Time Complexity: `O(n)` for looping through the `height` array.
+
+Space Complexity: `O(1)` for constant variables.
+
+#### Solution 2: Stack
+
+```py
+def trap(self, height):
+    water = 0
+    stack = []
+    for i, h in enumerate(height):
+        if stack and h > height[stack[-1]]:
+            deal = stack.pop()
+            if stack:
+                w = i - stack[-1] - 1
+                water += (min(h, height[deal]) - height[i]) * w
+        stack.append(i)
+    return water
+
+```
+
+**Invariant**: Stack always contain the indexes which have bar heights in decreasing order.
+
+When we encounter a higher bar, we will pop the stack until we meet invariant then push the stack again.
+
+Time Complexity: `O(n)` for looping through the `height` array.
+
+Space Complexity: `O(n)` for using a stack.
