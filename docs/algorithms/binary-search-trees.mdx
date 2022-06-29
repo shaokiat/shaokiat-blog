@@ -3,7 +3,10 @@
 https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/
 
 :::tip common questions
-[Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/submissions/)
+
+- [Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/submissions/)
+- [Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
+- [Binary Tree Right Side View](https://leetcode.com/problems/binary-tree-right-side-view/)
 
 :::
 
@@ -17,6 +20,15 @@ https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/
     Medium
   </a>
 </div>
+
+## Time Complexity
+
+| Operation | Big-O     | Note |
+| --------- | --------- | ---- |
+| Access    | O(log(n)) |      |
+| Search    | O(log(n)) |      |
+| Insert    | O(log(n)) |      |
+| Remove    | O(log(n)) |      |
 
 ### In-order Traversal
 
@@ -50,3 +62,59 @@ Algorithm for Post-order:
     2. Traverse right subtree -> call Postorder(node.right)
     3. Visit node
 ```
+
+## Example Solutions
+
+### [Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
+
+A common approach to this question is to **traverse by level**.
+
+#### Solution 1: Recursive Approach
+
+```py
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+def maxDepth(self, root):
+  if not root:
+    return 0
+  return 1 + max(self.maxDepth(root.left), self.maxDepth(root.right))
+
+```
+
+Time Complexity: `O(n)` for traversing the entire binary tree.
+
+Space Complexity: `O(n)` for the recursion stack.
+
+<br />
+
+#### Solution 2: Iterative Approach
+
+- A stack to store the order of nodes to traverse
+- Keeping track of the number of nodes in a level
+
+```py
+def maxDepth(self, root):
+  height = 0
+  level = [root] if root else None # stack of nodes in the level
+  level_size = 1
+  while level:
+    node = level.pop(0)
+    if node.left:
+      level.append(node.left)
+    if node.right:
+      level.append(node.right)
+    level_size -= 1
+    if level_size == 0: # move on to next level
+      height += 1
+      level_size = len(level)
+  return height
+
+```
+
+Time Complexity: `O(n)` for traversing the entire binary tree.
+
+Space Complexity: `O(log(n))` for the stack of nodes in the level.
