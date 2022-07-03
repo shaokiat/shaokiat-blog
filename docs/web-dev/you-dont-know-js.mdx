@@ -43,6 +43,27 @@ For example, [`Babel`](https://babeljs.io/) converts newer JS syntax version to 
 
 <br />
 
+### Strict Mode
+
+[Strict mode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode) was introduced with the release of ES5, to encourage better JS programs.
+
+- Prohibits function statements that are not at the top level of a script or function.
+
+[Some examples](https://www.geeksforgeeks.org/strict-mode-javascript/) of strict mode usage from geeksforgeeks.
+
+Enabling strict mode:
+
+```js
+// comments and whitespaces allowed only
+"use strict";
+// program
+```
+
+Due to [backwards compatibility](#backwards-compatability), JS will almost never enforce strict mode as it might break old JS code written.
+However, most production code has been transpiled to adhere to strict mode and ES6 modules assume strict mode.
+
+<br />
+
 ### Each JS File is a Program
 
 **Error Handling**
@@ -60,6 +81,78 @@ By sharing state via the "global scope".
 
 **Module**: A collection of state and publicly exposed methods to operate on that state <br/>
 Importing a module into another allows runtime interoperation between them
+
+<br />
+
+### Variables Declaration
+
+#### `var`
+
+Regular or function scoping: Hoisted to the global/function lexical environment and accessible in the global/function scope.
+
+#### `let` and `const`
+
+Block scoping: Allows a more limited access to the variable - only available in the block scope.
+
+- `let`: Can be reassigned a value
+- `const`: Must be given a value during declaration and cannot be re-assigned.
+
+#### Syntax that declares variables
+
+Function parameters are declared as `var` type as it is a function-scoped variable.
+
+```js
+function hello(variable) {
+  console.log(`this is a var type: ${variable}`);
+}
+
+hello("var");
+// this is a var type: var
+```
+
+`catch` clause are declared as `let` type as it is a block-scoped variable.
+
+```js
+try {
+  someCode();
+} catch (err) {
+  console.log(`this is a let type: ${err}`);
+}
+```
+
+### Functions
+
+In JS, functions are closely related to "procedures" - a collection of statements that can be invoked one or more times.
+
+Usual function declaration: (global object)
+
+```js
+function normalFunc(input) {
+  // ...
+  return input;
+}
+```
+
+In JS, functions are values that can be assigned to variables as such:
+
+```js
+const myFunction = function (input) {
+  // ...
+  return input;
+};
+
+let myFunc = (input) => {
+  // ...
+  return input;
+};
+```
+
+:::tip additional readings
+
+- Read this [stackoverflow post](https://stackoverflow.com/questions/336859/var-functionname-function-vs-function-functionname) for more clarity on their differences in terms of scoping.
+- [Difference between Arrow and Regular Functions](https://dmitripavlutin.com/differences-between-arrow-and-regular-functions/)
+
+:::
 
 <br />
 
