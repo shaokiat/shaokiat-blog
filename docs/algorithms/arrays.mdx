@@ -164,3 +164,56 @@ When we encounter a higher bar, we will pop the stack until we meet invariant th
 Time Complexity: `O(n)` for looping through the `height` array.
 
 Space Complexity: `O(n)` for using a stack.
+
+### [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
+
+#### Solution: Prefix + Postfix
+
+:::tip
+Here is an excellent [video explanation](https://www.youtube.com/watch?v=bNvIQI2wAjk) by NeetCode.
+:::
+
+Prefix product: Product of all numbers in the array before the current index.
+
+Postfix product: Product of all numbers in the array after the current index.
+
+Idea: Product except self is the product of prefix and postfix
+
+```py
+nums = [1, 2, 3, 4]
+prefix = [1, 2, 6, 24]
+postfix = [24, 24, 12, 4]
+
+result = [24, 12, 8, 6]
+# Example: index 1
+# prefix for nums[1] = 1
+# postfix for nums[1] = 12
+# product = 12
+```
+
+```py
+'''
+nums = [1, 2, 3, 4]
+res = [1, 1, 1, 1] - initial
+prefix = [1, 1, 2, 6] - shifted by 1
+postfix = [24, 12, 4, 1] - shifted by 1
+
+res = [24, 12, 8, 6]
+'''
+
+def productExceptSelf(self, nums):
+    n = len(nums)
+    prefix = postfix = 1 # initialized as 1
+    res = [1] * n
+    for i in range(nums):
+        res[i] *= prefix
+        prefix *= nums[i]
+
+        res[n-1-i] *= postfix
+        postfix *= nums[n-1-i]
+    return res
+```
+
+Time Complexity: `O(n)` for looping through the `nums` array.
+
+Space Complexity: `O(1)` as result array is not counted.
