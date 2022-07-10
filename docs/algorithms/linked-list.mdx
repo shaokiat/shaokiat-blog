@@ -7,6 +7,7 @@ contiguous as each element contains an address to the next element.
 [Reverse Linked list](https://leetcode.com/problems/reverse-linked-list/) <br/>
 [Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/) <br/>
 [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/) <br/>
+[Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/) <br/>
 :::
 
 ## Time Complexity
@@ -101,5 +102,43 @@ Time Complexity: `O(n)`. [_See here_](https://leetcode.com/problems/linked-list-
   - _Fast_ pointer reaches the end in `n/2` steps => O(n)
 - Case 2: Cycle exists
   - Once the slower node reaches the cycle, the faster node catches up to the slower node in `k` steps, where `k` is the length of cycle. O((n - k) + k) => O(n)
+
+Space Complexity: `O(1)` for 2 constant variables `fast` and `slow`.
+
+### [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
+
+:::tip
+Excellent [leetcode explanation](https://leetcode.com/problems/remove-nth-node-from-end-of-list/discuss/1164542/JS-Python-Java-C%2B%2B-or-Easy-Two-Pointer-Solution-w-Explanation) by sgallivan.
+:::
+
+#### Solution: Two Pointers
+
+```py
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+def removeNthFromEnd(self, head, n):
+    fast = slow = head
+    # Move fast pointer first
+    for _ in range(n):
+        fast = fast.next
+    # Edge case: n == len(list), remove first node
+    if not fast:
+        return head.next
+    # Move both pointer until fast reaches the end
+    while fast.next:
+        slow = slow.next
+        fast = fast.next
+    # Remove nth node
+    slow.next = slow.next.next
+    return head
+```
+
+Edge case explanation: when n == len(list), we want to remove the first node. `fast` would reach the end of the list and be equal to `None`, hence we check that `fast == None`.
+
+Time Complexity: `O(n)` as it is a one pass algorithm.
 
 Space Complexity: `O(1)` for 2 constant variables `fast` and `slow`.
