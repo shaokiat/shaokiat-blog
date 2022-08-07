@@ -33,7 +33,7 @@ const config = {
           customCss: require.resolve("./src/css/custom.css"),
         },
         gtag: {
-          trackingID: 'G-VS62WFN2SY'
+          trackingID: "G-VS62WFN2SY",
         },
       }),
     ],
@@ -41,32 +41,32 @@ const config = {
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({    
+    ({
       algolia: {
         // The application ID provided by Algolia
-        appId: 'YRKN607I5H',
+        appId: "YRKN607I5H",
 
         // Public API key: it is safe to commit it
-        apiKey: 'bdb6aa62b2026122db267ff4d72a786c',
+        apiKey: "bdb6aa62b2026122db267ff4d72a786c",
 
-        indexName: 'shaokiat_blog',
+        indexName: "shaokiat_blog",
 
         // Optional: see doc section below
         // contextualSearch: true,
 
         // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-        externalUrlRegex: 'external\\.com|domain\\.com',
+        externalUrlRegex: "external\\.com|domain\\.com",
 
         // Optional: Algolia search parameters
         searchParameters: {},
 
         // Optional: path for search page that enabled by default (`false` to disable it)
-        searchPagePath: 'search',
+        searchPagePath: "search",
 
         // Run this command to crawl page and update algolia
         // docker run -it --env-file=.env -e "CONFIG=$(cat /Users/shaokiat/Desktop/shaokiat-blog/config.json | jq -r tostring)" algolia/docsearch-scraper
       },
-      metadata: [{name: 'shao kiat', content: 'shao kiat, blog'}],
+      metadata: [{ name: "shao kiat", content: "shao kiat, blog" }],
       colorMode: {
         defaultMode: "dark",
       },
@@ -96,10 +96,10 @@ const config = {
           //   position: "right",
           // },
           {
-            href: 'https://github.com/shaokiat',
-            position: 'right',
-            className: 'header-github-link',
-            'aria-label': 'GitHub repository',
+            href: "https://github.com/shaokiat",
+            position: "right",
+            className: "header-github-link",
+            "aria-label": "GitHub repository",
           },
         ],
       },
@@ -128,7 +128,7 @@ const config = {
             items: [
               {
                 label: "Porfolio Website",
-                to: "https://www.shaokiat.ml",
+                to: "https://www.shaokiat.xyz",
               },
               {
                 label: "GitHub",
