@@ -1,4 +1,4 @@
-# Dynamic Programming (Top Down)
+# Dynamic Programming
 
 Dynamic programming has been my nemesis for awhile now and it is about time I tackle dynamic programming
 using the same approach for dynamic programming.
@@ -24,7 +24,9 @@ Fantastic [explanation](https://www.youtube.com/watch?v=5dRGRueKU3M) by [Abdul B
 on Top Down Approach using Fibonacci example.
 :::
 
-## Example 1: Road Trip
+## Example Solutions
+
+### Road Trip
 
 :::note Context
 Below is a question I had encountered during one of the technical assessment that _tripped_ me.
@@ -41,7 +43,7 @@ between them is divisible by _m_. You start out with an empty tank at station 1.
 Hardest part is identifying the recurrence relation
 :::
 
-### Recurrence Relation
+#### Recurrence Relation
 
 <div style={{ textAlign: "center" }}>
   <img
@@ -61,7 +63,7 @@ i: amount of fuel topped up
 
 ```
 
-### Approach
+#### Approach
 
 You can observe that if you have already solved the problem for all j' > j, then it is not hard
 to compute _C(station j, k)_.
@@ -74,7 +76,7 @@ and choose the _i_ that is the cheapest.
 Work in reverse until you get to the first station, and you will eventually find the cheapest way
 to reach destination.
 
-### Solution
+#### Solution
 
 ```py
 def minimumCost(distance, n, C, cost, m):
@@ -99,9 +101,11 @@ m = 10 # km/litre
 minimumCost(d, n, C, cost, m)
 ```
 
-## Example 2: [House Robber](https://leetcode.com/problems/house-robber/)
+<br />
 
-### Recurrence Relation
+### [House Robber](https://leetcode.com/problems/house-robber/)
+
+#### Recurrence Relation
 
 Robber has 2 options: (Knap-sack problems)
 
@@ -117,7 +121,7 @@ Robber has to maximize profits using these 2 scenarios:
 rob(i) = max(rob(i - 2) + i, rob(i - 1))
 ```
 
-### Solution
+#### Solution
 
 Let `rob1 = i - 2` and `rob2 = i - 1`.
 
@@ -137,3 +141,69 @@ def rob(nums):
 **Space Complexity**: `O(1)` as there are always only 2 variables (rob1, rob2) used.
 
 **Time Complexity**: `O(n)` as there is only one loop through the nums array.
+
+<br />
+
+### [01 Matrix](https://leetcode.com/problems/01-matrix/)
+
+:::tip
+Excellent [leetcode explanation](<https://leetcode.com/problems/01-matrix/discuss/1369741/C%2B%2BJavaPython-BFS-DP-solutions-with-Picture-Clean-and-Concise-O(1)-Space>) by hiepit.
+:::
+
+#### Solution 1: DP with Top-Down and Bottom-Up
+
+```py
+def updateMatrix(self, mat):
+    r, c = len(mat), len(mat[0])
+    # Top-Down Approach
+    for i in range(r):
+      for j in range(c):
+        if mat[i][j] > 0: # cells that needs to be updated
+          left = mat[i][j-1] if j > 0 else math.inf
+          top = mat[i-1][j] if i > 0 else math.inf
+          mat[i][j] = 1 + min(left, top)
+
+    # Bottom-Up Approach
+    for i in range(r-1, -1, -1):
+      for j in range(c-1, -1, -1):
+        if mat[i][j] > 0:
+          right = mat[i][j+1] if j < c-1 else math.inf
+          bot = mat[i+1][j] if i < r-1 else math.inf
+          mat[i][j] = min(mat[i][j], 1 + right, 1 + bot)
+    return mat
+```
+
+Time Complexity: `O(M * N)` due to the double for loops to run through the matrix.
+
+Space Complexity: `O(1)` as no additional data structures were used.
+
+#### Solution 2: BFS starting from zeroes
+
+```py
+def updateMatrix(self, mat):
+  DIR = [(0,1), (1,0), (0,-1), (-1,0)]
+  queue = []
+  for i in range(len(mat)):
+      for j in range(len(mat[0])):
+        if mat[i][j] == 0:
+          queue.append((i, j))
+        else:
+          mat[i][j] = -1 # marked as not processed
+
+  while queue:
+    r, c = queue.pop(0)
+    # Check all four directions
+    for x, y in DIR:
+      nr, nc = r + x, c + y
+      # Check out of bounds and already processed
+      if nr < 0 or nr >= len(mat) or nc < 0 or nc >= len(mat[0]) or mat[nr][nc] != -1:
+        continue
+      mat[nr][nc] = 1 + mat[r][c]
+      queue.append((nr, nc))
+
+  return mat
+```
+
+Time Complexity: `O(M * N)` due to the double for loops to run through the matrix.
+
+Space Complexity: `O(M * N)` due to the queue used.
