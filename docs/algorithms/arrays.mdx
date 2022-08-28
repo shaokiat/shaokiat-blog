@@ -115,6 +115,8 @@ Time Complexity: `O(n)` for looping through the `height` array.
 
 Space Complexity: `O(1)` for 3 variables `max_area` and `left` and `right`.
 
+<br />
+
 ### [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
 
 #### Solution 1: Sliding Window (Easier to understand)
@@ -164,6 +166,8 @@ When we encounter a higher bar, we will pop the stack until we meet invariant th
 Time Complexity: `O(n)` for looping through the `height` array.
 
 Space Complexity: `O(n)` for using a stack.
+
+<br />
 
 ### [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
 
@@ -215,5 +219,35 @@ def productExceptSelf(self, nums):
 ```
 
 Time Complexity: `O(n)` for looping through the `nums` array.
+
+Space Complexity: `O(1)` as result array is not counted.
+
+<br />
+
+### [Insert Interval](https://leetcode.com/problems/insert-interval/)
+
+#### Solution:
+
+```py
+def insert(self, intervals, newInterval):
+    n = newInterval
+    res = []
+    for index, i in enumerate(intervals):
+        # Case 1: n greater than i
+        if n[0] > i[1]:
+            res.append(i)
+        # Case 2: n smaller than i
+        elif n[1] < i[0]:
+            res.append(n)
+            return res + intervals[index:]
+        # Case 3: n overlaps with i -> merge
+        else:
+            n = [min(n[0], i[0]), max(n[1], i[1])]
+    # append n to end of list
+    res.append(n)
+    return res
+```
+
+Time Complexity: `O(n)` for looping through the `intervals` array.
 
 Space Complexity: `O(1)` as result array is not counted.
