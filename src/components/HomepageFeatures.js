@@ -7,7 +7,7 @@ const FeatureList = [
     Svg: require("../../static/img/undraw_docusaurus_mountain.svg").default,
   },
   {
-    title: "🛠️ Work in Progress 🛠️",
+    // title: "🛠️ Work in Progress 🛠️",
     Svg: require("../../static/img/undraw_docusaurus_tree.svg").default,
   },
   {

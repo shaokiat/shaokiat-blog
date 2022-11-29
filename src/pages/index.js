@@ -14,13 +14,20 @@ function HomepageHeader() {
       <div className="container">
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro"
-          >
-            Documentation 🚀
-          </Link>
+        <div className={styles.buttonsContainer}>
+          <div className={styles.buttons}>
+            <Link
+              className="button button--secondary button--lg"
+              to="/docs/intro"
+            >
+              Docs 🚀
+            </Link>
+          </div>
+          <div className={styles.buttons}>
+            <Link className="button button--secondary button--lg" to="/blog">
+              Blog 👨‍💻
+            </Link>
+          </div>
         </div>
       </div>
     </header>
@@ -35,7 +42,7 @@ export default function Home() {
       description="Technical blog for algorithms and computer science concepts"
     >
       <Head>
-      {/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-VS62WFN2SY"></script>
+        {/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-VS62WFN2SY"></script>
       <script>
         {`window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
