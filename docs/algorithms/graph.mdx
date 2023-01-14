@@ -6,8 +6,9 @@ My second nemesis 🥵!
 
 :::tip TIP
 If you have not tried these questions, please give it a go first! 👾 <br />
-https://leetcode.com/problems/course-schedule/ <br />
-https://leetcode.com/problems/course-schedule-ii/
+- https://leetcode.com/problems/course-schedule/
+- https://leetcode.com/problems/course-schedule-ii/
+- [Accounts Merge](https://leetcode.com/problems/accounts-merge/description/)
 :::
 
 :::important Source
@@ -59,6 +60,10 @@ class Solution:
 
 **Method 2: BFS (Kanh's Algorithm)**
 
+- Repeatedly remove nodes without any incoming edges and add them to the topological ordering.
+- As nodes without incoming edges (and their outgoing edges) are removed, new nodes without incoming edges should become free.
+- Repeat until all nodes covered or cycle detected.
+
 ```py
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
@@ -104,3 +109,54 @@ class Solution:
             graph[b].append(a)
         return graph
 ```
+
+
+### [Accounts Merge](https://leetcode.com/problems/accounts-merge/description/)
+
+:::tip
+
+[Amazing answer](https://leetcode.com/problems/accounts-merge/solutions/109161/python-simple-dfs-with-explanation/?orderBy=most_votes) by none other than Yang Shun.
+
+:::
+
+
+#### Solution 1: DFS
+
+```py
+def lowestCommonAncestor(self, accounts):
+    from collections import defaultdict
+    res = []
+    emails_map = defaultdict(list)
+    visited = [False] * len(accounts)
+
+    # Build emails_map
+    for i, account in enumerate(accounts):
+        for email in account[1:]:
+            emails_map[email].append(i)
+    
+    # DFS function
+    def dfs(i, emails):
+        if visited[i]:
+            return
+        visited[i] = True
+        for email in accounts[i][1:]:
+            emails.add(email)
+            for neighbor in emails_map[email]:
+                dfs(neighbor, emails)
+
+    # Run DFS
+    for i, account in enumerate(accounts):
+        if visited[i]:
+            continue
+        name, emails = account[0], set()
+        dfs(i, emails)
+        res.append([name] + sorted(emails))
+    return res
+  
+```
+
+Time Complexity: `O(nlogn)` for sorting the emails.
+
+Space Complexity: `O(n)` for the dictionary used.
+
+<br />
