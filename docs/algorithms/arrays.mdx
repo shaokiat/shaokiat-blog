@@ -8,6 +8,7 @@
 - [Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)
 - [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
 - [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
+- [Sort Colors](https://leetcode.com/problems/sort-colors/)
 
 :::
 
@@ -251,3 +252,37 @@ def insert(self, intervals, newInterval):
 Time Complexity: `O(n)` for looping through the `intervals` array.
 
 Space Complexity: `O(1)` as result array is not counted.
+
+<br />
+
+### [Sort Colors](https://leetcode.com/problems/sort-colors/)
+
+:::tip
+
+[Amazing answer explanation](https://www.youtube.com/watch?v=4xbWSRZHqac) by NeetCode.
+
+:::
+
+#### Solution:
+
+- left pointer pointing to the first 1
+- right pointer pointing to the non-2
+
+```py
+def sortColors(self, nums):
+    l = i = 0
+    r = len(nums) - 1
+    while i <= r:
+        if nums[i] == 0: # swap with left pointer
+            nums[l], nums[i] = nums[i], nums[l]
+            l += 1 # move left pointer
+        elif nums[i] == 2: # swap with right pointer
+            nums[r], nums[i] = nums[i], nums[r]
+            r -= 1 # move right pointer
+            i -= 1 # Edge case: swapped 0 to nums[i]
+        i += 1
+```
+
+Time Complexity: `O(n)` for one pass solution.
+
+Space Complexity: `O(1)` as solution is in-place.
