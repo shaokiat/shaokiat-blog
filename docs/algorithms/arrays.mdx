@@ -9,6 +9,7 @@
 - [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self/)
 - [Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
 - [Sort Colors](https://leetcode.com/problems/sort-colors/)
+- [Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
 
 :::
 
@@ -286,3 +287,45 @@ def sortColors(self, nums):
 Time Complexity: `O(n)` for one pass solution.
 
 Space Complexity: `O(1)` as solution is in-place.
+
+<br />
+
+### [Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
+
+:::tip
+
+[Amazing answer explanation](https://www.youtube.com/watch?v=G8xtZy0fDKg) by NeetCode.
+
+:::
+
+#### Solution:
+
+- Sliding window solution: Update dictionary according to sliding window
+
+```py
+def findAnagrams(self, s, p):
+    if len(p) > len(s):
+        return []
+    pCount, sCount = {}, {}
+    for i in range(len(p)):
+        pCount[p[i]] = 1 + pCount.get(p[i], 0) # default to 0 if not found
+        sCount[s[i]] = 1 + sCount.get(s[i], 0)
+    res = [0] if pCount == sCount else []
+
+    l = 0
+    for r in range(len(p), len(s)): # Starts from len(p) onwards
+        sCount[s[r]] = 1 + sCount.get(s[r], 0)
+        sCount[s[l]] -= 1
+        if sCount[s[l]] == 0: # Remove key from dict 
+            sCount.pop(s[l])
+        l += 1
+        if sCount == pCount:
+            res.append(l)
+    return res
+```
+
+Time Complexity: `O(n)` for one pass solution.
+
+Space Complexity: `O(1)` as maximum space used is dictionary for 26 characters in the alphabet.
+
+<br />
