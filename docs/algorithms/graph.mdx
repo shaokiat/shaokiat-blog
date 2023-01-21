@@ -8,6 +8,7 @@ My second nemesis 🥵!
 If you have not tried these questions, please give it a go first! 👾 <br />
 - https://leetcode.com/problems/course-schedule/
 - https://leetcode.com/problems/course-schedule-ii/
+- [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)
 - [Accounts Merge](https://leetcode.com/problems/accounts-merge/description/)
 :::
 
@@ -110,6 +111,53 @@ class Solution:
         return graph
 ```
 
+
+### [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)
+
+
+:::tip
+
+[Amazing answer](https://leetcode.com/problems/minimum-height-trees/solutions/76055/share-some-thoughts/?orderBy=most_votes) on LeetCode submissions.
+
+:::
+
+
+#### Solution 1: BFS
+
+- Maintain a list of leaf nodes where there is only one edge each
+- Remove layer of leaf nodes until 2 or less nodes remaining
+
+```py
+def findMinHeightTrees(self, n, edges):
+    if n == 1:
+        return [0]
+    # Build adjacency list
+    graph = [[] for i in range(n)]
+    for a, b in edges: # Undirected edges
+        graph[a].append(b)
+        graph[b].append(a)
+    # Add leaves
+    leaves = []
+    for i in range(n):
+        if len(graph[i]) == 1:
+            leaves.append(i)
+    while n > 2:
+        newLeaves = []
+        n -= len(leaves)
+        for leaf in leaves:
+            node = graph[leaf].pop()
+            graph[node].remove(leaf)
+            if len(graph[node]) == 1:
+                newLeaves.append(node)
+        leaves = newLeaves
+    return leaves
+```
+
+Time Complexity: `O(n)` for running BFS and building adjacency list.
+
+Space Complexity: `O(n)` for adjacency list and leaves list.
+
+<br />
 
 ### [Accounts Merge](https://leetcode.com/problems/accounts-merge/description/)
 
