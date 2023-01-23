@@ -1,0 +1,70 @@
+# Heaps
+
+:::tip common questions
+
+- [Task Scheduler](https://leetcode.com/problems/task-scheduler/)
+
+:::
+
+### [Task Scheduler](https://leetcode.com/problems/task-scheduler/)
+
+:::important Source
+[**Explanation**](https://leetcode.com/problems/task-scheduler/discussion/comments/1567434) on LeetCode discussions.
+:::
+
+
+#### Solution 1: Math Approach
+- Case 1: No idle gaps required - answer is length of tasks
+- Case 2: Idle gaps required - (maxFreq - 1) * (n + 1) + nMax
+  - (maxFreq - 1) - maximum occurences of character with maximum occurences except last occurence
+  - (n + 1) - number of elements in each repeated interval `A _ _`
+  - nMax - number of characters in last occurence
+ 
+```py
+def leastInterval(self, tasks, n):
+  store = {}
+  for i in tasks:
+    store = 1 + store.get(i, 0) # default 0 if not found
+  lst = sorted(store.values(), reverse=True)
+  maxFreq = lst[0]
+  nMax = lst.count(maxFreq)
+  caseTwo = (maxFreq - 1) * (n + 1) + nMax
+  return max(len(tasks), caseTwo)
+```
+
+Time Complexity: `O(n)` for counting tasks.
+
+Space Complexity: `O(1)` for fixed dictionary size of 26 characters.
+
+<br />
+
+#### Solution 2: Heap and Queue
+
+:::important Source
+[**Explanation**](https://www.youtube.com/watch?v=s8p8ukTyA2I) by NeetCode.
+:::
+
+```py
+def leastInterval(self, tasks, n):
+  count = Counter(tasks)
+  maxHeap = [-cnt for cnt in count.values()]
+  heapq.heapify(maxHeap)
+  
+  time = 0 
+  q = deque() # pairs of [-cnt, idleTime]
+  while maxHeap or q:
+    time += 1
+    if maxHeap:
+      cnt = 1 + heapq.heappop(maxHeap)
+      if cnt: # Count not zero: add back to queue with new idleTime
+        q.append([cnt, time + n])
+    if q and q[0][1] == time:
+      heapq.heappush(maxHeap, q.popleft()[0])
+  return time
+```
+
+Time Complexity: `O(n + m)` where n is len(tasks) and m is length of idle interval.
+
+Space Complexity: `O(1)` for fixed dictionary size of 26 characters.
+
+<br />
