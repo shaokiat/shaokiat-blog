@@ -3,6 +3,7 @@
 :::tip common questions
 
 - [Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/description/)
+- [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)
 
 :::
 
@@ -71,3 +72,98 @@ Time Complexity: `O(n)` for traversing the entire binary tree.
 Space Complexity: `O(n)` for the spaced used for stack and parent dictionary.
 
 <br />
+
+### [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)
+
+#### Solution:
+
+```py
+def findMinHeightTrees(self, n: int, edges: List[List[int]]) -> List[int]:
+    if n == 1:
+        return [0]
+    # Build adjacency list
+    graph = [[] for i in range(n)]
+    for a, b in edges: # undirected edges
+        graph[b].append(a)
+        graph[a].append(b)
+
+    leaves = []
+    for i in range(n):
+        if len(graph[i]) == 1:
+            leaves.append(i)
+    while n > 2: # At most 2 nodes in final answer
+        newLeaves = []
+        n -= len(leaves)
+        for leaf in leaves:
+            i = graph[leaf].pop()
+            graph[i].remove(leaf)
+            if len(graph[i]) == 1:
+                newLeaves.append(i)
+        leaves = newLeaves
+    return leaves
+
+```
+
+Time Complexity: `O(n)` for traversing the entire tree.
+
+Space Complexity: `O(n^2)` for the space used by adjacency list.
+
+<br />
+
+### Tree Decrements
+
+#### Solution:
+
+:::tip
+
+Code from [Stack Overflow](https://stackoverflow.com/questions/73922682/decrement-node-values-to-0-of-a-given-tree)
+
+:::
+
+Similar to [Minimum Height Trees](#minimum-height-trees)
+
+```py
+# Complete the 'getMinCost' function below.
+#
+# The function is expected to return an INTEGER.
+# The function accepts following parameters:
+#  1. INTEGER_ARRAY val
+#  2. UNWEIGHTED_INTEGER_GRAPH t
+#
+
+# For the unweighted graph, <name>:
+#
+# 1. The number of nodes is <name>_nodes.
+# 2. The number of edges is <name>_edges.
+# 3. An edge exists between <name>_from[i] and <name>_to[i].
+
+def getMinCost(val, t_nodes, t_from, t_to):
+    # Write your code here
+    for i in range(t_nodes):
+        val[i] = val[i] % 2
+    adjList = [[] for _ in range(t_nodes)]
+    for i in range(len(t_from)):
+        adjList[t_from[i]-1].append(t_to[i]-1)
+        adjList[t_to[i]-1].append(t_from[i]-1)
+    # get leaves
+    leaves = [i for i in range(t_nodes) if len(adjList[i]) == 1]
+    remaining = t_nodes
+    cost = 0
+    while leaves and remaining > 2:
+        remaining -= len(leaves)
+        newLeaves = []
+        for leaf in leaves:
+            parent = adjList[leaf].pop()
+            adjList[parent].remove(leaf)
+            if val[leaf] == 1: #odd
+                cost += 1
+                val[parent] = 1 - val[parent]
+
+            if len(adjList[parent]) == 1:
+                newLeaves.append(parent)
+        leaves = newLeaves
+    # Check if remaining 2 leaves are odd
+    if leaves and val[leaves[0]] == 1:
+        cost += 1
+    return cost
+```
