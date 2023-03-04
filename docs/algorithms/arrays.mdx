@@ -11,6 +11,7 @@
 - [Sort Colors](https://leetcode.com/problems/sort-colors/)
 - [Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
 - [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
+- [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)
 
 :::
 
@@ -372,5 +373,39 @@ def minWindow(self, s, t):
 Time Complexity: `O(n + m)` for looping through the string `s` of length `n` and string `t` of length `m`.
 
 Space Complexity: `O(n + m)` for hashmaps used for `wMap` and `tMap`.
+
+<br />
+
+### [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)
+
+#### Solution 1: Quick Select
+
+```py
+def kClosest(self, points):
+    def euclidean(point):
+        return point[0]**2 + point[1]**2
+
+    def partition(l, r):
+        rand = randint(l, r) # choose random pivot
+        points[r], points[rand] = points[rand], points[r] # move pivot to end
+        i, pivotDist = l, euclidean(points[rand])
+        for j in range(l, r+1):
+            if euclidean(points[j]) <= pivotDist:
+                points[i], points[j] = points[j], points[i]
+                i += 1
+        return i-1
+    l, r, p = 0, len(points) - 1, len(points)
+    while p != k:
+        p = partition(l, r)
+        if p < k:
+            l = p + 1
+        else:
+            r = p - 1
+    return points[:pivot]
+```
+
+Time Complexity: `O(n)` on average, the partitions roughly eliminates half of the remaining elements each time => O(2N).
+
+Space Complexity: `O(1)`, only constant space used.
 
 <br />
