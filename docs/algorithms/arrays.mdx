@@ -12,6 +12,7 @@
 - [Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
 - [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
 - [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)
+- [3Sum](https://leetcode.com/problems/3sum/)
 
 :::
 
@@ -407,5 +408,30 @@ def kClosest(self, points):
 Time Complexity: `O(n)` on average, the partitions roughly eliminates half of the remaining elements each time => O(2N).
 
 Space Complexity: `O(1)`, only constant space used.
+
+<br />
+
+### [3Sum](https://leetcode.com/problems/3sum/)
+
+#### Solution: Sort then 2Sum
+
+```py
+def threeSum(self, nums):
+    res = set()
+    nums.sort()
+    for index, i in enumerate(nums):
+        target = 0 - i
+        seen = {}
+        for j in nums[i+1:]:
+            diff = target - j
+            if diff in seen:
+                res.add(tuple([i, j, diff]))
+            seen[j] = j
+    return res
+```
+
+Time Complexity: `O(n*2)`
+
+Space Complexity: `O(n)`
 
 <br />
