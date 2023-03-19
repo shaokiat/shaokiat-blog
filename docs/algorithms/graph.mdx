@@ -170,6 +170,10 @@ Space Complexity: `O(n)` for adjacency list and leaves list.
 
 #### Solution 1: DFS
 
+- Create a graph `emails_map`: email -> [account index]
+- Perform DFS on each account and accounts that are linked to it using the `emails_map`, adding emails along the way and performing DFS on its neighbours.
+
+
 ```py
 def lowestCommonAncestor(self, accounts):
     from collections import defaultdict
