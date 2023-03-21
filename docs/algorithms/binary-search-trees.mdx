@@ -66,6 +66,66 @@ Algorithm for Post-order:
 
 ## Example Solutions
 
+### [Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
+
+#### Solution 1: Find in-order array of BST
+
+```py
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+def kthSmallest(self, root, k):
+  def findInorder(root, arr):
+    if not root:
+      return
+    findInorder(root.left, arr)
+    arr.append(root.val)
+    findInorder(root.right, arr)
+  arr = []
+  findInorder(root, arr)
+  return arr[k-1]
+
+```
+
+Time Complexity: `O(n)` for traversing the entire binary tree.
+
+Space Complexity: `O(n)` for the in-order array.
+
+
+#### Solution 2: Iterative solution
+
+```py
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+def kthSmallest(self, root, k):
+  stack = []
+  curr = root
+  while curr or stack:
+    while curr: # Find most left node
+      stack.append(curr)
+      curr = curr.left
+    curr = stack.pop()
+    k -= 1
+    if k == 0:
+      return curr.val
+    curr = curr.right
+
+```
+
+Time Complexity: `O(n)` for traversing the entire binary tree.
+
+Space Complexity: `O(n)` for the recursion stack.
+
+
+<br />
+
 ### [Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
 
 A common approach to this question is to **traverse by level**.
