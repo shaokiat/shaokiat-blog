@@ -149,7 +149,7 @@ const config = {
               },
               {
                 label: "Resume",
-                href: "https://shaokiat.github.io/shaokiat-blog/pdf/resume.pdf",
+                href: "https://www.shaokiat.xyz/resume.pdf",
               },
             ],
           },
