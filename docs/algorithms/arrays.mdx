@@ -13,6 +13,8 @@
 - [Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
 - [K Closest Points to Origin](https://leetcode.com/problems/k-closest-points-to-origin/)
 - [3Sum](https://leetcode.com/problems/3sum/)
+- [Next Permutation](https://leetcode.com/problems/next-permutation/)
+
 
 :::
 
@@ -433,5 +435,43 @@ def threeSum(self, nums):
 Time Complexity: `O(n*2)`
 
 Space Complexity: `O(n)`
+
+<br />
+
+### [Next Permutation](https://leetcode.com/problems/next-permutation/)
+
+#### Solution: 
+
+Idea:
+- find last ascending position `k`
+- find smallest num from the end that is greater than `nums[k]`
+- reverse `nums[k+1:]`
+
+```py
+def nextPermutation(self, nums):
+    i = j = len(nums) - 1
+    # Find last ascending position
+    while i > 0 and nums[i-1] > nums[i]: 
+        i -= 1
+    if i == 0: # nums is sorted in decreasing order
+        nums.reverse()
+        return
+    k = i - 1
+    # Find min nums[j] that is greater than nums[k]
+    while nums[j] < nums[k]:
+        j -= 1
+    nums[j], nums[k] = nums[k], nums[j] # swap
+    
+    # Reverse nums[k+1:]
+    l, r = i, len(nums) - 1
+    while l < r:
+        nums[l], nums[r] = nums[r], nums[l]
+        l += 1
+        r -= 1
+```
+
+Time Complexity: `O(n)`
+
+Space Complexity: `O(1)`
 
 <br />
