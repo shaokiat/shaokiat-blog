@@ -10,6 +10,8 @@ If you have not tried these questions, please give it a go first! 👾 <br />
 - https://leetcode.com/problems/course-schedule-ii/
 - [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)
 - [Accounts Merge](https://leetcode.com/problems/accounts-merge/description/)
+- [Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/)
+
 :::
 
 :::important Source
@@ -208,6 +210,49 @@ def lowestCommonAncestor(self, accounts):
 ```
 
 Time Complexity: `O(nlogn)` for sorting the emails.
+
+Space Complexity: `O(n)` for the dictionary used.
+
+<br />
+
+
+### [Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/)
+
+
+:::tip
+
+[Amazing answer](https://leetcode.com/problems/reconstruct-itinerary/solutions/375397/simply-simple-python-solution-using-stack-for-dfs-with-comments/?orderBy=most_votes) on LeetCode.
+
+:::
+
+
+#### Solution 1: DFS
+
+- Create a graph src -> [dst]
+- Sort [dst] in reverse order to pop last element in O(1) time
+- Perform DFS and add to `res` when location has no more destinations to go
+- Return reverse `res`
+
+
+```py
+def findItinerary(self, tickets):
+    graph = collections.defaultdict(list)
+    for src, dst in tickets: # src -> [dst]
+        graph[src].append(dst)
+    
+    for src in graph:
+        graph[src].sort(reverse=True)
+
+    res = []
+    stack = "JFK"
+    while stack:
+        while graph[stack[-1]]:
+            stack.append(graph[stack[-1]].pop())
+        res.append(stack.pop())
+    return res[::-1]
+```
+
+Time Complexity: `O(n)`
 
 Space Complexity: `O(n)` for the dictionary used.
 
