@@ -128,7 +128,7 @@ const config = {
             items: [
               {
                 label: "Porfolio Website",
-                to: "https://www.shaokiat.xyz",
+                to: "https://shaokiat.vercel.app",
               },
               {
                 label: "GitHub",
@@ -149,7 +149,7 @@ const config = {
               },
               {
                 label: "Resume",
-                href: "https://www.shaokiat.xyz/resume.pdf",
+                href: "https://shaokiat.vercel.app/resume.pdf",
               },
             ],
           },
