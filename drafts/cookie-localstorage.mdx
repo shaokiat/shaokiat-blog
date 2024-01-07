@@ -2,6 +2,19 @@
 
 https://stackoverflow.com/questions/3220660/local-storage-vs-cookies
 
+## Cookies
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
+
+An HTTP cookie is a small piece of data that a server sends to a user's web browser. The browser may store
+the cookie and send it back to the same server with later requests.
+
+Typically, this cookie is used to tell if two requests came from the same browser, keeping a user logged in.
+This way, it remembers stateful information for the stateless HTTP protocol. - MDN Web Docs
+
+Cookies are sent with every request, which can worsen performance. Modern APIs for client storage (localStorage and sessionStorage) are instead
+recommended for this use case.
+
 - Cookies are primarily for reading server-side
 - Cookies have a limit of 4096 bytes per cookie
 - Cookies have expiration date
