@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunksk_blog=globalThis.webpackChunksk_blog||[]).push([[7191],{5259(a){a.exports=JSON.parse('{"authors":[{"name":"Lim Shao Kiat","title":"Author","url":"https://shaokiat.vercel.app","imageURL":"https://github.com/shaokiat.png","key":"shaokiat","page":null,"count":5}]}')}}]);
