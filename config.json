@@ -12,12 +12,12 @@
   ],
   "selectors": {
     "lvl0": {
-      "selector": "(//ul[contains(@class,'menu__list')]//a[contains(@class, 'menu__link menu__link--sublist menu__link--active')]/text() | //nav[contains(@class, 'navbar')]//a[contains(@class, 'navbar__link--active')]/text())[last()]",
-      "type": "xpath",
+      "selector": ".menu__link.menu__link--sublist.menu__link--active, .navbar__item.navbar__link--active",
+      "type": "css",
       "global": true,
       "default_value": "Documentation"
     },
-    "lvl1": "header h1",
+    "lvl1": "header h1, article h1",
     "lvl2": "article h2",
     "lvl3": "article h3",
     "lvl4": "article h4",
@@ -41,6 +41,30 @@
       "url",
       "url_without_anchor",
       "type"
+    ],
+    "attributesToHighlight": [
+      "hierarchy",
+      "content"
+    ],
+    "attributesToSnippet": [
+      "content:10"
+    ],
+    "searchableAttributes": [
+      "unordered(hierarchy.lvl0)",
+      "unordered(hierarchy.lvl1)",
+      "unordered(hierarchy.lvl2)",
+      "unordered(hierarchy.lvl3)",
+      "unordered(hierarchy.lvl4)",
+      "unordered(hierarchy.lvl5)",
+      "unordered(hierarchy.lvl6)",
+      "content"
+    ],
+    "distinct": true,
+    "attributeForDistinct": "url",
+    "customRanking": [
+      "desc(weight.pageRank)",
+      "desc(weight.level)",
+      "asc(weight.position)"
     ]
   },
   "conversation_id": [
