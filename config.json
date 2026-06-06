@@ -29,9 +29,10 @@
   "custom_settings": {
     "separatorsToIndex": "_",
     "attributesForFaceting": [
+      "type",
+      "lang",
       "language",
       "version",
-      "type",
       "docusaurus_tag"
     ],
     "attributesToRetrieve": [
