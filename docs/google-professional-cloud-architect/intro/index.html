@@ -14,8 +14,8 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Shao Kiat&#39;s Blog" href="/shaokiat-blog/opensearch.xml"><link rel="stylesheet" href="/shaokiat-blog/assets/css/styles.186cae95.css">
-<script src="/shaokiat-blog/assets/js/runtime~main.a6926be8.js" defer="defer"></script>
-<script src="/shaokiat-blog/assets/js/main.5ef3b18a.js" defer="defer"></script>
+<script src="/shaokiat-blog/assets/js/runtime~main.1be95e8d.js" defer="defer"></script>
+<script src="/shaokiat-blog/assets/js/main.6c74e506.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -37,26 +37,25 @@
 <ul>
 <li class="">Business use cases and product strategy</li>
 <li class="">Identifying functional and non-functional requirements</li>
-<li class="">Business continuity planning</li>
-<li class="">Cost optimization</li>
+<li class="">Business continuity planning → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/high-availability-dr">HA &amp; DR</a></li>
+<li class="">Cost optimization → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/cost-optimization">Cost Optimization</a></li>
 <li class="">Supporting the application design</li>
 <li class="">Integration patterns with external systems</li>
 <li class="">Movement of data</li>
 <li class="">Design decision trade-offs</li>
 <li class="">Workload disposition strategies (build, buy, modify, or deprecate)</li>
 <li class="">Success measurements: KPIs, ROI, metrics</li>
-<li class="">Security and compliance</li>
-<li class="">Observability</li>
+<li class="">Security and compliance → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/security-controls">Security Controls</a></li>
+<li class="">Observability → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/observability">Observability</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="12-technical-requirements">1.2 Technical Requirements<a href="#12-technical-requirements" class="hash-link" aria-label="Direct link to 1.2 Technical Requirements" title="Direct link to 1.2 Technical Requirements" translate="no">​</a></h3>
 <ul>
-<li class="">Familiarity with the <strong>Google Cloud Well-Architected Framework</strong></li>
-<li class="">High availability and failover design</li>
-<li class="">Flexibility of cloud resources</li>
-<li class="">Scalability to meet growth requirements</li>
+<li class=""><strong>Google Cloud Well-Architected Framework</strong> → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/well-architected-framework">Well-Architected Framework</a></li>
+<li class="">High availability and failover design → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/high-availability-dr">HA &amp; DR</a></li>
+<li class="">Flexibility and scalability of cloud resources → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/compute-selection">Compute Selection</a></li>
 <li class="">Performance and latency</li>
-<li class=""><strong>Gemini Cloud Assist</strong></li>
-<li class="">Backup and recovery</li>
+<li class=""><strong>Gemini Cloud Assist</strong> → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/vertex-ai-genai">Vertex AI &amp; GenAI</a></li>
+<li class="">Backup and recovery → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/backup-and-recovery">Backup &amp; Data Transfer</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="13-network-storage-and-compute-design">1.3 Network, Storage, and Compute Design<a href="#13-network-storage-and-compute-design" class="hash-link" aria-label="Direct link to 1.3 Network, Storage, and Compute Design" title="Direct link to 1.3 Network, Storage, and Compute Design" translate="no">​</a></h3>
 <p><strong>AI and ML Solutions</strong></p>
@@ -81,10 +80,7 @@
 </ul>
 <p><strong>Data Processing</strong></p>
 <ul>
-<li class=""><strong>Pub/Sub:</strong> Async messaging, decoupling services</li>
-<li class=""><strong>Dataflow:</strong> Stream/batch processing (Apache Beam)</li>
-<li class=""><strong>Dataproc:</strong> Managed Hadoop/Spark</li>
-<li class=""><strong>BigQuery:</strong> Serverless data warehouse, SQL + ML</li>
+<li class="">Pub/Sub, Dataflow, Dataproc, BigQuery, Eventarc → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/data-processing">Data Processing</a></li>
 </ul>
 <p><strong>Networking</strong></p>
 <ul>
@@ -96,9 +92,8 @@
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="14-migration-planning">1.4 Migration Planning<a href="#14-migration-planning" class="hash-link" aria-label="Direct link to 1.4 Migration Planning" title="Direct link to 1.4 Migration Planning" translate="no">​</a></h3>
 <ul>
-<li class="">Integrating solutions with existing systems</li>
-<li class="">Assessing and migrating systems and data (<strong>Google Cloud Migration Center</strong>)</li>
-<li class="">Migration methodologies: lift-and-shift, re-platform, re-architect</li>
+<li class="">Migration methodologies: rehost, replatform, refactor, retire → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/migration">Migration</a></li>
+<li class="">Assessing and migrating systems and data (Migration Center, Migrate for Compute Engine, DMS) → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/migration">Migration</a></li>
 <li class="">Workload testing, network planning, dependency planning</li>
 <li class="">Software licence implications and financial impact</li>
 </ul>
@@ -112,33 +107,25 @@
 <h2 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="section-2-managing-and-provisioning-a-cloud-solution-infrastructure-175">Section 2: Managing and Provisioning a Cloud Solution Infrastructure (~17.5%)<a href="#section-2-managing-and-provisioning-a-cloud-solution-infrastructure-175" class="hash-link" aria-label="Direct link to Section 2: Managing and Provisioning a Cloud Solution Infrastructure (~17.5%)" title="Direct link to Section 2: Managing and Provisioning a Cloud Solution Infrastructure (~17.5%)" translate="no">​</a></h2>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="21-network-topology-configuration">2.1 Network Topology Configuration<a href="#21-network-topology-configuration" class="hash-link" aria-label="Direct link to 2.1 Network Topology Configuration" title="Direct link to 2.1 Network Topology Configuration" translate="no">​</a></h3>
 <ul>
-<li class=""><strong>Hybrid Connectivity:</strong>
-<ul>
-<li class=""><strong>Cloud VPN:</strong> IPsec tunnel over public internet</li>
-<li class=""><strong>Cloud Interconnect:</strong> Dedicated (physical link) or Partner (via provider)</li>
-</ul>
-</li>
+<li class=""><strong>Hybrid Connectivity:</strong> Cloud VPN, Dedicated Interconnect, Partner Interconnect → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/hybrid-connectivity">Hybrid Connectivity</a></li>
 <li class="">Multicloud networking: GCP-to-GCP and cross-cloud patterns</li>
-<li class="">Security protection: firewall rules, intrusion protection, access control</li>
-<li class="">VPC design and load balancing (access to cloud, internet, and cloud-adjacent services)</li>
+<li class="">VPC design, firewall rules, hierarchical firewall policies, Private Google Access → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/vpc-and-firewall">VPC &amp; Firewall</a></li>
+<li class="">Load balancing → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/networking-services">Networking Services</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="22-storage-system-configuration">2.2 Storage System Configuration<a href="#22-storage-system-configuration" class="hash-link" aria-label="Direct link to 2.2 Storage System Configuration" title="Direct link to 2.2 Storage System Configuration" translate="no">​</a></h3>
 <ul>
-<li class="">Data storage allocation and provisioning</li>
-<li class="">Security and access management (IAM, signed URLs)</li>
-<li class="">Configuration for data transfer and latency</li>
-<li class="">Data retention, lifecycle management, and object versioning</li>
-<li class="">Data growth planning</li>
-<li class="">Data protection: backup and recovery</li>
+<li class="">Data storage allocation → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/database-selection">Database Selection</a></li>
+<li class="">Cloud Storage lifecycle management and object versioning → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/cloud-storage">Cloud Storage</a></li>
+<li class="">Data transfer services (Storage Transfer Service, Transfer Appliance, Datastream) → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/backup-and-recovery">Backup &amp; Data Transfer</a></li>
+<li class="">Data protection: snapshots, automated backups, PITR → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/backup-and-recovery">Backup &amp; Data Transfer</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="23-compute-system-configuration">2.3 Compute System Configuration<a href="#23-compute-system-configuration" class="hash-link" aria-label="Direct link to 2.3 Compute System Configuration" title="Direct link to 2.3 Compute System Configuration" translate="no">​</a></h3>
 <ul>
-<li class="">Compute resource provisioning (instance templates, MIGs)</li>
-<li class="">Compute volatility: spot vs. standard VMs</li>
-<li class="">Cloud-native network config for GCE, GKE, serverless, Google Cloud VMware Engine</li>
-<li class="">Infrastructure orchestration, patch management, Config Connector</li>
-<li class="">Container orchestration</li>
-<li class="">Serverless computing</li>
+<li class="">Compute resource provisioning: instance templates, MIGs, autoscaling, autohealing → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/infrastructure-orchestration">Infrastructure Orchestration</a></li>
+<li class="">Compute volatility: spot vs. standard VMs → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/compute-selection">Compute Selection</a></li>
+<li class="">Infrastructure orchestration: Terraform, Config Connector, VM Manager patch jobs → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/infrastructure-orchestration">Infrastructure Orchestration</a></li>
+<li class="">Container orchestration: GKE node pools, HPA, VPA → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/infrastructure-orchestration">Infrastructure Orchestration</a></li>
+<li class="">Compute selection: GCE, GKE, Cloud Run, Functions → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/compute-selection">Compute Selection</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="24-leveraging-vertex-ai-for-end-to-end-ml-workflows">2.4 Leveraging Vertex AI for End-to-End ML Workflows<a href="#24-leveraging-vertex-ai-for-end-to-end-ml-workflows" class="hash-link" aria-label="Direct link to 2.4 Leveraging Vertex AI for End-to-End ML Workflows" title="Direct link to 2.4 Leveraging Vertex AI for End-to-End ML Workflows" translate="no">​</a></h3>
 <ul>
@@ -177,18 +164,17 @@
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="41-technical-process-analysis">4.1 Technical Process Analysis<a href="#41-technical-process-analysis" class="hash-link" aria-label="Direct link to 4.1 Technical Process Analysis" title="Direct link to 4.1 Technical Process Analysis" translate="no">​</a></h3>
 <ul>
 <li class=""><strong>SDLC:</strong> Development, testing, release, rollout, and provisioning stages</li>
-<li class=""><strong>CI/CD:</strong> Cloud Build → Artifact Registry → Cloud Deploy (progressive delivery for GKE and Cloud Run)</li>
+<li class=""><strong>CI/CD:</strong> Cloud Build → Artifact Registry → Cloud Deploy → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/ci-cd">CI/CD &amp; Deployment</a></li>
 <li class="">Troubleshooting and root cause analysis best practices</li>
 <li class="">Testing and validation of software and infrastructure</li>
-<li class="">Service catalogue and provisioning</li>
-<li class="">Disaster recovery</li>
+<li class="">Disaster recovery → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/high-availability-dr">HA &amp; DR</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="42-business-process-analysis">4.2 Business Process Analysis<a href="#42-business-process-analysis" class="hash-link" aria-label="Direct link to 4.2 Business Process Analysis" title="Direct link to 4.2 Business Process Analysis" translate="no">​</a></h3>
 <ul>
 <li class="">Stakeholder management, change management, team skills readiness</li>
 <li class="">Decision-making processes and customer success management</li>
-<li class=""><strong>Cost optimisation (CapEx vs. OpEx):</strong> Committed Use Discounts, rightsizing with Recommender, billing exports to BigQuery, sustained use discounts, spot VMs</li>
-<li class="">Business continuity</li>
+<li class=""><strong>Cost optimisation (CapEx vs. OpEx):</strong> CUDs, rightsizing, billing exports, spot VMs → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/cost-optimization">Cost Optimization</a></li>
+<li class="">Business continuity → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/high-availability-dr">HA &amp; DR</a></li>
 </ul>
 <hr>
 <h2 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="section-5-managing-implementation-125">Section 5: Managing Implementation (~12.5%)<a href="#section-5-managing-implementation-125" class="hash-link" aria-label="Direct link to Section 5: Managing Implementation (~12.5%)" title="Direct link to Section 5: Managing Implementation (~12.5%)" translate="no">​</a></h2>
@@ -212,32 +198,31 @@
 <h2 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="section-6-ensuring-solution-and-operations-excellence-125">Section 6: Ensuring Solution and Operations Excellence (~12.5%)<a href="#section-6-ensuring-solution-and-operations-excellence-125" class="hash-link" aria-label="Direct link to Section 6: Ensuring Solution and Operations Excellence (~12.5%)" title="Direct link to Section 6: Ensuring Solution and Operations Excellence (~12.5%)" translate="no">​</a></h2>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="61-well-architected-framework--operational-excellence-pillar">6.1 Well-Architected Framework — Operational Excellence Pillar<a href="#61-well-architected-framework--operational-excellence-pillar" class="hash-link" aria-label="Direct link to 6.1 Well-Architected Framework — Operational Excellence Pillar" title="Direct link to 6.1 Well-Architected Framework — Operational Excellence Pillar" translate="no">​</a></h3>
 <ul>
-<li class="">Automation, change management, and continuous improvement</li>
+<li class="">Automation, change management, and continuous improvement → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/well-architected-framework">Well-Architected Framework</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="62-google-cloud-observability-solutions">6.2 Google Cloud Observability Solutions<a href="#62-google-cloud-observability-solutions" class="hash-link" aria-label="Direct link to 6.2 Google Cloud Observability Solutions" title="Direct link to 6.2 Google Cloud Observability Solutions" translate="no">​</a></h3>
 <ul>
-<li class=""><strong>Monitoring and Logging:</strong> Cloud Monitoring, Cloud Logging</li>
-<li class=""><strong>Profiling and Benchmarking:</strong> Cloud Profiler, Cloud Trace</li>
-<li class=""><strong>Alerting Strategies:</strong> SLI/SLO/SLA, error budgets, burn rate alerts</li>
+<li class="">Cloud Monitoring, Cloud Logging, Cloud Trace, Cloud Profiler, Error Reporting → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/observability">Observability</a></li>
+<li class="">SLI/SLO/SLA, error budgets, burn rate alerts → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/observability">Observability</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="63-deployment-and-release-management">6.3 Deployment and Release Management<a href="#63-deployment-and-release-management" class="hash-link" aria-label="Direct link to 6.3 Deployment and Release Management" title="Direct link to 6.3 Deployment and Release Management" translate="no">​</a></h3>
 <ul>
-<li class="">Deployment strategies: rolling, blue/green, canary</li>
-<li class="">Traffic splitting (Cloud Run, GKE) and rollback procedures</li>
+<li class="">Deployment strategies: rolling, blue/green, canary → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/ci-cd">CI/CD &amp; Deployment</a></li>
+<li class="">Traffic splitting (Cloud Run, GKE) and rollback procedures → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/ci-cd">CI/CD &amp; Deployment</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="64-assisting-with-the-support-of-deployed-solutions">6.4 Assisting with the Support of Deployed Solutions<a href="#64-assisting-with-the-support-of-deployed-solutions" class="hash-link" aria-label="Direct link to 6.4 Assisting with the Support of Deployed Solutions" title="Direct link to 6.4 Assisting with the Support of Deployed Solutions" translate="no">​</a></h3>
 <ul>
 <li class="">Incident response and escalation paths</li>
-<li class="">Diagnosing issues with Cloud Logging, Trace, Debugger</li>
+<li class="">Diagnosing issues with Cloud Logging, Trace, Debugger → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/observability">Observability</a></li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="65-evaluating-quality-control-measures">6.5 Evaluating Quality Control Measures<a href="#65-evaluating-quality-control-measures" class="hash-link" aria-label="Direct link to 6.5 Evaluating Quality Control Measures" title="Direct link to 6.5 Evaluating Quality Control Measures" translate="no">​</a></h3>
 <ul>
-<li class="">SLO error budget management</li>
+<li class="">SLO error budget management → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/observability">Observability</a></li>
 <li class="">Capacity planning and post-mortem / blameless review process</li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="66-ensuring-reliability-of-solutions-in-production">6.6 Ensuring Reliability of Solutions in Production<a href="#66-ensuring-reliability-of-solutions-in-production" class="hash-link" aria-label="Direct link to 6.6 Ensuring Reliability of Solutions in Production" title="Direct link to 6.6 Ensuring Reliability of Solutions in Production" translate="no">​</a></h3>
 <ul>
-<li class="">Chaos engineering, penetration testing, load testing</li>
+<li class="">Chaos engineering, penetration testing, load testing → <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/high-availability-dr">HA &amp; DR</a></li>
 </ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/shaokiat/shaokiat-blog/tree/main/docs/google-professional-cloud-architect/intro.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/shaokiat-blog/docs/web3/web3-introduction"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">What is Web 3.0?</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/cloud-storage"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Cloud Storage</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#case-studies" class="table-of-contents__link toc-highlight">Case Studies</a></li><li><a href="#section-1-designing-and-planning-a-cloud-solution-architecture-25" class="table-of-contents__link toc-highlight">Section 1: Designing and Planning a Cloud Solution Architecture (~25%)</a><ul><li><a href="#11-business-requirements" class="table-of-contents__link toc-highlight">1.1 Business Requirements</a></li><li><a href="#12-technical-requirements" class="table-of-contents__link toc-highlight">1.2 Technical Requirements</a></li><li><a href="#13-network-storage-and-compute-design" class="table-of-contents__link toc-highlight">1.3 Network, Storage, and Compute Design</a></li><li><a href="#14-migration-planning" class="table-of-contents__link toc-highlight">1.4 Migration Planning</a></li><li><a href="#15-future-solution-improvements" class="table-of-contents__link toc-highlight">1.5 Future Solution Improvements</a></li></ul></li><li><a href="#section-2-managing-and-provisioning-a-cloud-solution-infrastructure-175" class="table-of-contents__link toc-highlight">Section 2: Managing and Provisioning a Cloud Solution Infrastructure (~17.5%)</a><ul><li><a href="#21-network-topology-configuration" class="table-of-contents__link toc-highlight">2.1 Network Topology Configuration</a></li><li><a href="#22-storage-system-configuration" class="table-of-contents__link toc-highlight">2.2 Storage System Configuration</a></li><li><a href="#23-compute-system-configuration" class="table-of-contents__link toc-highlight">2.3 Compute System Configuration</a></li><li><a href="#24-leveraging-vertex-ai-for-end-to-end-ml-workflows" class="table-of-contents__link toc-highlight">2.4 Leveraging Vertex AI for End-to-End ML Workflows</a></li><li><a href="#25-configuring-prebuilt-solutions-or-apis-with-vertex-ai" class="table-of-contents__link toc-highlight">2.5 Configuring Prebuilt Solutions or APIs with Vertex AI</a></li></ul></li><li><a href="#section-3-designing-for-security-and-compliance-175" class="table-of-contents__link toc-highlight">Section 3: Designing for Security and Compliance (~17.5%)</a><ul><li><a href="#31-security-design" class="table-of-contents__link toc-highlight">3.1 Security Design</a></li><li><a href="#32-compliance-design" class="table-of-contents__link toc-highlight">3.2 Compliance Design</a></li></ul></li><li><a href="#section-4-analyzing-and-optimizing-technical-and-business-processes-15" class="table-of-contents__link toc-highlight">Section 4: Analyzing and Optimizing Technical and Business Processes (~15%)</a><ul><li><a href="#41-technical-process-analysis" class="table-of-contents__link toc-highlight">4.1 Technical Process Analysis</a></li><li><a href="#42-business-process-analysis" class="table-of-contents__link toc-highlight">4.2 Business Process Analysis</a></li></ul></li><li><a href="#section-5-managing-implementation-125" class="table-of-contents__link toc-highlight">Section 5: Managing Implementation (~12.5%)</a><ul><li><a href="#51-advising-development-and-operations-teams" class="table-of-contents__link toc-highlight">5.1 Advising Development and Operations Teams</a></li><li><a href="#52-interacting-with-google-cloud-programmatically" class="table-of-contents__link toc-highlight">5.2 Interacting with Google Cloud Programmatically</a></li></ul></li><li><a href="#section-6-ensuring-solution-and-operations-excellence-125" class="table-of-contents__link toc-highlight">Section 6: Ensuring Solution and Operations Excellence (~12.5%)</a><ul><li><a href="#61-well-architected-framework--operational-excellence-pillar" class="table-of-contents__link toc-highlight">6.1 Well-Architected Framework — Operational Excellence Pillar</a></li><li><a href="#62-google-cloud-observability-solutions" class="table-of-contents__link toc-highlight">6.2 Google Cloud Observability Solutions</a></li><li><a href="#63-deployment-and-release-management" class="table-of-contents__link toc-highlight">6.3 Deployment and Release Management</a></li><li><a href="#64-assisting-with-the-support-of-deployed-solutions" class="table-of-contents__link toc-highlight">6.4 Assisting with the Support of Deployed Solutions</a></li><li><a href="#65-evaluating-quality-control-measures" class="table-of-contents__link toc-highlight">6.5 Evaluating Quality Control Measures</a></li><li><a href="#66-ensuring-reliability-of-solutions-in-production" class="table-of-contents__link toc-highlight">6.6 Ensuring Reliability of Solutions in Production</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Content</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/shaokiat-blog/">Home</a></li><li class="footer__item"><a class="footer__link-item" href="/shaokiat-blog/docs/intro">Docs</a></li><li class="footer__item"><a class="footer__link-item" href="/shaokiat-blog/blog">Blog</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Discover</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://shaokiat.vercel.app" target="_blank" rel="noopener noreferrer" class="footer__link-item">Porfolio Website</a></li><li class="footer__item"><a href="https://github.com/shaokiat" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Contact Me</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://linkedin.com/in/shaokiat" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn</a></li><li class="footer__item"><a href="mailto:shaokiat@u.nus.edu" target="_blank" rel="noopener noreferrer" class="footer__link-item">Email<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://shaokiat.vercel.app/resume.pdf" target="_blank" rel="noopener noreferrer" class="footer__link-item">Resume<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2026 Lim Shao Kiat. Built with Docusaurus.</div></div></div></footer></div>
 </body>
 </html>
