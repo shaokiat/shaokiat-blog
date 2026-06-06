@@ -59,6 +59,95 @@ sidebar_position: 5
 **"Apply safety guardrails to prompts and responses from any LLM"**
 → **Model Armor.** Works as a layer on top of any model, detecting prompt injection, jailbreaks, and unsafe content categories.
 
+## Gemini Cloud Assist
+
+An AI assistant built directly into the Google Cloud Console, gcloud CLI, and Cloud Shell. It helps architects, developers, and operators with:
+
+- **Explaining resources** — ask "what does this Cloud Run service do?" and get a contextual summary
+- **Generating configurations** — describe what you want in natural language; Gemini Cloud Assist produces Terraform, gcloud commands, or YAML
+- **Troubleshooting** — paste an error message or describe a problem; receive guided remediation steps
+- **Log analysis** — summarise recent log activity or help write log queries
+
+**Exam context:** Gemini Cloud Assist appears in Section 1.2 (Technical Requirements) and Section 5.1 (Advising Teams). Exam questions about it typically ask when it would help an operations team — the answer is *accelerating operational tasks like troubleshooting, writing IaC, and understanding unfamiliar resources*, not for building custom AI features (use Vertex AI for that).
+
+> Docs: [Gemini Cloud Assist overview](https://cloud.google.com/gemini/docs/discover/overview)
+
+---
+
+## Conversational AI and Agent Services
+
+These three services are the most commonly confused in the exam. The right choice depends on how much customisation you need and what the user interaction model looks like.
+
+### Gemini on Vertex AI
+
+Gemini is Google's multimodal foundation model, accessible via API through Vertex AI. It processes and generates text, code, images, audio, and video.
+
+**Intended purpose:** The underlying intelligence layer. You call Gemini directly when you need a general-purpose LLM capability — summarisation, translation, code generation, question answering over a prompt — and you are building the surrounding application logic yourself.
+
+**Key variants:**
+- **Gemini 2.0 Flash** — low latency, high throughput, cost-efficient for high-volume tasks
+- **Gemini 2.0 Pro** — best reasoning and complex instruction following
+- **Gemini 2.0 Flash-Lite** — cheapest option for simple classification or extraction tasks
+
+**When to use over Agent Builder:** When you need raw LLM access, are building a custom orchestration layer, or need multimodal inputs (e.g., analysing video frames alongside text).
+
+> Docs: [Gemini on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/overview)
+
+---
+
+### Vertex AI Agent Builder
+
+A managed platform for building **RAG-powered search applications** and **multi-turn conversational agents** without writing orchestration code.
+
+**Intended purpose:** Grounding LLM responses in *your* data. Agent Builder connects Gemini to your data sources (Cloud Storage documents, BigQuery tables, websites, third-party connectors) so it can answer questions with citations from your content rather than relying solely on training knowledge.
+
+**Two main capabilities:**
+
+| Capability | What It Does |
+|---|---|
+| **Search** | Enterprise search over your documents and data with LLM-generated summaries |
+| **Conversation (Agent)** | Multi-turn chatbot grounded in your content; can call tools and APIs |
+
+**Key features:**
+- Built-in chunking, embedding, and vector indexing of your documents
+- Grounding with citations — responses link back to source documents
+- Multi-agent orchestration via **Agent Engine** for complex workflows
+- No need to manage a vector database manually
+
+**When to use over raw Gemini:** When the requirement is *"answer questions based on our content / knowledge base"* or *"build a support chatbot with access to our documentation"*. Agent Builder handles the RAG plumbing; you don't build it yourself.
+
+> Docs: [Vertex AI Agent Builder](https://cloud.google.com/generative-ai-app-builder/docs/introduction)
+
+---
+
+### Dialogflow CX
+
+A dedicated platform for building **structured, flow-based conversational agents** — voice IVR systems, contact centre bots, and complex multi-turn dialogue with strict conversation control.
+
+**Intended purpose:** Conversations that follow defined paths with explicit states, intents, and transitions. Built for enterprise contact centres and voice interfaces where the dialogue structure must be precisely controlled and audited.
+
+**Key features:**
+- Visual flow builder — design conversation states and transitions graphically
+- **Intent detection** — classify user utterances into defined categories
+- **Entity extraction** — pull structured data (dates, names, order numbers) from natural language
+- Native integration with **CCAI (Contact Center AI)** and telephony systems
+- Supports voice (via Telephony Gateway) and text channels
+
+**Dialogflow CX vs Agent Builder — When to Choose:**
+
+| | Dialogflow CX | Agent Builder |
+|---|---|---|
+| Conversation structure | Explicit flows and states | Open-ended, LLM-driven |
+| Grounding in documents | Limited | Core feature (RAG) |
+| Voice / telephony | Native | Limited |
+| Contact centre use case | Yes | Not primary use |
+| Dev skill required | Flow design + intents | Minimal (managed) |
+| Best when | Regulated, auditable dialogue; voice IVR | Knowledge base Q&A; support chatbots |
+
+> Docs: [Dialogflow CX overview](https://cloud.google.com/dialogflow/cx/docs/basics)
+
+---
+
 ## Vertex AI Pipelines vs Custom Training Jobs
 
 | | Pipelines | Custom Training |
@@ -74,6 +163,7 @@ sidebar_position: 5
 - [Gemini on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/overview)
 - [Model Garden](https://cloud.google.com/vertex-ai/generative-ai/docs/model-garden/explore-models)
 - [Vertex AI Agent Builder](https://cloud.google.com/generative-ai-app-builder/docs/introduction)
+- [Dialogflow CX overview](https://cloud.google.com/dialogflow/cx/docs/basics)
 - [Vertex AI Pipelines](https://cloud.google.com/vertex-ai/docs/pipelines/introduction)
 - [Vertex AI Explainability](https://cloud.google.com/vertex-ai/docs/explainable-ai/overview)
 - [AI Hypercomputer](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-ai-hypercomputer)

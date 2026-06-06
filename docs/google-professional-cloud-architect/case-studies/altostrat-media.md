@@ -7,6 +7,8 @@ sidebar_position: 1
 # Case Study: Altostrat Media
 
 > Official case study: [Altostrat Media Case Study PDF](https://services.google.com/fh/files/misc/v6.1_pca_altostrat_media_case_study_english.pdf)
+>
+> Sample questions walkthrough: [Altostrat Media — PCA Question Bank (YouTube)](https://www.youtube.com/watch?v=ZMaBgxe91Yw)
 
 ## What This Case Study Is About
 

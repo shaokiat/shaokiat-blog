@@ -24,25 +24,24 @@ Four published case studies appear in the exam. Understand the business and tech
 ### 1.1 Business Requirements
 - Business use cases and product strategy
 - Identifying functional and non-functional requirements
-- Business continuity planning
-- Cost optimization
+- Business continuity planning → [HA & DR](./reference/high-availability-dr.md)
+- Cost optimization → [Cost Optimization](./reference/cost-optimization.md)
 - Supporting the application design
 - Integration patterns with external systems
 - Movement of data
 - Design decision trade-offs
 - Workload disposition strategies (build, buy, modify, or deprecate)
 - Success measurements: KPIs, ROI, metrics
-- Security and compliance
-- Observability
+- Security and compliance → [Security Controls](./reference/security-controls.md)
+- Observability → [Observability](./reference/observability.md)
 
 ### 1.2 Technical Requirements
-- Familiarity with the **Google Cloud Well-Architected Framework**
-- High availability and failover design
-- Flexibility of cloud resources
-- Scalability to meet growth requirements
+- **Google Cloud Well-Architected Framework** → [Well-Architected Framework](./reference/well-architected-framework.md)
+- High availability and failover design → [HA & DR](./reference/high-availability-dr.md)
+- Flexibility and scalability of cloud resources → [Compute Selection](./reference/compute-selection.md)
 - Performance and latency
-- **Gemini Cloud Assist**
-- Backup and recovery
+- **Gemini Cloud Assist** → [Vertex AI & GenAI](./reference/vertex-ai-genai.md)
+- Backup and recovery → [Backup & Data Transfer](./reference/backup-and-recovery.md)
 
 ### 1.3 Network, Storage, and Compute Design
 
@@ -64,10 +63,7 @@ Four published case studies appear in the exam. Understand the business and tech
 - **Cloud Storage:** Object storage; Standard, Nearline, Coldline, Archive classes → [Reference: Cloud Storage](./reference/cloud-storage.md)
 
 **Data Processing**
-- **Pub/Sub:** Async messaging, decoupling services
-- **Dataflow:** Stream/batch processing (Apache Beam)
-- **Dataproc:** Managed Hadoop/Spark
-- **BigQuery:** Serverless data warehouse, SQL + ML
+- Pub/Sub, Dataflow, Dataproc, BigQuery, Eventarc → [Data Processing](./reference/data-processing.md)
 
 **Networking**
 - VPC, peering, firewalls, load balancers, routing, container networking
@@ -77,9 +73,8 @@ Four published case studies appear in the exam. Understand the business and tech
 - Cloud CDN, Cloud NAT, Cloud Armor, Cloud DNS
 
 ### 1.4 Migration Planning
-- Integrating solutions with existing systems
-- Assessing and migrating systems and data (**Google Cloud Migration Center**)
-- Migration methodologies: lift-and-shift, re-platform, re-architect
+- Migration methodologies: rehost, replatform, refactor, retire → [Migration](./reference/migration.md)
+- Assessing and migrating systems and data (Migration Center, Migrate for Compute Engine, DMS) → [Migration](./reference/migration.md)
 - Workload testing, network planning, dependency planning
 - Software licence implications and financial impact
 
@@ -93,28 +88,23 @@ Four published case studies appear in the exam. Understand the business and tech
 ## Section 2: Managing and Provisioning a Cloud Solution Infrastructure (~17.5%)
 
 ### 2.1 Network Topology Configuration
-- **Hybrid Connectivity:**
-  - **Cloud VPN:** IPsec tunnel over public internet
-  - **Cloud Interconnect:** Dedicated (physical link) or Partner (via provider)
+- **Hybrid Connectivity:** Cloud VPN, Dedicated Interconnect, Partner Interconnect → [Hybrid Connectivity](./reference/hybrid-connectivity.md)
 - Multicloud networking: GCP-to-GCP and cross-cloud patterns
-- Security protection: firewall rules, intrusion protection, access control
-- VPC design and load balancing (access to cloud, internet, and cloud-adjacent services)
+- VPC design, firewall rules, hierarchical firewall policies, Private Google Access → [VPC & Firewall](./reference/vpc-and-firewall.md)
+- Load balancing → [Networking Services](./reference/networking-services.md)
 
 ### 2.2 Storage System Configuration
-- Data storage allocation and provisioning
-- Security and access management (IAM, signed URLs)
-- Configuration for data transfer and latency
-- Data retention, lifecycle management, and object versioning
-- Data growth planning
-- Data protection: backup and recovery
+- Data storage allocation → [Database Selection](./reference/database-selection.md)
+- Cloud Storage lifecycle management and object versioning → [Cloud Storage](./reference/cloud-storage.md)
+- Data transfer services (Storage Transfer Service, Transfer Appliance, Datastream) → [Backup & Data Transfer](./reference/backup-and-recovery.md)
+- Data protection: snapshots, automated backups, PITR → [Backup & Data Transfer](./reference/backup-and-recovery.md)
 
 ### 2.3 Compute System Configuration
-- Compute resource provisioning (instance templates, MIGs)
-- Compute volatility: spot vs. standard VMs
-- Cloud-native network config for GCE, GKE, serverless, Google Cloud VMware Engine
-- Infrastructure orchestration, patch management, Config Connector
-- Container orchestration
-- Serverless computing
+- Compute resource provisioning: instance templates, MIGs, autoscaling, autohealing → [Infrastructure Orchestration](./reference/infrastructure-orchestration.md)
+- Compute volatility: spot vs. standard VMs → [Compute Selection](./reference/compute-selection.md)
+- Infrastructure orchestration: Terraform, Config Connector, VM Manager patch jobs → [Infrastructure Orchestration](./reference/infrastructure-orchestration.md)
+- Container orchestration: GKE node pools, HPA, VPA → [Infrastructure Orchestration](./reference/infrastructure-orchestration.md)
+- Compute selection: GCE, GKE, Cloud Run, Functions → [Compute Selection](./reference/compute-selection.md)
 
 ### 2.4 Leveraging Vertex AI for End-to-End ML Workflows
 - **Vertex AI Pipelines:** Automate and orchestrate the ML lifecycle
@@ -152,17 +142,16 @@ Four published case studies appear in the exam. Understand the business and tech
 
 ### 4.1 Technical Process Analysis
 - **SDLC:** Development, testing, release, rollout, and provisioning stages
-- **CI/CD:** Cloud Build → Artifact Registry → Cloud Deploy (progressive delivery for GKE and Cloud Run)
+- **CI/CD:** Cloud Build → Artifact Registry → Cloud Deploy → [CI/CD & Deployment](./reference/ci-cd.md)
 - Troubleshooting and root cause analysis best practices
 - Testing and validation of software and infrastructure
-- Service catalogue and provisioning
-- Disaster recovery
+- Disaster recovery → [HA & DR](./reference/high-availability-dr.md)
 
 ### 4.2 Business Process Analysis
 - Stakeholder management, change management, team skills readiness
 - Decision-making processes and customer success management
-- **Cost optimisation (CapEx vs. OpEx):** Committed Use Discounts, rightsizing with Recommender, billing exports to BigQuery, sustained use discounts, spot VMs
-- Business continuity
+- **Cost optimisation (CapEx vs. OpEx):** CUDs, rightsizing, billing exports, spot VMs → [Cost Optimization](./reference/cost-optimization.md)
+- Business continuity → [HA & DR](./reference/high-availability-dr.md)
 
 ---
 
@@ -187,24 +176,23 @@ Four published case studies appear in the exam. Understand the business and tech
 ## Section 6: Ensuring Solution and Operations Excellence (~12.5%)
 
 ### 6.1 Well-Architected Framework — Operational Excellence Pillar
-- Automation, change management, and continuous improvement
+- Automation, change management, and continuous improvement → [Well-Architected Framework](./reference/well-architected-framework.md)
 
 ### 6.2 Google Cloud Observability Solutions
-- **Monitoring and Logging:** Cloud Monitoring, Cloud Logging
-- **Profiling and Benchmarking:** Cloud Profiler, Cloud Trace
-- **Alerting Strategies:** SLI/SLO/SLA, error budgets, burn rate alerts
+- Cloud Monitoring, Cloud Logging, Cloud Trace, Cloud Profiler, Error Reporting → [Observability](./reference/observability.md)
+- SLI/SLO/SLA, error budgets, burn rate alerts → [Observability](./reference/observability.md)
 
 ### 6.3 Deployment and Release Management
-- Deployment strategies: rolling, blue/green, canary
-- Traffic splitting (Cloud Run, GKE) and rollback procedures
+- Deployment strategies: rolling, blue/green, canary → [CI/CD & Deployment](./reference/ci-cd.md)
+- Traffic splitting (Cloud Run, GKE) and rollback procedures → [CI/CD & Deployment](./reference/ci-cd.md)
 
 ### 6.4 Assisting with the Support of Deployed Solutions
 - Incident response and escalation paths
-- Diagnosing issues with Cloud Logging, Trace, Debugger
+- Diagnosing issues with Cloud Logging, Trace, Debugger → [Observability](./reference/observability.md)
 
 ### 6.5 Evaluating Quality Control Measures
-- SLO error budget management
+- SLO error budget management → [Observability](./reference/observability.md)
 - Capacity planning and post-mortem / blameless review process
 
 ### 6.6 Ensuring Reliability of Solutions in Production
-- Chaos engineering, penetration testing, load testing
+- Chaos engineering, penetration testing, load testing → [HA & DR](./reference/high-availability-dr.md)

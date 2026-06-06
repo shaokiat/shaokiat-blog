@@ -66,6 +66,88 @@ Web Application Firewall (WAF) and DDoS protection, integrated with the Global E
 > Docs: [API Gateway overview](https://cloud.google.com/api-gateway/docs/about-api-gateway)  
 > Docs: [Cloud Endpoints overview](https://cloud.google.com/endpoints/docs/openapi/about-cloud-endpoints)
 
+---
+
+## Apigee — Deep Dive
+
+Apigee is Google Cloud's **full-lifecycle API management platform**. It sits as a proxy layer between API consumers (external partners, mobile apps, third-party developers) and your backend services, handling everything from security enforcement to traffic shaping to developer onboarding.
+
+> Docs: [Apigee overview](https://cloud.google.com/apigee/docs/api-platform/get-started/what-apigee)
+
+### Core Concepts
+
+**API Proxy**
+The fundamental unit in Apigee. An API proxy is a facade that sits in front of your backend service. Consumers call the proxy URL; Apigee applies policies, then forwards the request to the backend. Your backend URL is never exposed directly.
+
+```
+Consumer → Apigee API Proxy → Backend Service (Cloud Run, GKE, on-prem)
+```
+
+**API Product**
+A bundle of one or more API proxies packaged with an access quota and plan. A single backend API can be packaged into multiple products — e.g. a "Free" product (100 calls/day) and a "Premium" product (unlimited calls). Developers subscribe to products, not proxies directly.
+
+**Developer Portal**
+A self-service website where external developers can discover APIs, read documentation, register apps, and obtain API keys. Apigee generates the portal from your API specs (OpenAPI/Swagger) automatically.
+
+**App and API Key**
+When a developer registers on the portal, they create an *App* and receive an API key. The key is tied to an API product and its quota. Apigee validates the key on every inbound request.
+
+### Policy Framework
+
+Apigee enforces behaviour through **policies** attached to the request or response flow. Policies are applied without changing backend code.
+
+| Policy Category | Examples |
+|---|---|
+| **Security** | OAuth 2.0 token validation, API key verification, JWT validation, HMAC signature |
+| **Traffic management** | Quota (per API key), Spike Arrest (rate limiting), Concurrent Rate Limit |
+| **Mediation** | JSON ↔ XML transformation, payload masking, header manipulation, SOAP-to-REST |
+| **Extension** | Call external services, JavaScript/Python custom logic, cache lookup/population |
+| **Threat protection** | JSON/XML threat protection (malformed payload rejection), RegEx threat protection |
+
+### Environments and Environment Groups
+
+Apigee uses **environments** (e.g. `dev`, `staging`, `prod`) to deploy different versions of an API proxy. An **environment group** maps hostnames to environments, so `api-dev.example.com` routes to `dev` and `api.example.com` routes to `prod`.
+
+### OAuth 2.0 and Security Flows
+
+Apigee has built-in support for all standard OAuth 2.0 grant types:
+
+| Grant Type | Use Case |
+|---|---|
+| **Client Credentials** | Machine-to-machine (M2M), no user involved — common for partner integrations |
+| **Authorization Code** | User-delegated access — web and mobile apps acting on behalf of a user |
+| **Implicit** | Legacy browser-based flows (now discouraged) |
+| **Resource Owner Password** | Direct credential exchange (avoid unless legacy requirement) |
+
+Apigee acts as the **OAuth authorization server** — it issues, validates, and revokes tokens without your backend needing to implement OAuth logic.
+
+### Analytics and Monetisation
+
+- **Built-in analytics dashboard** — tracks API traffic, latency, error rates, and quota usage per developer and product
+- **Custom reports** — slice analytics by proxy, app, developer, or environment
+- **Monetisation** (Apigee X) — define billing models (pay-per-call, revenue sharing, freemium) and generate invoices for API usage directly from the platform
+
+### Apigee X vs Apigee Hybrid
+
+| | Apigee X | Apigee Hybrid |
+|---|---|---|
+| **Runtime location** | Fully managed on Google Cloud | Runtime runs in your own Kubernetes cluster (on-prem or another cloud) |
+| **Management plane** | Google Cloud | Google Cloud |
+| **Use when** | All workloads on GCP | Data residency requirements, on-prem backends, low-latency to on-prem |
+| **Ops overhead** | Low | Higher (you manage the runtime cluster) |
+
+### When Apigee Appears in Case Studies
+
+The exam uses Apigee when a scenario includes any of:
+
+- **External partner or developer ecosystem** — third parties need access to your APIs with different tiers, quotas, or contracts
+- **API monetisation** — charging for API usage or managing revenue-sharing agreements
+- **Legacy SOAP-to-REST** — exposing an old SOAP backend as a modern REST API without changing the backend
+- **Centralised API governance across teams** — one team owns API security policy; product teams just deploy proxies
+- **Developer self-service portal** — developers discover, subscribe to, and test APIs without involving your engineering team
+
+**KnightMotives example:** Third-party developers building in-vehicle apps need access to vehicle telemetry APIs. Apigee provides separate API products (with different quotas) for OEM partners vs. independent developers, a self-service portal, and OAuth-based authentication — all without changes to the backend data services.
+
 ## Private Service Connect
 
 Allows consumers to access Google APIs and managed services (or third-party services in other VPCs) via **private internal IPs**, without traffic traversing the public internet.
@@ -103,6 +185,10 @@ Managed, authoritative DNS service. Supports public and private zones.
 - [Cloud CDN overview](https://cloud.google.com/cdn/docs/overview)
 - [Cloud Armor overview](https://cloud.google.com/armor/docs/cloud-armor-overview)
 - [Apigee overview](https://cloud.google.com/apigee/docs/api-platform/get-started/what-apigee)
+- [Apigee API proxies](https://cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies)
+- [Apigee policies reference](https://cloud.google.com/apigee/docs/api-platform/reference/policies/reference-overview-policy)
+- [Apigee X vs Hybrid](https://cloud.google.com/apigee/docs/api-platform/get-started/compare-apigee-products)
+- [Apigee monetisation](https://cloud.google.com/apigee/docs/api-platform/monetization/basics)
 - [API Gateway overview](https://cloud.google.com/api-gateway/docs/about-api-gateway)
 - [Private Service Connect overview](https://cloud.google.com/vpc/docs/private-service-connect)
 - [Cloud NAT overview](https://cloud.google.com/nat/docs/overview)
