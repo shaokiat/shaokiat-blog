@@ -32,6 +32,8 @@ sidebar_position: 6
 
 **Least privilege principle:** Grant the minimum role needed, scoped to the lowest resource level possible (resource > project > folder > org).
 
+**Exam signal:** "Predefined role is too broad" or "need a subset of permissions" → **Custom role**. "Developer needs read-only access to a single bucket" → predefined `roles/storage.objectViewer` scoped to that bucket, not the project. Exam avoids primitive roles (Owner/Editor) in any answer involving production or compliance. Service accounts should use predefined roles scoped to the resource they access — never primitive roles.
+
 ## Cloud KMS and CMEK
 
 By default, Google manages encryption keys (GMEK). **CMEK** lets you supply your own keys via **Cloud KMS**.
@@ -55,6 +57,8 @@ Creates a **security perimeter** around Google Cloud APIs and services. Requests
 - Enforcing that BigQuery data can only be accessed from a trusted VPC
 
 **Not a replacement for IAM** — IAM controls *who* can access; VPC SC controls *from where*.
+
+**Exam signal:** "Prevent data exfiltration", "ensure BigQuery data can only be accessed from our network", or "a compromised credential shouldn't be able to copy data out" → **VPC Service Controls**. Distinguisher: if the question is about *who* can access → IAM; if it's about *from where* or *stopping lateral data movement* → VPC SC.
 
 > Docs: [VPC Service Controls overview](https://cloud.google.com/vpc-service-controls/docs/overview)
 
@@ -80,25 +84,98 @@ How it works: external identity token → Workload Identity Pool → short-lived
 
 **Use instead of:** exporting and distributing service account JSON keys, which are long-lived and hard to rotate.
 
+**Exam signal:** "GitHub Actions / Jenkins / AWS Lambda needs to access GCP without storing a service account key" or "eliminate long-lived credentials for CI/CD pipelines" → **Workload Identity Federation**. If the workload is *within* GCP (e.g., a GKE pod) → use **Workload Identity for GKE** (binds a Kubernetes service account to a GCP service account instead).
+
 > Docs: [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
 
 ## Identity-Aware Proxy (IAP)
 
-Enforces access control for web apps and SSH/RDP to VMs based on identity and context (device, location), without requiring a VPN.
+IAP sits in front of your application or VM and intercepts every request. Before forwarding the request, it verifies the user's **Google identity** and checks that they have the `roles/iap.httpsResourceAccessor` (for web apps) or `roles/iap.tunnelResourceAccessor` (for TCP/SSH) IAM binding. Requests that fail either check are rejected with a 403 — the backend never sees them.
 
-**Use when:** Employees need to access internal tools or GCE VMs securely over the internet without exposing them publicly.
+### What IAP Protects
 
-> Docs: [Identity-Aware Proxy overview](https://cloud.google.com/iap/docs/concepts-overview)
+| Target | How IAP Is Applied | Protocol |
+|---|---|---|
+| **App Engine apps** | Enabled per app in the console; no code change needed | HTTPS |
+| **Cloud Run services** | Enabled on the Cloud Run service; requires authenticated ingress | HTTPS |
+| **GKE workloads** | Via a BackendConfig resource attached to the Ingress | HTTPS |
+| **Compute Engine web apps** | Enabled on the backend service in a load balancer | HTTPS |
+| **GCE VMs (SSH/RDP)** | IAP TCP tunnelling — `gcloud compute ssh` routes through IAP | TCP tunnel |
+
+### IAP TCP Tunnelling (SSH Without a Bastion)
+
+IAP can tunnel TCP traffic (SSH, RDP) to a VM that has **no public IP and no firewall rule open to the internet**. The flow:
+
+1. Developer runs `gcloud compute ssh instance-name --tunnel-through-iap`
+2. gcloud opens a local port and tunnels traffic through `iap.googleapis.com` over HTTPS
+3. IAP validates the developer's identity and IAM binding, then forwards traffic to the VM's internal IP on port 22
+4. The only required firewall rule allows ingress from `35.235.240.0/20` (IAP's IP range) on port 22 — not from `0.0.0.0/0`
+
+**Why this matters for the exam:** This replaces the traditional pattern of a bastion/jump host. Fewer VMs to manage, no public IPs exposed, and access is still controlled by IAM.
+
+### IAP vs VPN vs Bastion Host
+
+| | IAP | VPN (Cloud VPN) | Bastion Host |
+|---|---|---|---|
+| Access control | Per-user IAM binding | Network-level (anyone on the VPN) | SSH key or IAM at the OS level |
+| Public IP on target | Not required | Not required | Not required |
+| User experience | Browser / gcloud command | VPN client | SSH to bastion, then hop |
+| Admin overhead | Low (IAM bindings) | Medium (VPN gateway config) | High (manage the bastion VM) |
+| Best for | Individual app / VM access | Full network connectivity | Legacy environments |
+
+**Exam signal:** "Secure access to an internal web app without a VPN", "replace VPN for accessing internal tools", "allow SSH to GCE instances without a public IP", or "replace bastion host" → **IAP**. Distinguisher from BeyondCorp: IAP enforces identity-based access; BeyondCorp/Context-Aware Access adds device posture checks on top of IAP.
+
+> Docs: [Identity-Aware Proxy overview](https://cloud.google.com/iap/docs/concepts-overview) · [IAP TCP forwarding](https://cloud.google.com/iap/docs/using-tcp-forwarding)
 
 ## Organization Policy
 
-Preventive guardrails that *restrict what can be configured*, regardless of IAM permissions. Examples:
-- Prevent service account key creation
-- Restrict which regions resources can be deployed to
-- Enforce uniform bucket-level access on Cloud Storage
-- Disable public IP on VM instances
+Organization Policy enforces **preventive guardrails** across your resource hierarchy (org → folder → project). Policies restrict what *can be configured*, regardless of what IAM allows. A user with `roles/owner` on a project still cannot violate an Org Policy set at the folder or org level.
 
-> Docs: [Organization Policy overview](https://cloud.google.com/resource-manager/docs/organization-policy/overview)
+### How It Works
+
+Policies are defined as **constraints** — boolean toggles or allowed/denied value lists — attached to a node in the hierarchy. A constraint set at the org level propagates down to all folders and projects unless explicitly overridden at a lower node (if the policy allows inheritance override).
+
+```
+Organisation  ←  policy set here applies to everything below
+  └── Folder (e.g. Production)
+        └── Project A   ←  can tighten but not loosen org-level policy
+        └── Project B
+```
+
+### Common Constraints
+
+| Constraint | What It Enforces |
+|---|---|
+| `constraints/iam.disableServiceAccountKeyCreation` | Block creation of downloadable SA key files org-wide |
+| `constraints/compute.restrictCloudSQLInstances` | Restrict Cloud SQL to approved instance types |
+| `constraints/compute.vmExternalIpAccess` | Deny external (public) IPs on all GCE VMs |
+| `constraints/gcp.resourceLocations` | Restrict resource creation to specified regions (data residency) |
+| `constraints/storage.uniformBucketLevelAccess` | Enforce uniform bucket-level IAM; disables per-object ACLs |
+| `constraints/storage.publicAccessPrevention` | Prevent any GCS bucket or object from being made public |
+| `constraints/compute.requireShieldedVm` | Require all new VMs to use Shielded VM (Secure Boot, vTPM) |
+| `constraints/compute.skipDefaultNetworkCreation` | Prevent the default VPC from being created in new projects |
+
+### Inheritance and Override
+
+- By default, a constraint set at the org level is **inherited** by all folders and projects below.
+- A lower-level node can **tighten** the policy (e.g., restrict regions further), but cannot relax it.
+- Some constraints support `inheritFromParent: false` to allow a project to define an independent policy — use this carefully; it's a common exam trap where a project-level override silently weakens an org-level control.
+
+### Org Policy vs IAM — Key Distinction
+
+| | Organization Policy | IAM |
+|---|---|---|
+| Controls | What *can* be done (configuration actions) | Who *can* do what (API permissions) |
+| Scope | Resource type and configuration | Principal and resource |
+| Enforcement | Preventive — blocks the API call | Authorisation — denies the API call |
+| Override by project admin | No (set at org/folder level) | Yes (if granted the right role) |
+| Example | "No VM may have a public IP" | "This user cannot create VMs" |
+
+Use both together: Org Policy sets the ceiling; IAM controls who operates within it.
+
+**Exam signal:** "Prevent developers from creating service account keys across the org", "enforce all VMs must be in us-central1 for data residency", "ensure no GCS bucket can be made public", or "new projects must not get a default VPC" → **Organization Policy**. Org Policy is always the answer when the requirement is a *hard, org-wide technical guardrail* that individual project owners cannot override — as opposed to a permission denial (IAM) or a network boundary (VPC SC).
+
+> Docs: [Organization Policy overview](https://cloud.google.com/resource-manager/docs/organization-policy/overview) · [Predefined constraints](https://cloud.google.com/resource-manager/docs/organization-policy/org-policy-constraints)
 
 ## Security Command Center (SCC)
 
@@ -189,7 +266,7 @@ Extends IAP to enforce access decisions based on **identity AND device context**
 - Device posture (is it corp-managed? Does it have a screen lock? Is the OS patched?)
 - Network context (are they on a trusted network?)
 
-**Use when:** The exam mentions *"zero-trust access"*, *"employees accessing internal apps from unmanaged devices"*, or *"enforce device policy without a VPN"*.
+**Exam signal:** "Zero-trust access", "enforce that only managed/compliant devices can access internal apps", or "access control based on device posture, not just identity" → **BeyondCorp / Context-Aware Access**. Distinguisher: IAP alone checks identity; Context-Aware Access (layered on IAP) additionally checks device health, OS version, and corporate enrollment status before granting access.
 
 > Docs: [BeyondCorp Enterprise overview](https://cloud.google.com/beyondcorp-enterprise/docs/overview)
 
@@ -206,7 +283,7 @@ Discovers, classifies, and protects sensitive data (PII, PCI, PHI) across GCP st
   - **Bucketing / generalisation** — replace exact values with ranges (e.g. age 27 → "20–30")
 - **Risk analysis** — measure re-identification risk in a dataset
 
-**Use when:** The exam mentions *"find and mask PII before loading to BigQuery"*, *"ensure credit card numbers are not stored in raw form"*, or *"classify data across our data lake"*.
+**Exam signal:** "Find and mask PII before loading to BigQuery", "ensure credit card numbers are not stored in raw form", "classify data across our data lake", or "anonymise user data for analytics" → **Sensitive Data Protection**. Common trap: CMEK encrypts data but doesn't remove PII — if the requirement is to *eliminate* sensitive values from a dataset, use DLP de-identification, not encryption.
 
 > Docs: [Sensitive Data Protection overview](https://cloud.google.com/sensitive-data-protection/docs/overview)
 
@@ -223,7 +300,7 @@ Ensures only verified, trusted code and images reach production.
 
 **SLSA (Supply chain Levels for Software Artifacts)** — a security framework for hardening the build process. GCP's Cloud Build supports SLSA provenance generation (proof of where and how a build was produced).
 
-**Use when:** The exam mentions *"ensure only approved images are deployed"*, *"prevent deploying images with critical vulnerabilities"*, or *"secure the CI/CD pipeline"*.
+**Exam signal:** "Ensure only approved/signed images are deployed to GKE", "prevent deploying images with critical CVEs", or "enforce that all container images pass a security scan before production" → **Binary Authorization**. The trigger chain is: Cloud Build scans and signs the image → attestation stored in Artifact Registry → Binary Authorization policy enforces the attestation at deploy time.
 
 > Docs: [Binary Authorization overview](https://cloud.google.com/binary-authorization/docs/overview)  
 > Docs: [Artifact Registry vulnerability scanning](https://cloud.google.com/artifact-registry/docs/analysis)

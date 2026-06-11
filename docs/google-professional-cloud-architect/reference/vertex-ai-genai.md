@@ -21,17 +21,41 @@ sidebar_position: 5
 | **AI Hypercomputer** | Infrastructure for large-scale distributed ML training (TPUs, GPUs) |
 | **Recommendations AI** | Pre-built personalised product recommendations for retail |
 | **Model Armor** | Safety filters and guardrails applied to LLM inputs/outputs |
+| **Imagen** | Text-to-image and image-editing model; generates, edits, and upscales images |
 
 ## Pre-built AI APIs (no ML expertise needed)
 
 | API | Use Case |
 |---|---|
-| **Vision API** | Image labelling, OCR, SafeSearch, face detection |
-| **Video Intelligence API** | Scene detection, object tracking, explicit content detection in video |
+| **Vision API** | Image labelling, OCR, SafeSearch, face detection, landmark recognition |
+| **Video Intelligence API** | Scene detection, object tracking, transcription, explicit content detection in video |
 | **Natural Language API** | Entity recognition, sentiment analysis, content classification |
-| **Speech-to-Text / Text-to-Speech** | Audio transcription and synthesis |
+| **Speech-to-Text v2 (Chirp 2)** | Audio transcription — best accuracy across 100+ languages, streaming with word-level timestamps |
+| **Text-to-Speech** | Synthesise natural-sounding speech; WaveNet and Neural2 voices |
 | **Document AI** | Structured data extraction from documents (invoices, forms) |
 | **Translation API** | Text translation across 100+ languages |
+
+### Vision API vs Imagen — Key Distinction
+
+| | Vision API | Imagen |
+|---|---|---|
+| Direction | Image **in** → analysis out | Text prompt **in** → image out |
+| Task | Classify, label, detect objects in existing images | Generate, edit, or upscale images |
+| Use case | Content moderation, OCR, catalogue tagging | Creative assets, product visualisation, synthetic data |
+| Exam signal | "Detect", "classify", "extract text from" images | "Generate", "create", "edit" images |
+
+> Docs: [Vision API](https://cloud.google.com/vision/docs/features-list) · [Imagen on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/image/overview)
+
+### Audio — Speech APIs
+
+| API | When to Use |
+|---|---|
+| **Speech-to-Text v2 (Chirp 2)** | Long-form transcription, multilingual support, noisy audio, call centre recordings; streaming with word-level timestamps |
+| **Text-to-Speech** | Synthesise narration, IVR prompts, accessibility features |
+
+**Exam signal:** "Transcribe audio/video files" → Speech-to-Text. "Voice-enable an IVR" → Text-to-Speech + Dialogflow CX. "High accuracy across many languages" → Chirp model.
+
+> Docs: [Speech-to-Text overview](https://cloud.google.com/speech-to-text/docs/overview) · [Text-to-Speech overview](https://cloud.google.com/text-to-speech/docs/overview)
 
 ## Decision Guide
 
@@ -53,11 +77,23 @@ sidebar_position: 5
 **"Explain why the model made a specific prediction (auditability requirement)"**
 → **Vertex AI Explainability.** Provides feature attributions (SHAP, Integrated Gradients) for tabular, image, and text models.
 
+**"Generate images from text descriptions or edit existing images"**
+→ **Imagen on Vertex AI.** Use for product visualisation, creative asset generation, or synthetic training data. Not Vision API (which analyses, not generates).
+
+**"Transcribe call recordings or meeting audio at scale"**
+→ **Speech-to-Text v2 (Chirp 2).** Handles noisy audio and 100+ languages. Pair with Natural Language API if you need entity extraction or sentiment from the transcript.
+
 **"Add product recommendations to a retail platform quickly"**
 → **Recommendations AI.** Pre-built and tuned for e-commerce; faster to implement than custom Vertex AI models. Use custom Vertex AI when you need full control over the model.
 
 **"Apply safety guardrails to prompts and responses from any LLM"**
 → **Model Armor.** Works as a layer on top of any model, detecting prompt injection, jailbreaks, and unsafe content categories.
+
+**"Use an open-source model (Llama, Mistral) or specialised model without managing infrastructure"**
+→ **Model Garden.** Deploy a managed endpoint in a few clicks; no custom training needed. Use Model Garden when the task is well-served by an existing model and you want to avoid training costs.
+
+**"Let employees query internal knowledge bases or research documents conversationally"**
+→ **NotebookLM Enterprise.** Grounds responses in your uploaded sources and cites them. No coding required. Use Vertex AI Agent Builder instead when you need programmatic API access or custom retrieval logic.
 
 ## Gemini Cloud Assist
 
@@ -148,6 +184,63 @@ A dedicated platform for building **structured, flow-based conversational agents
 
 ---
 
+## Gemini Enterprise Features
+
+Gemini Enterprise is the Google Workspace tier that includes advanced AI capabilities for productivity workflows.
+
+### AI Agents in Workspace
+
+Gemini AI Agents automate multi-step workflows across Google Workspace apps (Docs, Sheets, Drive, Gmail). They can be triggered by events (new email, sheet update) and execute actions across apps.
+
+**Exam context:** When the requirement is *"automate repetitive knowledge-worker tasks without writing custom code"* — Gemini Workspace Agents. When you need a custom API-integrated agent or data grounding — Vertex AI Agent Builder.
+
+| | Gemini Workspace Agents | Vertex AI Agent Builder |
+|---|---|---|
+| Target user | Business user / low-code | Developer |
+| Integration | Google Workspace apps | Any API or data source |
+| Grounding | Drive/Docs content | Cloud Storage, BigQuery, web |
+| Custom logic | Limited | Full (code, tools, APIs) |
+
+> Docs: [Gemini for Google Workspace](https://workspace.google.com/products/gemini/)
+
+### NotebookLM Enterprise
+
+An AI-powered research tool that grounds responses strictly in documents you upload (PDFs, Docs, Slides, URLs). It generates summaries, answers questions with citations, and creates audio overviews of your sources.
+
+**Exam signal:** "Employees need to query internal policy documents / research papers without hallucination" → NotebookLM Enterprise. Responses are scoped to uploaded sources and include source citations — minimises hallucination risk.
+
+**NotebookLM vs Agent Builder:**
+- **NotebookLM** — no-code, end-user product, sources are uploaded directly; best for knowledge workers
+- **Agent Builder** — developer API, supports dynamic data connectors (BigQuery, GCS, websites), best for production apps
+
+> Docs: [NotebookLM](https://notebooklm.google.com/) · [NotebookLM Enterprise](https://workspace.google.com/products/notebooklm/)
+
+---
+
+## Model Garden Integration
+
+Model Garden is the Vertex AI hub for discovering and deploying pre-trained models without custom training.
+
+**What's available:**
+- **Google models** — Gemini, Imagen, Chirp, MedLM, Codey
+- **Open-source models** — Llama 3, Mistral, Falcon, Stable Diffusion (deployed on managed endpoints)
+- **Third-party models** — Anthropic Claude, AI21, etc. (via Model Garden partner hub)
+
+**Integration patterns:**
+
+| Pattern | How |
+|---|---|
+| **Managed endpoint** | One-click deploy → call via Vertex AI Prediction API (no infra management) |
+| **Fine-tuning** | Start from a Model Garden base model, fine-tune on your data, deploy to registry |
+| **Batch prediction** | Run inference over large datasets without a persistent endpoint |
+| **Model evaluation** | Compare multiple Model Garden models on your benchmark dataset before choosing |
+
+**Exam signal:** "Use Llama 3 without managing GPU instances" → Model Garden managed endpoint. "Fine-tune an open-source LLM on proprietary data" → Model Garden + Vertex AI custom training. "Evaluate which model fits our accuracy/cost requirements" → Model Garden evaluation.
+
+> Docs: [Model Garden](https://cloud.google.com/vertex-ai/generative-ai/docs/model-garden/explore-models)
+
+---
+
 ## Vertex AI Pipelines vs Custom Training Jobs
 
 | | Pipelines | Custom Training |
@@ -170,3 +263,8 @@ A dedicated platform for building **structured, flow-based conversational agents
 - [Model Armor](https://cloud.google.com/security-command-center/docs/model-armor-overview)
 - [Recommendations AI](https://cloud.google.com/recommendations-ai/docs/overview)
 - [Pre-built AI APIs](https://cloud.google.com/products/ai)
+- [Imagen on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/image/overview)
+- [Speech-to-Text overview](https://cloud.google.com/speech-to-text/docs/overview)
+- [Text-to-Speech overview](https://cloud.google.com/text-to-speech/docs/overview)
+- [NotebookLM Enterprise](https://workspace.google.com/products/notebooklm/)
+- [Gemini for Google Workspace](https://workspace.google.com/products/gemini/)
