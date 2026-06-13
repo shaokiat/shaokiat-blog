@@ -8,6 +8,24 @@ sidebar_position: 16
 
 > Docs: [Cost optimisation on Google Cloud](https://cloud.google.com/architecture/framework/cost-optimization)
 
+## CapEx vs. OpEx
+
+Cloud computing shifts infrastructure spend from **CapEx (Capital Expenditure)** to **OpEx (Operating Expenditure)**:
+
+| Model | Definition | Cloud equivalent |
+|---|---|---|
+| **CapEx** | Upfront investment in owned assets — servers, data centre hardware | On-premises infrastructure; reserved hardware purchases |
+| **OpEx** | Ongoing operating costs — pay as you use | GCP on-demand pricing; billed monthly |
+
+**Why this matters for the exam:**
+- "Reduce upfront capital costs" → migrate to GCP (CapEx → OpEx shift)
+- "Predictable monthly spend" → Committed Use Discounts (CUDs) — you keep OpEx but get a discount for a usage commitment
+- "Eliminate data centre refresh cycles" → cloud removes hardware CapEx entirely
+
+The exam often uses the CapEx/OpEx framing as justification for a cloud migration decision — recognise it as the financial rationale, not a technical constraint.
+
+> Docs: [Total cost of ownership](https://cloud.google.com/architecture/framework/cost-optimization/total-cost-of-ownership)
+
 ## Pricing Model Basics
 
 GCP uses **on-demand pricing** by default — pay per second with no upfront commitment. Discounts stack on top of on-demand rates.

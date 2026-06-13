@@ -8,6 +8,21 @@ sidebar_position: 15
 
 > Docs: [CI/CD on Google Cloud](https://cloud.google.com/docs/ci-cd)
 
+## SDLC Stages on GCP
+
+The exam maps the Software Development Lifecycle to GCP services at each stage:
+
+| Stage | What Happens | GCP Services |
+|---|---|---|
+| **Develop** | Write and review code | Cloud Shell, Cloud Code (IDE plugin), Cloud Source Repositories / GitHub |
+| **Build & Test** | Compile, run unit + integration tests, produce artefacts | **Cloud Build** |
+| **Store** | Version and store container images and packages | **Artifact Registry** |
+| **Release** | Promote through dev → staging → prod with approval gates | **Cloud Deploy** |
+| **Rollout** | Progressive delivery — canary/blue-green traffic shifting | Cloud Deploy + Cloud Run traffic splits / GKE |
+| **Provision** | Spin up infrastructure for each environment | **Terraform**, Config Connector |
+
+> Docs: [DevOps on Google Cloud](https://cloud.google.com/devops)
+
 ## The GCP CI/CD Toolchain
 
 ```
@@ -74,6 +89,24 @@ Managed continuous delivery service. Defines a **delivery pipeline** with ordere
 **GKE:** Rolling updates are the default (`RollingUpdate` strategy in Deployment spec). Blue/green and canary require traffic splitting via a service mesh or Ingress.
 
 **Cloud Run:** Native traffic splitting — specify `--traffic` percentages across revisions, enabling canary and blue/green natively.
+
+## Testing Strategies
+
+| Type | Purpose | GCP Tooling |
+|---|---|---|
+| **Unit tests** | Test individual functions in isolation | Run as a step in Cloud Build (`cloudbuild.yaml`) |
+| **Integration tests** | Test service interactions against real dependencies | Cloud Build step with Cloud SQL / Pub/Sub emulators or a staging environment |
+| **Load tests** | Validate performance and scalability under traffic | External tools (Locust, k6, JMeter) run against a staging Cloud Run or GKE service |
+| **Smoke tests** | Quick sanity check immediately post-deploy | Cloud Deploy `verifyConfig` hook; or a Cloud Build step after promotion |
+
+**Emulators for integration testing** — GCP provides local emulators (Pub/Sub, Bigtable, Spanner, Firestore) so integration tests run without hitting production APIs. Run them as a service container step in Cloud Build.
+
+**Use when the exam says:**
+- "Run tests before deploying to production" → Cloud Build step in the pipeline
+- "Test against real GCP services without incurring cost" → Cloud emulators
+- "Validate the deployment didn't break anything" → smoke test via Cloud Deploy verify or Cloud Build post-deploy step
+
+> Docs: [Testing strategies on GCP](https://cloud.google.com/architecture/devops/devops-tech-test-automation)
 
 ## Binary Authorization
 

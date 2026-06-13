@@ -33,6 +33,26 @@ A Kubernetes operator that lets you manage GCP resources using **Kubernetes-styl
 
 > Docs: [Config Connector overview](https://cloud.google.com/config-connector/docs/overview)
 
+### Terraform vs. Config Connector
+
+| | **Terraform** | **Config Connector** |
+|---|---|---|
+| **Config format** | HCL (`.tf` files) | Kubernetes YAML (CRDs) |
+| **Scope** | Any GCP resource, multi-cloud, non-GKE infra | GCP services managed via Kubernetes YAML alongside app workloads |
+| **Drift detection** | On next `plan` (manual or scheduled) | Continuous — controller reconciles on any drift |
+
+**Use Terraform when:**
+- Managing infrastructure outside of or independent from GKE (VPCs, Cloud SQL, IAM, multi-cloud)
+- Your team works in a classic CI/CD pipeline and doesn't have a running GKE cluster
+- You need multi-environment promotion with explicit plan/apply gates
+
+**Use Config Connector when:**
+- You want to manage GCP services (Cloud SQL, IAM, Pub/Sub, BigQuery, etc.) using the **same Kubernetes YAML and `kubectl` workflow** as your application workloads — one language, one tool, one pipeline
+- You want a single GitOps workflow (`kubectl apply`) for both app and infra
+- Continuous drift reconciliation is more important than explicit plan previews
+
+> Docs: [Choosing between Terraform and Config Connector](https://cloud.google.com/config-connector/docs/how-to/import-export/export#choosing-between-terraform-and-config-connector)
+
 ---
 
 ## Compute Engine Provisioning Primitives

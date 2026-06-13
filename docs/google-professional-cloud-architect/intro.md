@@ -143,8 +143,8 @@ Four published case studies appear in the exam. Understand the business and tech
 ### 4.1 Technical Process Analysis
 - **SDLC:** Development, testing, release, rollout, and provisioning stages
 - **CI/CD:** Cloud Build → Artifact Registry → Cloud Deploy → [CI/CD & Deployment](./reference/ci-cd.md)
-- Troubleshooting and root cause analysis best practices
-- Testing and validation of software and infrastructure
+- Troubleshooting and root cause analysis best practices → [Observability](./reference/observability.md)
+- Testing and validation of software and infrastructure → [CI/CD & Deployment](./reference/ci-cd.md)
 - Disaster recovery → [HA & DR](./reference/high-availability-dr.md)
 
 ### 4.2 Business Process Analysis
