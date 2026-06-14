@@ -14,7 +14,7 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Shao Kiat&#39;s Blog" href="/shaokiat-blog/opensearch.xml"><link rel="stylesheet" href="/shaokiat-blog/assets/css/styles.5ea67e5b.css">
-<script src="/shaokiat-blog/assets/js/runtime~main.377fd66d.js" defer="defer"></script>
+<script src="/shaokiat-blog/assets/js/runtime~main.a558c78b.js" defer="defer"></script>
 <script src="/shaokiat-blog/assets/js/main.afa18859.js" defer="defer"></script>
 </head>
 <body>
@@ -53,9 +53,19 @@
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="hybrid-connectivity">Hybrid Connectivity<a href="#hybrid-connectivity" class="hash-link" aria-label="Direct link to Hybrid Connectivity" title="Direct link to Hybrid Connectivity" translate="no">​</a></h3>
 <p>→ Reference: <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/hybrid-connectivity">Hybrid Connectivity</a></p>
+<p><strong>Decision reasoning — why Dedicated Interconnect, not the others:</strong></p>
+<table><thead><tr><th>Option</th><th>Why not for EHR?</th></tr></thead><tbody><tr><td><strong>Cloud VPN</strong></td><td>Traffic crosses the public internet (even encrypted); latency is variable — fails &quot;consistent high-throughput&quot; requirement</td></tr><tr><td><strong>Direct Peering</strong></td><td>Connects to Google&#x27;s public services only (Workspace, APIs) — cannot reach GCP VPC resources; no SLA</td></tr><tr><td><strong>Partner Interconnect</strong></td><td>Valid fallback if EHR cannot colocate at a Google peering facility; lower cost but bandwidth capped at 10 Gbps per link</td></tr><tr><td><strong>Dedicated Interconnect</strong></td><td>✓ Private physical link directly into GCP VPC; consistent throughput at 10/100 Gbps; 99.99% SLA with redundant links; satisfies HIPAA private connectivity requirement</td></tr></tbody></table>
+<p><strong>Answer: Dedicated Interconnect</strong> — driven by:</p>
+<ol>
+<li class="">&quot;Consistent high-throughput connectivity&quot; → rules out VPN (variable latency, 3 Gbps cap)</li>
+<li class="">HIPAA / PHI compliance → traffic must not traverse the public internet → rules out VPN</li>
+<li class="">&quot;Maintain legacy connections during migration&quot; → persistent private link, not a one-time transfer</li>
+<li class="">Direct Peering is not applicable — EHR needs to reach VPC resources, not Google public services</li>
+</ol>
+<p><strong>Partner Interconnect</strong> is the correct answer only if the exam states EHR cannot physically colocate at a Google peering facility.</p>
 <ul>
-<li class=""><strong>Cloud Interconnect (Dedicated or Partner)</strong> for consistent high-throughput on-prem connectivity — not Cloud VPN (too variable for healthcare SLA requirements)</li>
 <li class="">Use <strong>Shared VPC</strong> to centralise network management across environments</li>
+<li class="">For 99.99% SLA: deploy 2× Dedicated Interconnect connections in 2 different metropolitan areas</li>
 </ul>
 <h3 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="high-availability-and-dr">High Availability and DR<a href="#high-availability-and-dr" class="hash-link" aria-label="Direct link to High Availability and DR" title="Direct link to High Availability and DR" translate="no">​</a></h3>
 <p>→ Reference: <a class="" href="/shaokiat-blog/docs/google-professional-cloud-architect/reference/database-selection">Database Selection</a></p>
