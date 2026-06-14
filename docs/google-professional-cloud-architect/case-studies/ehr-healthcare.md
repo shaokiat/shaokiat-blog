@@ -41,8 +41,25 @@ EHR Healthcare is a leading provider of electronic health record software to the
 ### Hybrid Connectivity
 → Reference: [Hybrid Connectivity](../reference/hybrid-connectivity.md)
 
-- **Cloud Interconnect (Dedicated or Partner)** for consistent high-throughput on-prem connectivity — not Cloud VPN (too variable for healthcare SLA requirements)
+**Decision reasoning — why Dedicated Interconnect, not the others:**
+
+| Option | Why not for EHR? |
+|---|---|
+| **Cloud VPN** | Traffic crosses the public internet (even encrypted); latency is variable — fails "consistent high-throughput" requirement |
+| **Direct Peering** | Connects to Google's public services only (Workspace, APIs) — cannot reach GCP VPC resources; no SLA |
+| **Partner Interconnect** | Valid fallback if EHR cannot colocate at a Google peering facility; lower cost but bandwidth capped at 10 Gbps per link |
+| **Dedicated Interconnect** | ✓ Private physical link directly into GCP VPC; consistent throughput at 10/100 Gbps; 99.99% SLA with redundant links; satisfies HIPAA private connectivity requirement |
+
+**Answer: Dedicated Interconnect** — driven by:
+1. "Consistent high-throughput connectivity" → rules out VPN (variable latency, 3 Gbps cap)
+2. HIPAA / PHI compliance → traffic must not traverse the public internet → rules out VPN
+3. "Maintain legacy connections during migration" → persistent private link, not a one-time transfer
+4. Direct Peering is not applicable — EHR needs to reach VPC resources, not Google public services
+
+**Partner Interconnect** is the correct answer only if the exam states EHR cannot physically colocate at a Google peering facility.
+
 - Use **Shared VPC** to centralise network management across environments
+- For 99.99% SLA: deploy 2× Dedicated Interconnect connections in 2 different metropolitan areas
 
 ### High Availability and DR
 → Reference: [Database Selection](../reference/database-selection.md)
