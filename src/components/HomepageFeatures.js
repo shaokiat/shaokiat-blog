@@ -1,29 +1,84 @@
 import React from "react";
-import clsx from "clsx";
+import Link from "@docusaurus/Link";
 import styles from "./HomepageFeatures.module.css";
 
-const FeatureList = [
+const CONTENT_AREAS = [
   {
-    Svg: require("../../static/img/undraw_docusaurus_mountain.svg").default,
+    icon: "🤖",
+    title: "AI / ML & Agents",
+    description:
+      "Notes on machine learning, LLM applications, agentic systems, and getting models to production.",
+    link: "/docs/data-science/predictive-maintenance",
+    cta: "Explore",
   },
   {
-    // title: "🛠️ Work in Progress 🛠️",
-    Svg: require("../../static/img/undraw_docusaurus_tree.svg").default,
+    icon: "☁️",
+    title: "GCP Cloud Architect",
+    description:
+      "Exam prep for Google Professional Cloud Architect — reference decision guides, service comparisons, and official case study walkthroughs.",
+    link: "/docs/google-professional-cloud-architect/intro",
+    cta: "View Notes",
   },
   {
-    Svg: require("../../static/img/undraw_docusaurus_react.svg").default,
+    icon: "🧮",
+    title: "Algorithms & DSA",
+    description:
+      "LeetCode patterns, data structures, and interview prep topics organised by problem type.",
+    link: "/docs/algorithms/arrays",
+    cta: "Study Now",
+  },
+  {
+    icon: "✍️",
+    title: "Blog",
+    description:
+      "Longer-form writeups on AI/ML projects, engineering lessons, and things I'm figuring out.",
+    link: "/blog",
+    cta: "Read Posts",
   },
 ];
 
-function Feature({ Svg, title, description }) {
+const SKILLS = [
+  {
+    category: "LLM & Agents",
+    items: ["Python", "LangChain", "RAG", "MCP", "OpenAI", "Claude API"],
+  },
+  {
+    category: "ML & Data Science",
+    items: ["PyTorch", "Computer Vision", "MLflow", "Pandas", "scikit-learn"],
+  },
+  {
+    category: "Cloud & Infra",
+    items: ["GCP", "Terraform", "Docker", "Kubernetes", "BigQuery", "Vertex AI"],
+  },
+  {
+    category: "Engineering",
+    items: ["React", "Node.js", "PostgreSQL", "FastAPI", "TypeScript"],
+  },
+];
+
+function ContentCard({ icon, title, description, link, cta }) {
   return (
-    <div className={clsx("col col--4")}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} alt={title} />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
-        <p>{description}</p>
+    <div className={styles.contentCard}>
+      <span className={styles.cardIcon}>{icon}</span>
+      <h3 className={styles.cardTitle}>{title}</h3>
+      <p className={styles.cardDesc}>{description}</p>
+      <Link className={styles.cardCta} to={link}>
+        {cta} →
+      </Link>
+    </div>
+  );
+}
+
+function SkillGroup({ category, items }) {
+  return (
+    <div className={styles.skillGroup}>
+      <h4 className={styles.skillCategory}>{category}</h4>
+      <div className={styles.skillTags}>
+        {items.map((item) => (
+          <span key={item} className={styles.skillTag}>
+            {item}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -31,14 +86,27 @@ function Feature({ Svg, title, description }) {
 
 export default function HomepageFeatures() {
   return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
+    <>
+      <section className={styles.contentSection}>
+        <div className="container">
+          <h2 className={styles.sectionTitle}>What's Here</h2>
+          <div className={styles.contentGrid}>
+            {CONTENT_AREAS.map((area) => (
+              <ContentCard key={area.title} {...area} />
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <section className={styles.skillsSection}>
+        <div className="container">
+          <h2 className={styles.sectionTitle}>Tech Stack</h2>
+          <div className={styles.skillsGrid}>
+            {SKILLS.map((group) => (
+              <SkillGroup key={group.category} {...group} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

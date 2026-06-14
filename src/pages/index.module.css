@@ -1,34 +1,140 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
-.heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+.hero {
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
 }
 
-.buttons {
+.heroContainer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 10px;
+  gap: 4rem;
 }
 
-.buttonsContainer {
+.heroLeft {
+  flex: 1;
+  min-width: 0;
+}
+
+.heroRight {
+  flex-shrink: 0;
+}
+
+.heroImage {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.greeting {
+  font-size: 1.05rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 0.2rem;
+}
+
+.name {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+}
+
+.roleBadge {
+  display: inline-block;
+  background: var(--ifm-color-primary);
+  color: #fff;
+  padding: 0.3rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  color: var(--ifm-color-emphasis-700);
+  max-width: 500px;
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+}
+
+.tagline2 {
+  font-size: 0.88rem;
+  color: var(--ifm-color-emphasis-600);
+  max-width: 500px;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.ctaRow {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
 }
 
-@media screen and (max-width: 966px) {
-  .heroBanner {
-    padding: 2rem;
+.socialRow {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.socialLink {
+  font-size: 0.88rem;
+  color: var(--ifm-color-emphasis-600);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+  padding-bottom: 1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.socialLink:hover {
+  color: var(--ifm-color-primary);
+  border-bottom-color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.hobbyRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.hobbyChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-600);
+  background: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 2rem;
+  padding: 0.2rem 0.65rem;
+}
+
+@media (max-width: 996px) {
+  .heroContainer {
+    flex-direction: column-reverse;
+    gap: 2rem;
   }
-  .buttonsContainer {
-    flex-direction: column;
+
+  .heroImage {
+    width: 200px;
+    height: 200px;
+  }
+
+  .name {
+    font-size: 2.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 3rem 0 2.5rem;
+  }
+
+  .name {
+    font-size: 1.9rem;
   }
 }
