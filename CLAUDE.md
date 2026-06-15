@@ -4,6 +4,14 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 
 ---
 
+## Skills
+
+| Command | What it does |
+|---|---|
+| `/new-doc` | Create a new ML Engineering documentation page following the repo's style conventions |
+
+---
+
 ## Google Professional Cloud Architect (PCA) Section
 
 All PCA content lives under `docs/google-professional-cloud-architect/`.

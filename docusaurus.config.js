@@ -7,6 +7,10 @@ const darkCodeTheme = themes.nightOwl;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
+  markdown: {
+    mermaid: true,
+  },
+  themes: ["@docusaurus/theme-mermaid"],
   title: "Shao Kiat's Blog",
   tagline: "A leetcode a day keeps unemployment away",
   url: "https://shaokiat.github.io",
@@ -25,6 +29,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl: "https://github.com/shaokiat/shaokiat-blog/tree/main/",
+          exclude: ["**/web-dev/**", "**/web3/**", "**/data-science/**"],
         },
         blog: {
           showReadingTime: true,

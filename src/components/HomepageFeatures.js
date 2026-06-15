@@ -4,11 +4,11 @@ import styles from "./HomepageFeatures.module.css";
 
 const CONTENT_AREAS = [
   {
-    icon: "🤖",
-    title: "AI / ML & Agents",
+    icon: "⚡",
+    title: "GenAI & Agents",
     description:
-      "Notes on machine learning, LLM applications, agentic systems, and getting models to production.",
-    link: "/docs/data-science/predictive-maintenance",
+      "Hands-on evaluation of GenAI workflows and agentic systems — starting with AI slide deck generation tools.",
+    link: "/docs/genai-agents/intro",
     cta: "Explore",
   },
   {
