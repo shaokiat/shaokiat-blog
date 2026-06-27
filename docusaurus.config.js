@@ -9,6 +9,9 @@ const darkCodeTheme = themes.nightOwl;
 const config = {
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: "warn",
+    },
   },
   themes: ["@docusaurus/theme-mermaid"],
   title: "Shao Kiat's Blog",
@@ -16,7 +19,6 @@ const config = {
   url: "https://shaokiat.github.io",
   baseUrl: "/shaokiat-blog/",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
   favicon: "img/moon.ico",
   organizationName: "shaokiat",
   projectName: "shaokiat-blog",
@@ -92,14 +94,15 @@ const config = {
             type: "doc",
             docId: "intro",
             position: "left",
-            label: "Docs",
+            label: "Study Notes",
           },
           { to: "/blog", label: "Blog", position: "left" },
-          // {
-          //   label: "Resume",
-          //   href: "https://shaokiat.github.io/shaokiat-blog/pdf/resume.pdf",
-          //   position: "right",
-          // },
+          {
+            href: "https://linkedin.com/in/shaokiat",
+            position: "right",
+            className: "header-linkedin-link",
+            "aria-label": "LinkedIn profile",
+          },
           {
             href: "https://github.com/shaokiat",
             position: "right",

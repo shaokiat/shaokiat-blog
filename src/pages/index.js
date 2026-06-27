@@ -27,7 +27,10 @@ function HomepageHero() {
         <div className={styles.heroLeft}>
         <p className={styles.greeting}>Hi, I'm</p>
         <h1 className={styles.name}>Shao Kiat</h1>
-        <div className={styles.roleBadge}>Data Scientist</div>
+        <div className={styles.badgeRow}>
+          <div className={styles.roleBadge}>Data Scientist</div>
+          <div className={styles.certBadge}>🏅 GCP Professional Cloud Architect</div>
+        </div>
         <p className={styles.tagline}>
           I build AI that makes it to production and document what I learn along the way.
         </p>

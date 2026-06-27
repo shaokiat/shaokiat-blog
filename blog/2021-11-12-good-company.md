@@ -8,6 +8,8 @@ tags: []
 Here is an article by Eli James on Singapore's Tech Companies and it has inspired me to think deep about the company
 I would want to work at.
 
+<!-- truncate -->
+
 :::tip TIP
 
 Read the full article here if you haven't done so!

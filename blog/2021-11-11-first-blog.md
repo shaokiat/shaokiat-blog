@@ -9,6 +9,8 @@ This marks the start of my very first blog post and the start of my journey to r
 I want to pen down my thoughts through my job search journey as a software engineer and whoever is reading this (yes that's you :flushed:) will
 serve as witness and reminder for me to hold myself accountable :bulb:.
 
+<!-- truncate -->
+
 ### About me
 
 As of writing this blog post, I am in my third year of NUS, majoring in Computer Science.
