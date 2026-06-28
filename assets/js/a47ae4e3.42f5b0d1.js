@@ -1,1 +1,0 @@
-"use strict";(globalThis.webpackChunksk_blog=globalThis.webpackChunksk_blog||[]).push([[3019],{8062(o){o.exports=JSON.parse('{"metadata":{"permalink":"/shaokiat-blog/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":5,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
