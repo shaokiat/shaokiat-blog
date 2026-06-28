@@ -21,7 +21,7 @@ All PCA content lives under `docs/google-professional-cloud-architect/`.
 ```
 docs/google-professional-cloud-architect/
 ├── _category_.json          # Sidebar label: "GCP Cloud Architect ☁️", position 5
-├── intro.md                 # Landing page: brief intro + case study links + full 6-section exam guide
+├── index.md                 # Landing page: brief intro + case study links + full 6-section exam guide
 ├── reference/               # Sidebar position 2 — concise decision guides per GCP topic
 │   ├── _category_.json
 │   ├── cloud-storage.md
@@ -88,7 +88,7 @@ Docusaurus uses `sidebar_position` in frontmatter to order pages within a catego
 
 | File | Position |
 |---|---|
-| `intro.md` | 1 |
+| `index.md` | — |
 | `reference/` category | 2 |
 | `case-studies/` category | 3 |
 | `reference/cloud-storage.md` | 1 |
