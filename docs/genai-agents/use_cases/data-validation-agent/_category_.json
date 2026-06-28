@@ -1,0 +1,10 @@
+{
+  "label": "Data Validation Agent",
+  "position": 1,
+  "collapsible": true,
+  "collapsed": false,
+  "link": {
+    "type": "doc",
+    "id": "genai-agents/use_cases/data-validation-agent/index"
+  }
+}
