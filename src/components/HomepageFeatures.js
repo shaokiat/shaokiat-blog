@@ -8,7 +8,7 @@ const CONTENT_AREAS = [
     title: "GenAI & Agents",
     description:
       "Hands-on evaluation of GenAI workflows and agentic systems — starting with AI slide deck generation tools.",
-    link: "/docs/genai-agents/intro",
+    link: "/docs/genai-agents/",
     cta: "Explore",
   },
   {
@@ -16,7 +16,7 @@ const CONTENT_AREAS = [
     title: "GCP Cloud Architect",
     description:
       "Exam prep for Google Professional Cloud Architect — reference decision guides, service comparisons, and official case study walkthroughs.",
-    link: "/docs/google-professional-cloud-architect/intro",
+    link: "/docs/google-professional-cloud-architect/",
     cta: "View Notes",
   },
   {
