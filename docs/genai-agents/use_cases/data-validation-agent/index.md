@@ -402,13 +402,21 @@ flowchart LR
     style A fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
     style B fill:#fef3c7,stroke:#f59e0b,color:#78350f
     style C fill:#e0e7ff,stroke:#6366f1,color:#3730a3
-    style D fill:#fef3c7,stroke:#f59e0b,color:#78350f
+    style D fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
     style E fill:#e0e7ff,stroke:#6366f1,color:#3730a3
     style F fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
-    style G fill:#fce7f3,stroke:#ec4899,color:#831843
+    style G fill:#fef3c7,stroke:#f59e0b,color:#78350f
     style H fill:#bbf7d0,stroke:#22c55e,color:#166534
 ```
 
+<p align="center" style={{fontSize:"0.85em"}}>
+  <span style={{background:"#f1f5f9",border:"1px solid #94a3b8",padding:"2px 10px",borderRadius:"4px",color:"#1e293b",margin:"0 4px"}}>User</span>
+  <span style={{background:"#fef3c7",border:"1px solid #f59e0b",padding:"2px 10px",borderRadius:"4px",color:"#78350f",margin:"0 4px"}}>Agent</span>
+  <span style={{background:"#e0e7ff",border:"1px solid #6366f1",padding:"2px 10px",borderRadius:"4px",color:"#3730a3",margin:"0 4px"}}>HITL gate</span>
+  <span style={{background:"#dbeafe",border:"1px solid #3b82f6",padding:"2px 10px",borderRadius:"4px",color:"#1e3a8a",margin:"0 4px"}}>Pipeline</span>
+  <span style={{background:"#bbf7d0",border:"1px solid #22c55e",padding:"2px 10px",borderRadius:"4px",color:"#166534",margin:"0 4px"}}>Output</span>
+</p>
+
 </div>
 
-The two purple decision nodes are the HITL gates — each placed immediately after the step that produces the information needed to make that decision.
+Each HITL gate is placed immediately after the step that produces the information needed to make that decision.
