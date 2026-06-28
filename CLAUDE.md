@@ -9,6 +9,7 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 | Command | What it does |
 |---|---|
 | `/new-doc` | Create a new ML Engineering documentation page following the repo's style conventions |
+| `/new-genai-doc` | Create a new GenAI Agents documentation page following the MCP guide's style conventions |
 
 ---
 
