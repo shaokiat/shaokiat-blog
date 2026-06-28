@@ -388,4 +388,4 @@ The patterns above are building blocks. The pages below walk through end-to-end 
 
 | Use Case | Patterns used | Status |
 |---|---|---|
-| *More coming soon* | — | — |
+| [Data Validation Agent](./use_cases/data-validation-agent/index.md) | Tool Use, ReAct, HITL, Parallelization | Done |
