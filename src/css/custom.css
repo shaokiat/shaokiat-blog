@@ -66,6 +66,108 @@
     no-repeat;
 }
 
+/* ─── ML Diagram Color Tokens ───────────────────────────────────────────── */
+:root {
+  --ml-blue:      #2f6fa8;
+  --ml-orange:    #9a5028;
+  --ml-green:     #2d7a52;
+  --ml-axis:      #52606d;
+  --ml-label:     #4a5568;
+  --ml-highlight: #946020;
+  --ml-underfit:  #52606d;
+  --ml-overfit:   #a04030;
+  --ml-error:     #9a3030;
+  --mermaid-node-fill:   #dce8f5;
+  --mermaid-node-border: #3a6f9a;
+  --mermaid-node-text:   #1e3a4f;
+  --mermaid-edge:        #3a6f9a;
+}
+
+[data-theme='dark'] {
+  --ml-blue:      #5b8db8;
+  --ml-orange:    #b87048;
+  --ml-green:     #4a8f6a;
+  --ml-axis:      #607080;
+  --ml-label:     #8896a8;
+  --ml-highlight: #c89050;
+  --ml-underfit:  #708090;
+  --ml-overfit:   #b86050;
+  --ml-error:     #b84040;
+  --mermaid-node-fill:   #1e3347;
+  --mermaid-node-border: #4a7fa5;
+  --mermaid-node-text:   #c5d5e8;
+  --mermaid-edge:        #4a7fa5;
+}
+
+/* ─── ML Diagram SVG Layout & Colors ────────────────────────────────────── */
+.ml-diagram { display: block; margin: 1.5rem auto; max-width: 480px; }
+
+.ml-diagram .axis-line     { stroke: var(--ml-axis); }
+.ml-diagram .axis-label    { fill:   var(--ml-label); }
+.ml-diagram .pt-blue       { fill:   var(--ml-blue); }
+.ml-diagram .pt-orange     { fill:   var(--ml-orange); }
+.ml-diagram .fit-line      { stroke: var(--ml-green); }
+.ml-diagram .fit-label     { fill:   var(--ml-green); }
+.ml-diagram .margin-line   { stroke: var(--ml-green); }
+.ml-diagram .underfit-line  { stroke: var(--ml-underfit); }
+.ml-diagram .overfit-line   { stroke: var(--ml-overfit); }
+.ml-diagram .underfit-label { fill:   var(--ml-underfit); }
+.ml-diagram .overfit-label  { fill:   var(--ml-overfit); }
+.ml-diagram .highlight-pt   { fill:   var(--ml-highlight); }
+.ml-diagram .highlight-label { fill:  var(--ml-highlight); }
+.ml-diagram .class0-label   { fill:   var(--ml-blue); }
+.ml-diagram .class1-label   { fill:   var(--ml-green); }
+.ml-diagram .zone-class0    { fill:   var(--ml-blue); }
+.ml-diagram .zone-class1    { fill:   var(--ml-green); }
+.ml-diagram .sv-ring        { stroke: var(--ml-orange); fill: none; }
+.ml-diagram .sv-ring-blue   { stroke: var(--ml-blue);   fill: none; }
+.ml-diagram .zero-label     { fill:   var(--ml-error); }
+.ml-diagram .zero-bar       { stroke: var(--ml-axis);   fill: none; }
+.ml-diagram .knn-circle     { stroke: var(--ml-label);  fill: none; }
+.ml-diagram .knn-line-blue  { stroke: var(--ml-blue); }
+.ml-diagram .knn-line-orange { stroke: var(--ml-orange); }
+.ml-diagram .query-pt       { fill:   var(--ml-highlight); }
+
+/* ─── Mermaid Centering & Colors ─────────────────────────────────────────── */
+.docusaurus-mermaid-container {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.docusaurus-mermaid-container .node .label-container,
+.docusaurus-mermaid-container .node rect,
+.docusaurus-mermaid-container .node polygon,
+.docusaurus-mermaid-container .node circle {
+  fill:   var(--mermaid-node-fill)   !important;
+  stroke: var(--mermaid-node-border) !important;
+}
+
+.docusaurus-mermaid-container .nodeLabel,
+.docusaurus-mermaid-container .nodeLabel p {
+  color: var(--mermaid-node-text) !important;
+}
+
+.docusaurus-mermaid-container .flowchart-link,
+.docusaurus-mermaid-container .edgePath .path {
+  stroke: var(--mermaid-edge) !important;
+}
+
+.docusaurus-mermaid-container .edgeLabel .label rect {
+  fill: transparent !important;
+}
+
+.docusaurus-mermaid-container .edgeLabel span,
+.docusaurus-mermaid-container .edgeLabel p {
+  color: var(--ml-label) !important;
+  background: transparent !important;
+}
+
+.docusaurus-mermaid-container marker path {
+  fill: var(--mermaid-edge) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 .dating-app-container {
   display: flex;
   justify-content: center;

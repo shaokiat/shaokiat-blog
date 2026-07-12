@@ -31,7 +31,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl: "https://github.com/shaokiat/shaokiat-blog/tree/main/",
-          exclude: ["**/web-dev/**", "**/web3/**", "**/data-science/**"],
+          exclude: ["**/web-dev/**", "**/web3/**", "**/predictive-maintenance*"],
         },
         blog: {
           showReadingTime: true,
@@ -132,37 +132,31 @@ const config = {
             ],
           },
           {
-            title: "Discover",
+            title: "Connect",
             items: [
               {
-                label: "Porfolio Website",
+                label: "Portfolio",
                 to: "https://shaokiat.vercel.app",
               },
               {
                 label: "GitHub",
                 to: "https://github.com/shaokiat",
               },
-            ],
-          },
-          {
-            title: "Contact Me",
-            items: [
               {
                 label: "LinkedIn",
                 to: "https://linkedin.com/in/shaokiat",
               },
               {
                 label: "Email",
-                href: "mailto:shaokiat@u.nus.edu",
-              },
-              {
-                label: "Resume",
-                href: "https://shaokiat.vercel.app/resume.pdf",
+                href: "mailto:shaokiat@gmail.com",
               },
             ],
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Lim Shao Kiat. Built with Docusaurus.`,
+      },
+      mermaid: {
+        theme: { light: 'neutral', dark: 'dark' },
       },
       prism: {
         theme: lightCodeTheme,
