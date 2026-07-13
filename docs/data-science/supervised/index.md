@@ -11,7 +11,7 @@ Two sub-problems based on the target type:
 | Problem | Target `y` | Examples |
 |---|---|---|
 | **Regression** | Continuous value | House price, demand forecast, sensor reading |
-| **Classification** | Discrete class label | Spam/not-spam, disease diagnosis, churn prediction |
+| **Classification** | Discrete class label | Spam/not-spam, disease diagnosis, machine-failure prediction |
 
 ---
 
@@ -59,7 +59,7 @@ Adds a penalty to the loss function to shrink model complexity.
 
 ---
 
-Choosing and training a model is one stage of a real project. For the stages around it (framing, preprocessing, features, production), see the [ML Project Lifecycle](../ml-lifecycle/index.md), which carries this section's churn example end to end.
+Choosing and training a model is one stage of a real project. For the stages around it (framing, preprocessing, features, production), see the [ML Project Lifecycle](../ml-lifecycle/index.md), which carries this section's machine-failure example end to end.
 
 ## Pages in This Section
 
@@ -68,4 +68,4 @@ Each page opens with a **cheatsheet table** (model → when to reach for it → 
 | Page | Running example | What it covers |
 |---|---|---|
 | [Regression](./regression.md) | Bike-rental demand | Linear, Ridge/Lasso/ElasticNet, trees, boosting, SVR; RMSE vs MAE with worked numbers |
-| [Classification](./classification.md) | Customer churn (8% positive class) | Logistic Regression, trees, ensembles, SVM, KNN, Naive Bayes, MLP; worked confusion matrices and threshold tuning |
+| [Classification](./classification.md) | Machine failure (3% positive class) | Logistic Regression, trees, ensembles, SVM, KNN, Naive Bayes, MLP; worked confusion matrices and threshold tuning |

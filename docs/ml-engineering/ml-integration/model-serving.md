@@ -6,6 +6,8 @@ sidebar_position: 1
 
 Reference: [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/) | [Pydantic v2](https://docs.pydantic.dev/latest/)
 
+This page assumes the upstream decisions are already made — that online serving beats a batch job, and that the `.pkl` you're loading is a versioned, full-pipeline artifact. Those decisions (batch vs online, serialization pitfalls, drift monitoring) live in [Inference & Production](../../data-science/ml-lifecycle/inference-and-production.md) on the data science side.
+
 ## Model Loading
 
 Load models once at startup via lifespan — never on each request.

@@ -1,12 +1,13 @@
----
-sidebar_position: 1
----
+# The Machine Learning Landscape
 
-# Machine Learning Overview
+A map of the major ML model classes, when to use each, and what problems they solve. Every section answers: _"What kind of problem is this model class built for?"_
 
-A map of the major ML model classes, when to use each, and what problems they solve.
+Two ways in:
 
-Every section answers: _"What kind of problem is this model class built for?"_
+- **Follow a project end to end** → [ML Project Lifecycle](./ml-lifecycle/index.md). One machine-failure problem from the factory floor, from framing to production. Start here.
+- **Pick a model for a problem** → [Supervised Learning](./supervised/index.md). Cheatsheets and per-model decision guides for regression and classification.
+
+The rest of this page is the wider map: the paradigms and model families those sections don't cover yet.
 
 ---
 
@@ -29,11 +30,9 @@ Before picking a model, identify the learning paradigm — it narrows your choic
 Labeled data, predict a value or a class. This section has its own deep-dive pages — each with a cheatsheet table, a running example, and per-model decision guidance — so the details live there, not here:
 
 - **[Regression](./supervised/regression.md)** — target is continuous (price, demand, sensor reading). Covers Linear/Ridge/Lasso/ElasticNet, polynomial, trees, Random Forest, gradient boosting, SVR. Rule of thumb: start linear, and on tabular data expect gradient boosting to win once tuned.
-- **[Classification](./supervised/classification.md)** — target is a class label (spam, churn, fraud). Covers Logistic Regression, trees, ensembles, SVM, KNN, Naive Bayes, MLP. Rule of thumb: start with logistic regression, never report plain accuracy on imbalanced data.
+- **[Classification](./supervised/classification.md)** — target is a class label (spam, machine failure, fraud). Covers Logistic Regression, trees, ensembles, SVM, KNN, Naive Bayes, MLP. Rule of thumb: start with logistic regression, never report plain accuracy on imbalanced data.
 
 See also the [Supervised Learning intro](./supervised/index.md) for train/validation/test splits, cross-validation, bias–variance, and regularisation.
-
-Picking the model is one stage of a project. For everything around it — problem framing, preprocessing, feature engineering, training discipline, and production — see the **[ML Project Lifecycle](./ml-lifecycle/index.md)** section, which follows one churn problem end to end.
 
 ---
 
@@ -143,14 +142,6 @@ Is there an environment with rewards?
 
 ---
 
-## What's Next
+## Roadmap
 
-Each model class has its own depth. Written so far:
-
-| Page | What it covers |
-|---|---|
-| [Regression Models](./supervised/regression.md) | Linear, Ridge/Lasso/ElasticNet, trees, boosting, SVR — with a running bike-rental example |
-| [Classification Models](./supervised/classification.md) | Logistic Regression through MLP, worked confusion matrices, class imbalance — running churn example |
-| [ML Project Lifecycle](./ml-lifecycle/index.md) | Everything around the model: framing, preprocessing, features, training discipline, production |
-
-Planned: Clustering (K-Means internals, choosing K, silhouette), Dimensionality Reduction (PCA math, t-SNE vs UMAP), Neural Networks & Deep Learning (backprop, CNNs, Transformers), Anomaly Detection (Isolation Forest, autoencoders, threshold selection).
+Planned deep-dive pages, in rough priority order: Anomaly Detection & Clustering (unsupervised methods on plant sensor data), Time Series Forecasting (demand and sensor forecasting), Neural Networks & Deep Learning (backprop, CNNs, Transformers), Dimensionality Reduction (PCA math, t-SNE vs UMAP).

@@ -25,33 +25,33 @@ The mistake most people make is jumping straight to gradient boosting. Start wit
 
 ---
 
-## Running Example: Customer Churn
+## Running Example: Machine Failure
 
-Every model below is applied to the same problem: **predict which subscribers will churn next month** from tier, usage metrics, support-ticket counts, and payment history. 10,000 customers, 800 churners. An 8% positive class, because real classification problems are imbalanced.
+Every model below is applied to the same problem: **predict which machines in a plant will have an unplanned breakdown in the next 30 days** from vibration, temperature, load cycles, service history, and maintenance work orders. 10,000 machines, ~300 failures per window. A 3% positive class, because real classification problems are imbalanced.
 
-First, the trap. A model that predicts "nobody churns" scores **92% accuracy** and catches zero churners. That single fact drives everything else on this page: the metric is PR-AUC (or recall at a chosen precision), never accuracy.
+First, the trap. A model that predicts "nothing fails" scores **97% accuracy** and catches zero breakdowns. That single fact drives everything else on this page: the metric is PR-AUC (or recall at a chosen precision), never accuracy.
 
 Illustrative results (typical pattern, not one specific run):
 
 | Model | ROC-AUC | PR-AUC | Notes |
 |---|---|---|---|
-| Predict "no churn" always | 0.50 | 0.08 | 92% accuracy. Useless. |
-| Logistic Regression | 0.79 | 0.31 | 2 minutes of work; coefficients explain *why* people churn |
-| Decision Tree (depth 4) | 0.75 | 0.26 | Weakest, but the retention team can read it |
-| Random Forest | 0.84 | 0.40 | Big jump: churn drivers interact |
+| Predict "no failure" always | 0.50 | 0.03 | 97% accuracy. Useless. |
+| Logistic Regression | 0.79 | 0.31 | 2 minutes of work; coefficients explain *why* machines fail |
+| Decision Tree (depth 4) | 0.75 | 0.26 | Weakest, but the maintenance crew can read it |
+| Random Forest | 0.84 | 0.40 | Big jump: failure drivers interact |
 | **XGBoost (tuned)** | **0.87** | **0.46** | Best; needed `scale_pos_weight` and early stopping |
 | SVM (RBF) | 0.80 | 0.33 | Slowest to train; not its home turf (that's text) |
 | KNN (k=15) | 0.77 | 0.28 | OK, but 50ms per prediction at serving time |
-| Naive Bayes | 0.72 | 0.22 | Features aren't independent; wrong tool here (its home is also text) |
+| Naive Bayes | 0.72 | 0.22 | Sensors aren't independent; wrong tool here (its home is also text) |
 | MLP (2 layers) | 0.85 | 0.42 | Close to XGBoost, needed the most babysitting |
 
-Same story as regression: linear gets you most of the way instantly, boosting wins if you tune it. Two models (SVM, Naive Bayes) underperform here because churn isn't their turf. Knowing where each model wins is the whole game.
+Same story as regression: linear gets you most of the way instantly, boosting wins if you tune it. Two models (SVM, Naive Bayes) underperform here because sensor data isn't their turf. Knowing where each model wins is the whole game.
 
 ---
 
 ## Evaluation Metrics
 
-Stop reporting accuracy. On imbalanced datasets it's meaningless: see the churn table above.
+Stop reporting accuracy. On imbalanced datasets it's meaningless: see the failure table above.
 
 | Metric | Formula | Reach for it when |
 |---|---|---|
@@ -66,27 +66,27 @@ Stop reporting accuracy. On imbalanced datasets it's meaningless: see the churn 
 | **Actual Positive** | TP ✓ | FN: missed it |
 | **Actual Negative** | FP: false alarm | TN ✓ |
 
-**Worked example: the threshold is a business decision.** Take the XGBoost churn model on a 2,000-customer test set containing 160 real churners:
+**Worked example: the threshold is a business decision.** Take the XGBoost failure model on a 2,000-machine test set containing 60 real breakdowns:
 
-At the default **threshold 0.5** it flags 90 customers:
+At the default **threshold 0.5** it flags 40 machines:
 
-|  | Predicted churn | Predicted stay |
+|  | Predicted fail | Predicted run |
 |---|---|---|
-| **Actually churned (160)** | TP = 70 | FN = 90 |
-| **Actually stayed (1,840)** | FP = 20 | TN = 1,820 |
+| **Actually failed (60)** | TP = 30 | FN = 30 |
+| **Actually ran fine (1,940)** | FP = 10 | TN = 1,930 |
 
-Precision = 70/90 ≈ **0.78**, Recall = 70/160 ≈ **0.44**. The model is right when it speaks up, but it misses more than half the churners.
+Precision = 30/40 = **0.75**, Recall = 30/60 = **0.50**. The model is right when it speaks up, but it misses half the breakdowns.
 
-Lower the **threshold to 0.25** and it flags 240 customers:
+Lower the **threshold to 0.25** and it flags 150 machines:
 
-|  | Predicted churn | Predicted stay |
+|  | Predicted fail | Predicted run |
 |---|---|---|
-| **Actually churned (160)** | TP = 120 | FN = 40 |
-| **Actually stayed (1,840)** | FP = 120 | TN = 1,720 |
+| **Actually failed (60)** | TP = 48 | FN = 12 |
+| **Actually ran fine (1,940)** | FP = 102 | TN = 1,838 |
 
-Precision = 120/240 = **0.50**, Recall = 120/160 = **0.75**. Now you catch three-quarters of churners, but half your retention offers go to people who were staying anyway.
+Precision = 48/150 = **0.32**, Recall = 48/60 = **0.80**. Now you catch four in five breakdowns, but two-thirds of your inspections find nothing wrong.
 
-Which threshold is right? That's not an ML question. If a retention offer costs \$10 and a lost customer costs \$200, the 0.25 threshold wins easily. The model produces scores; *you* pick the operating point.
+Which threshold is right? That's not an ML question. An inspection costs \$500; an unplanned breakdown costs \$50,000 in downtime. The 110 extra inspections cost \$55k and prevent 18 more breakdowns worth \$900k. The 0.25 threshold wins by a mile. The model produces scores; *you* pick the operating point.
 
 ---
 
@@ -111,7 +111,7 @@ Same decision as regression: start linear, go non-linear only when the data forc
 
 **Go non-linear when:**
 - Linear model accuracy has plateaued and residuals show systematic errors
-- Class boundaries depend on feature interactions (e.g. churn that's only likely given *both* low usage and a recent support ticket)
+- Class boundaries depend on feature interactions (e.g. failure that's only likely given *both* rising vibration and rising temperature)
 - You have enough data to support a more complex model without overfitting
 
 ---
@@ -163,7 +163,7 @@ model.fit(X_train, y_train)
 proba = model.predict_proba(X_test)[:, 1]  # tune YOUR threshold on these
 ```
 
-**On the churn data:** ROC-AUC 0.79 in two minutes, and the coefficients are the deliverable. Support tickets in the last 30 days is the strongest churn signal, annual billing the strongest retention signal. When the retention team asks "why was this customer flagged?", you have an answer. No other model on this page gives you that plus honest probabilities for free.
+**On the plant data:** ROC-AUC 0.79 in two minutes, and the coefficients are the deliverable. Rising vibration trend is the strongest failure signal, a recent service the strongest protective one. When a planner asks "why was this machine flagged?", you have an answer. No other model on this page gives you that plus honest probabilities for free.
 
 ---
 
@@ -175,13 +175,13 @@ At each node, the tree picks the feature and threshold that best separates your 
 
 ```mermaid
 graph TD
-    A{"Income > $60k?"}
-    A -->|Yes| B{"Credit score > 680?"}
-    A -->|No| C["❌ Reject"]
-    B -->|Yes| D{"Debt ratio < 0.4?"}
-    B -->|No| E["❌ Reject"]
-    D -->|Yes| F["✅ Approve"]
-    D -->|No| G["❌ Reject"]
+    A{"Temperature > 80°C?"}
+    A -->|Yes| B{"Hours since service > 5,000?"}
+    A -->|No| C["✅ OK"]
+    B -->|Yes| D{"Vibration trend > 1.3?"}
+    B -->|No| E["✅ OK"]
+    D -->|Yes| F["⚠️ Inspect"]
+    D -->|No| G["✅ OK"]
 ```
 
 :::tip[Use this when]
@@ -202,7 +202,7 @@ tree.fit(X_train, y_train)
 print(export_text(tree, feature_names=list(X_train.columns)))
 ```
 
-**On the churn data:** weakest scores (AUC 0.75), but the printed rules ("monthly billing AND >2 tickets AND usage down 50% → churn") became the retention team's manual playbook. That rule set delivered more business value than the 0.12 AUC the tuned XGBoost added on top. Sometimes the diagnostic *is* the product.
+**On the plant data:** weakest scores (AUC 0.75), but the printed rules ("temp > 80°C AND over 5,000h since service AND vibration rising → fail") became the maintenance crew's walk-down checklist. That rule set delivered more business value than the 0.12 AUC the tuned XGBoost added on top. Sometimes the diagnostic *is* the product.
 
 ---
 
@@ -214,10 +214,10 @@ Hundreds of decision trees, each on a different random bootstrap sample with a r
 
 ```mermaid
 graph LR
-    D["Training Data"] --> T1["Tree 1 → Churn"]
-    D --> T2["Tree 2 → Churn"]
-    D --> T3["Tree 3 → Stay"]
-    T1 & T2 & T3 --> V["Majority vote → Churn"]
+    D["Training Data"] --> T1["Tree 1 → Fail"]
+    D --> T2["Tree 2 → Fail"]
+    D --> T3["Tree 3 → OK"]
+    T1 & T2 & T3 --> V["Majority vote → Fail"]
 ```
 
 :::tip[Use this when]
@@ -240,7 +240,7 @@ rf.fit(X_train, y_train)
 print(f"OOB accuracy: {rf.oob_score_:.3f}")
 ```
 
-**On the churn data:** AUC jumps from 0.79 to 0.84 with no tuning. Evidence that churn drivers interact: a support ticket only predicts churn when usage is also declining. The one catch: its probability outputs cluster around the middle. If you need honest probabilities for the threshold math above, wrap it in `CalibratedClassifierCV`.
+**On the plant data:** AUC jumps from 0.79 to 0.84 with no tuning. Evidence that failure drivers interact: rising vibration only predicts failure when temperature is also climbing. The one catch: its probability outputs cluster around the middle. If you need honest probabilities for the threshold math above, wrap it in `CalibratedClassifierCV`.
 
 ---
 
@@ -281,13 +281,13 @@ import xgboost as xgb
 
 model = xgb.XGBClassifier(
     n_estimators=2000, learning_rate=0.03, max_depth=4,
-    scale_pos_weight=9200 / 800,  # n_negatives / n_positives
+    scale_pos_weight=9700 / 300,  # n_negatives / n_positives
     early_stopping_rounds=50, eval_metric="aucpr"
 )
 model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
 ```
 
-**On the churn data:** best model (AUC 0.87, PR-AUC 0.46), but only after setting `scale_pos_weight` and letting early stopping pick ~700 rounds. Without `scale_pos_weight`, the first run barely beat Random Forest. That PR-AUC gap over logistic regression means catching ~30 more churners per 2,000 customers at the same precision. That's the number that justifies the tuning time, or doesn't, depending on your business.
+**On the plant data:** best model (AUC 0.87, PR-AUC 0.46), but only after setting `scale_pos_weight` and letting early stopping pick ~700 rounds. Without `scale_pos_weight`, the first run barely beat Random Forest. That PR-AUC gap over logistic regression means catching ~18 more breakdowns per 2,000 machines at the same precision, worth about $900k in avoided downtime. That's the number that justifies the tuning time.
 
 ---
 
@@ -341,7 +341,7 @@ Your features are high-dimensional and sparse: TF-IDF text vectors are the canon
 :::
 
 ```python
-# SVM's home turf: sparse text, not tabular churn
+# SVM's home turf: sparse text, not tabular sensor data
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
 
@@ -349,7 +349,7 @@ model = make_pipeline(TfidfVectorizer(), LinearSVC(C=1.0))
 model.fit(texts_train, y_train)
 ```
 
-**On the churn data:** AUC 0.80. Slightly better than logistic regression, worse than every tree ensemble, slowest to train. Expected: dense tabular data with 20 features is not SVM territory. Where it wins is the opposite regime, the free text of those support tickets. TF-IDF them into 30,000 sparse dimensions and a `LinearSVC` classifying complaint topics beats the tree models that choke on sparse input.
+**On the plant data:** AUC 0.80. Slightly better than logistic regression, worse than every tree ensemble, slowest to train. Expected: dense tabular sensor data with 20 features is not SVM territory. Where it wins is the opposite regime, the free text of the maintenance work orders. TF-IDF them into 30,000 sparse dimensions and a `LinearSVC` classifying failure modes from technician notes beats the tree models that choke on sparse input.
 
 ---
 
@@ -406,7 +406,7 @@ model = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=15))
 model.fit(X_train, y_train)  # "training" just stores the data
 ```
 
-**On the churn data:** AUC 0.77. "Customers similar to past churners churn" holds well enough. Two practical problems: scoring the full base means a distance computation against all 10,000 training rows per customer, and one badly-scaled feature (account age in days vs tickets in single digits) silently dominated every distance until we scaled. KNN's real niche is small datasets where "find me similar cases" is itself the product.
+**On the plant data:** AUC 0.77. "Machines that look like past failures fail" holds well enough. Two practical problems: scoring the fleet means a distance computation against all 10,000 training rows per machine, and one badly-scaled feature (machine age in days vs alarms in single digits) silently dominated every distance until we scaled. KNN's real niche is small datasets where "find me similar cases" is itself the product, like pulling comparable historical breakdowns for a technician.
 
 ---
 
@@ -440,7 +440,7 @@ model = make_pipeline(CountVectorizer(), MultinomialNB(alpha=1.0))
 model.fit(texts_train, y_train)  # trains in milliseconds
 ```
 
-**On the churn data:** worst real model in the table (AUC 0.72). Usage, tickets, and billing are strongly correlated, exactly what Naive Bayes assumes away. But feed it the *text* of support tickets to flag cancellation intent and it trains in milliseconds on a few thousand labelled messages, hitting 90%+ before you've finished setting up XGBoost. Naive Bayes isn't a weak model. It's a specialist.
+**On the plant data:** worst real model in the table (AUC 0.72). Vibration, temperature, and load are strongly correlated, exactly what Naive Bayes assumes away. But feed it the *text* of work orders to flag which ones describe bearing problems and it trains in milliseconds on a few thousand labelled notes, hitting 90%+ before you've finished setting up XGBoost. Naive Bayes isn't a weak model. It's a specialist.
 
 ---
 
@@ -478,13 +478,13 @@ model = make_pipeline(
 model.fit(X_train, y_train)
 ```
 
-**On the churn data:** AUC 0.85, between Random Forest and XGBoost, and it needed the most babysitting: scaling, learning-rate warnings, two convergence failures before `early_stopping` and a smaller first layer settled it. On 10k rows it can't beat tuned boosting. The calculus flips at scale and with unstructured inputs: 500k customers, or raw ticket text fed through an embedding into the same network.
+**On the plant data:** AUC 0.85, between Random Forest and XGBoost, and it needed the most babysitting: scaling, learning-rate warnings, two convergence failures before `early_stopping` and a smaller first layer settled it. On 10k rows it can't beat tuned boosting. The calculus flips at scale and with unstructured inputs: a fleet of 500k machines, or raw vibration waveforms fed through an embedding into the same network.
 
 ---
 
 ## Handling Class Imbalance
 
-Don't ignore this. Most real classification problems are imbalanced: fraud is rare, churn is rare, disease is rare. A model that ignores imbalance will be confidently wrong on the class that matters.
+Don't ignore this. Most real classification problems are imbalanced: fraud is rare, breakdowns are rare, disease is rare. A model that ignores imbalance will be confidently wrong on the class that matters.
 
 | Technique | When to use |
 |---|---|
@@ -527,6 +527,6 @@ Need to explain the model to a non-technical person?
 
 ---
 
-## Where the Churn Example Goes Next
+## Where the Machine-Failure Example Goes Next
 
-Picking the model was one stage. The same 10,000-customer churn problem continues through the [ML Project Lifecycle](../ml-lifecycle/index.md): how the label and snapshot date were [defined](../ml-lifecycle/index.md#frame-the-problem-first), the [leakage bug that scored AUC 0.99](../ml-lifecycle/data-preprocessing.md), why [random k-fold lies on this problem](../ml-lifecycle/model-training.md#choosing-the-validation-split), and what happens [after it ships](../ml-lifecycle/inference-and-production.md).
+Picking the model was one stage. The same 10,000-machine problem continues through the [ML Project Lifecycle](../ml-lifecycle/index.md): how the label and snapshot date were [defined](../ml-lifecycle/index.md#frame-the-problem-first), the [leakage bug that scored AUC 0.99](../ml-lifecycle/data-preprocessing.md), why [random k-fold lies on this problem](../ml-lifecycle/model-training.md#choosing-the-validation-split), and what happens [after it ships](../ml-lifecycle/inference-and-production.md).
