@@ -13,6 +13,18 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 
 ---
 
+## GenAI & Agents Section
+
+Content lives under `docs/genai-agents/`. Three layers, cross-linked:
+
+- `agent_design_patterns.md` — architecture layer: how agent loops are shaped (ReAct, Plan-and-Execute, HITL, …)
+- `concepts/` — technique layer: one page per **decision area** (context engineering, model I/O, reliability, evaluation), not per algorithm. New techniques are appended as sections or table rows to an existing page — never a new file per concept. A page splits only when it becomes unwieldy.
+- `use_cases/` — one directory per use case (`index.md` overview + `implementation.md`), created with `/new-genai-doc` style conventions
+
+Linking convention: use case pages link into concepts with `→ Concept: [Title](../concepts/page.md#anchor)` (mirrors the PCA `→ Reference:` convention). Each concept section ends with a **Used in:** backlink list to the use cases that apply it. Stub concept pages carry a `:::note Stub` admonition until filled.
+
+---
+
 ## Google Professional Cloud Architect (PCA) Section
 
 All PCA content lives under `docs/google-professional-cloud-architect/`.
