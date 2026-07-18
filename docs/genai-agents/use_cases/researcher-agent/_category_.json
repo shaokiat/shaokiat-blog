@@ -1,0 +1,10 @@
+{
+  "label": "Researcher Agent",
+  "position": 2,
+  "collapsible": true,
+  "collapsed": false,
+  "link": {
+    "type": "doc",
+    "id": "genai-agents/use_cases/researcher-agent/index"
+  }
+}
