@@ -14,8 +14,8 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Shao Kiat&#39;s Blog" href="/shaokiat-blog/opensearch.xml"><link rel="stylesheet" href="/shaokiat-blog/assets/css/styles.83ef85a6.css">
-<script src="/shaokiat-blog/assets/js/runtime~main.9c5b582a.js" defer="defer"></script>
-<script src="/shaokiat-blog/assets/js/main.a4e786fd.js" defer="defer"></script>
+<script src="/shaokiat-blog/assets/js/runtime~main.bb2c0aad.js" defer="defer"></script>
+<script src="/shaokiat-blog/assets/js/main.6774aa8d.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -42,7 +42,7 @@
 <div class="language-python codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#d6deeb;--prism-background-color:#011627"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-python codeBlock_bY9V thin-scrollbar" style="color:#d6deeb;background-color:#011627"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#d6deeb"><span class="token keyword" style="color:rgb(127, 219, 202)">import</span><span class="token plain"> joblib</span><br></div><div class="token-line" style="color:#d6deeb"><span class="token plain">joblib</span><span class="token punctuation" style="color:rgb(199, 146, 234)">.</span><span class="token plain">dump</span><span class="token punctuation" style="color:rgb(199, 146, 234)">(</span><span class="token plain">model</span><span class="token punctuation" style="color:rgb(199, 146, 234)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(173, 219, 103)">&quot;failure_model_2026-07.joblib&quot;</span><span class="token punctuation" style="color:rgb(199, 146, 234)">)</span><span class="token plain">   </span><span class="token comment" style="color:rgb(99, 119, 119);font-style:italic"># the WHOLE Pipeline from preprocessing.md</span><br></div></code></pre></div></div>
 <p>The rules that make that one line safe:</p>
 <ul>
-<li class=""><strong>Serialize the <code>Pipeline</code>, not the classifier.</strong> If you save only the XGBoost step, the serving side must reimplement imputation, scaling, and encoding: instant <a href="#training-serving-skew" class="">skew</a>.</li>
+<li class=""><strong>Serialize the <code>Pipeline</code>, not the classifier.</strong> If you save only the XGBoost step, the serving side must reimplement imputation, scaling, and encoding: instant <a href="#trainingserving-skew" class="">skew</a>.</li>
 <li class=""><strong>Pickles are not portable across versions.</strong> A model saved under scikit-learn 1.3 and loaded under 1.5 may crash. Or worse, load and predict differently with no error. Pin exact versions in the serving image and record them next to the artifact.</li>
 <li class=""><strong>Version the artifact</strong> (<code>failure_model_2026-07.joblib</code>, data range, code commit, validation score). &quot;Which model is in prod?&quot; must have a one-line answer.</li>
 <li class="">Smoke-test at load: score 100 known machines, assert outputs match the values saved at training time. Three lines that catch an entire class of silent corruption. (This is the counterpart to the startup loading in <a class="" href="/shaokiat-blog/docs/ml-engineering/ml-integration/model-serving">ML Engineering&#x27;s serving page</a>.)</li>
