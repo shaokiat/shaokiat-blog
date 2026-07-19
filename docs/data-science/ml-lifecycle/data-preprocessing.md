@@ -223,7 +223,7 @@ model = Pipeline([("prep", preprocess),
 model.fit(X_train, y_train)   # every statistic learned from train only
 ```
 
-`cross_val_score(model, ...)` now refits everything inside each fold automatically. And this exact object is what gets [serialized for production](./inference-and-production.md#serialization-the-pkl-file-will-bite-you), so there's no "reimplement the preprocessing in the serving code" step. That step is where [training/serving skew](./inference-and-production.md#training-serving-skew) is born.
+`cross_val_score(model, ...)` now refits everything inside each fold automatically. And this exact object is what gets [serialized for production](./inference-and-production.md#serialization-the-pkl-file-will-bite-you), so there's no "reimplement the preprocessing in the serving code" step. That step is where [training/serving skew](./inference-and-production.md#trainingserving-skew) is born.
 
 ---
 

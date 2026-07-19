@@ -50,7 +50,7 @@ joblib.dump(model, "failure_model_2026-07.joblib")   # the WHOLE Pipeline from p
 
 The rules that make that one line safe:
 
-- **Serialize the `Pipeline`, not the classifier.** If you save only the XGBoost step, the serving side must reimplement imputation, scaling, and encoding: instant [skew](#training-serving-skew).
+- **Serialize the `Pipeline`, not the classifier.** If you save only the XGBoost step, the serving side must reimplement imputation, scaling, and encoding: instant [skew](#trainingserving-skew).
 - **Pickles are not portable across versions.** A model saved under scikit-learn 1.3 and loaded under 1.5 may crash. Or worse, load and predict differently with no error. Pin exact versions in the serving image and record them next to the artifact.
 - **Version the artifact** (`failure_model_2026-07.joblib`, data range, code commit, validation score). "Which model is in prod?" must have a one-line answer.
 - Smoke-test at load: score 100 known machines, assert outputs match the values saved at training time. Three lines that catch an entire class of silent corruption. (This is the counterpart to the startup loading in [ML Engineering's serving page](../../ml-engineering/ml-integration/model-serving.md).)

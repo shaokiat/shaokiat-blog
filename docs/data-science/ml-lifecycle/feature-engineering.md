@@ -50,7 +50,7 @@ def build_features(events: pd.DataFrame, snapshot_date: pd.Timestamp) -> pd.Data
     ...
 ```
 
-One function, `snapshot_date` as an argument, the filter on line one. Training data is this function run at many historical snapshots. Production scoring is the same function run at today's date. Same code path, which is how you avoid [training/serving skew](./inference-and-production.md#training-serving-skew) later.
+One function, `snapshot_date` as an argument, the filter on line one. Training data is this function run at many historical snapshots. Production scoring is the same function run at today's date. Same code path, which is how you avoid [training/serving skew](./inference-and-production.md#trainingserving-skew) later.
 
 ---
 
