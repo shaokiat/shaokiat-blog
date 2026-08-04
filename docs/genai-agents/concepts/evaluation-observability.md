@@ -24,6 +24,12 @@ Aggregating traces into step counts, tool usage, and error rates without re-runn
 
 Scoring agent outputs against a rubric with a judge model; where it's reliable and where it drifts.
 
+## RAG evaluation
+
+Attributing a bad answer to the retriever or the generator, using claim-level metrics scored by a judge model.
+
+→ Guide: [RAG Evaluation with RAGAS](../rag-evaluation.md)
+
 ## Token and cost tracking
 
 A cumulative usage accumulator on the shared LLM wrapper, so every call path (completions, embeddings) reports into one total per run.

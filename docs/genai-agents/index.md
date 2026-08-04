@@ -39,6 +39,12 @@ Protocol internals, how to build a server with the Python SDK, and six design pa
 
 - [MCP Inner Workings & Design Patterns](./mcp.md)
 
+### RAG Evaluation
+
+Scoring a RAG pipeline component by component with RAGAS — context recall and precision on the retriever, faithfulness and response relevancy on the generator — plus how to read the score combinations and gate CI on them.
+
+- [RAG Evaluation with RAGAS](./rag-evaluation.md)
+
 ### AI Slide Deck Making
 
 Evaluating open-source tools across complexity tiers — from single-pass generators (slide-deck-ai) to Gamma-like agentic pipelines (Presenton), with Marp as a future code-first option.
