@@ -1,0 +1,599 @@
+---
+sidebar_position: 2
+---
+
+# Practice Questions
+
+Fifteen questions against a toy e-commerce schema. Load the seed, write your query, then open the solution and check it against the expected output.
+
+Each question has a naive answer that looks right and is wrong. The solution says which one.
+
+For the reference material behind these, see the [SQL Cheatsheet](./sql-cheatsheet.mdx).
+
+## The data
+
+`customers` → `orders` → `order_items` → `products`.
+
+| table | columns |
+|---|---|
+| `customers` | `id`, `name`, `email`, `country`, `created_at` |
+| `products` | `id`, `name`, `category`, `price` |
+| `orders` | `id`, `customer_id` → customers, `status` (`pending`/`paid`/`refunded`), `metadata` jsonb, `created_at` |
+| `order_items` | `id`, `order_id` → orders, `product_id` → products, `quantity`, `unit_price` |
+
+**Revenue** = `quantity * unit_price` from `order_items`, `paid` orders only. Not `products.price` — that's today's price, `unit_price` is the price at sale. **Total paid revenue is 8450.00**; if a join fans out, your number exceeds it.
+
+Two rows from each, to show the shape — the rest is in [`seed.sql`](https://github.com/shaokiat/shaokiat-blog/blob/main/docs/database/seed.sql).
+
+**customers** — 6 rows, countries SG / MY / IN / DE. Emails are `<firstname>@example.com`.
+
+| id | name | email | country | created_at |
+|---|---|---|---|---|
+| 1 | Amara Okafor | amara@example.com | SG | 2026-08-02 |
+| 4 | Divya Rao | divya@example.com | IN | 2026-09-02 |
+
+**products** — 8 rows across furniture, electronics, pantry.
+
+| id | name | category | price |
+|---|---|---|---|
+| 1 | Aeron Chair | furniture | 1200.00 |
+| 5 | 27" Monitor | electronics | 400.00 |
+
+**orders** — 11 rows dated June–September 2026: 9 `paid`, 1 `refunded`, 1 `pending`.
+
+| id | customer_id | status | metadata | created_at |
+|---|---|---|---|---|
+| 10 | 4 | paid | `{"source":"web"}` | 2026-09-03 |
+| 5 | 1 | refunded | `{"source":"web"}` | 2026-08-01 |
+
+**order_items** — 18 rows, 1–2 per order. `unit_price` happens to match `products.price` throughout.
+
+| id | order_id | product_id | quantity | unit_price |
+|---|---|---|---|---|
+| 16 | 10 | 2 | 2 | 800.00 |
+| 17 | 10 | 6 | 1 | 60.00 |
+
+Three edge cases the questions hunt for: one customer never orders, one product appears only in the pending order, and orders 5 and 11 are not revenue.
+
+To run the queries for real, load [`seed.sql`](https://github.com/shaokiat/shaokiat-blog/blob/main/docs/database/seed.sql) into any Postgres 15+:
+
+```bash
+docker run --rm -e POSTGRES_PASSWORD=pg -p 5432:5432 -d postgres:16
+psql postgres://postgres:pg@localhost:5432/postgres -f seed.sql
+```
+
+No Docker? Paste it into [DB Fiddle](https://www.db-fiddle.com/) on PostgreSQL 15 — everything runs except question 15's `EXPLAIN`.
+
+---
+
+## Joins
+
+### 1. Customers who have never ordered
+
+Return `name`, `email`. One row, any order.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select c.name, c.email
+from customers c
+left join orders o on o.customer_id = c.id
+where o.id is null;
+```
+
+| name | email |
+|---|---|
+| Farid Hassan | farid@example.com |
+
+The anti-join pattern is `LEFT JOIN … WHERE right.pk IS NULL`. `NOT EXISTS` is equally good and usually plans identically:
+
+```sql
+select name, email from customers c
+where not exists (select 1 from orders o where o.customer_id = c.id);
+```
+
+**Trap:** `where c.id not in (select customer_id from orders)` returns **zero rows** the moment that subquery yields a single `NULL` — `x NOT IN (1, NULL)` evaluates to `NULL`, never `true`. `orders.customer_id` is `NOT NULL` here so it happens to work, but the habit breaks the first time you point it at a nullable column. Default to `NOT EXISTS`.
+</details>
+
+### 2. Products that have never sold
+
+"Sold" means appearing in a **paid** order. Return `id`, `name`, `category`. One row.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select p.id, p.name, p.category
+from products p
+where not exists (
+  select 1 from order_items i
+  join orders o on o.id = i.order_id and o.status = 'paid'
+  where i.product_id = p.id
+);
+```
+
+| id | name | category |
+|---|---|---|
+| 8 | Tea Sampler | pantry |
+
+**Trap:** dropping the `status` condition asks a different question — "never appeared in any order" — and returns **zero rows**, because the Tea Sampler does sit in order 11. That order is `pending`, so nobody has paid for it. The status filter belongs inside the `EXISTS`; a product with only unpaid orders must still count as unsold.
+</details>
+
+### 3. Revenue per paid order
+
+Return `order_id`, `customer`, `total`, ordered by `total` descending. Nine rows.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select o.id as order_id, c.name as customer, sum(i.quantity * i.unit_price) as total
+from orders o
+join customers c on c.id = o.customer_id
+join order_items i on i.order_id = o.id
+where o.status = 'paid'
+group by o.id, c.name
+order by total desc;
+```
+
+| order_id | customer | total |
+|---|---|---|
+| 10 | Divya Rao | 1660.00 |
+| 9 | Chen Wei | 1600.00 |
+| 1 | Amara Okafor | 1380.00 |
+| 3 | Ben Tan | 1200.00 |
+| 6 | Divya Rao | 890.00 |
+| 4 | Chen Wei | 800.00 |
+| 7 | Ben Tan | 550.00 |
+| 2 | Amara Okafor | 270.00 |
+| 8 | Elena Fischer | 100.00 |
+
+Nine rows summing to 8450.00. Orders 5 and 11 are absent.
+
+**Trap:** joining `order_items` multiplies the order row by its line-item count. Anything you aggregate off the `orders` row itself — say `sum(o.shipping_fee)` — is now counted once per item, so a two-item order double-counts its shipping. Aggregate line items in a subquery *before* joining anything else onto the order.
+</details>
+
+### 4. Top 3 customers by paid revenue
+
+Return `customer`, `revenue`, ordered by `revenue` descending. Three rows.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select c.name as customer, sum(i.quantity * i.unit_price) as revenue
+from customers c
+join orders o on o.customer_id = c.id and o.status = 'paid'
+join order_items i on i.order_id = o.id
+group by c.id, c.name
+order by revenue desc
+limit 3;
+```
+
+| customer | revenue |
+|---|---|
+| Divya Rao | 2550.00 |
+| Chen Wei | 2400.00 |
+| Ben Tan | 1750.00 |
+
+Without the `LIMIT` you'd also see Amara Okafor 1650.00 and Elena Fischer 100.00 — five rows, not six, because Farid has nothing to join to.
+
+Group by `c.id`, not just `c.name` — two customers can share a name and would silently merge into one row. Once `c.id` (the primary key) is in the `GROUP BY`, Postgres lets you select any other `customers` column without listing it.
+</details>
+
+### 5. Revenue per customer, including customers with none
+
+Return `customer`, `revenue`, ordered by `revenue` descending. Every customer appears, so six rows; non-buyers show `0.00`, not `NULL`.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select c.name as customer, coalesce(sum(i.quantity * i.unit_price), 0) as revenue
+from customers c
+left join orders o on o.customer_id = c.id and o.status = 'paid'
+left join order_items i on i.order_id = o.id
+group by c.id, c.name
+order by revenue desc;
+```
+
+| customer | revenue |
+|---|---|
+| Divya Rao | 2550.00 |
+| Chen Wei | 2400.00 |
+| Ben Tan | 1750.00 |
+| Amara Okafor | 1650.00 |
+| Elena Fischer | 100.00 |
+| Farid Hassan | 0.00 |
+
+**Trap:** move `o.status = 'paid'` into the `WHERE` clause and you silently convert the `LEFT JOIN` into an inner one — Farid's row has `o.status IS NULL`, which fails the predicate, and you're back to five rows. A filter on the *right* table of a `LEFT JOIN` belongs in `ON`; a filter on the left table belongs in `WHERE`.
+
+The `coalesce` matters too: `sum()` over zero rows is `NULL`, not `0`. Without it Farid shows a blank, and `order by` puts `NULL` first by default in descending order.
+</details>
+
+---
+
+## Aggregation
+
+### 6. Order counts per status, in one row
+
+Return exactly one row with three columns: `paid`, `refunded`, `pending`.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select
+  count(*) filter (where status = 'paid')     as paid,
+  count(*) filter (where status = 'refunded') as refunded,
+  count(*) filter (where status = 'pending')  as pending
+from orders;
+```
+
+| paid | refunded | pending |
+|---|---|---|
+| 9 | 1 | 1 |
+
+`FILTER` reads better than `sum(case when … then 1 else 0 end)` and beats three separate scans of the table for speed — one pass, three counters.
+
+**Trap:** `count(status = 'paid')` counts **11**, not 9. `count(x)` counts non-`NULL` inputs, and `false` is not `NULL`. The `case` version needs `else null` (or `sum(… else 0)`) to be correct.
+</details>
+
+### 7. Countries with more than one paying customer
+
+Return `country`, `paying_customers`. One row.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select c.country, count(distinct c.id) as paying_customers
+from customers c
+join orders o on o.customer_id = c.id and o.status = 'paid'
+group by c.country
+having count(distinct c.id) > 1;
+```
+
+| country | paying_customers |
+|---|---|
+| SG | 2 |
+
+Without the `HAVING` you'd get four rows: DE 1, IN 1, MY 1, SG 2. Note MY shows **1**, not 2 — Farid is Malaysian but never ordered, so the inner join drops him.
+
+`WHERE` filters rows before grouping; `HAVING` filters groups after.
+
+**Trap:** `count(*)` instead of `count(distinct c.id)` counts *order* rows, giving SG 4, MY 2, IN 2, DE 1 — and MY passes the `> 1` test on the strength of one customer's two orders.
+</details>
+
+### 8. Revenue for every month from June to September 2026
+
+Return `month` (a `date`, first of the month) and `revenue`, ordered by `month`. Four rows — a month with no paid revenue must still appear, showing `0.00`.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select g.month::date, coalesce(sum(i.quantity * i.unit_price), 0) as revenue
+from generate_series('2026-06-01'::date, '2026-09-01'::date, '1 month') as g(month)
+left join orders o
+  on o.status = 'paid'
+ and o.created_at >= g.month
+ and o.created_at <  g.month + interval '1 month'
+left join order_items i on i.order_id = o.id
+group by g.month
+order by g.month;
+```
+
+| month | revenue |
+|---|---|
+| 2026-06-01 | 1650.00 |
+| 2026-07-01 | 2000.00 |
+| 2026-08-01 | 1440.00 |
+| 2026-09-01 | 3360.00 |
+
+Summing to 8450.00. August is 1440.00 rather than 2640.00 because order 5 was refunded.
+
+Gaps only appear if you generate the calendar and left-join the data onto it. `group by date_trunc('month', created_at)` can only return months that already have rows — an empty month is invisible rather than zero, and a chart built on it silently closes the gap.
+
+**Trap:** the date range is a half-open interval, `>= month AND < month + 1 month`. Writing `between g.month and g.month + interval '1 month'` includes the first instant of the next month, so an order at midnight on the 1st is counted in both.
+</details>
+
+---
+
+## Window Functions
+
+### 9. Running total of paid revenue by order date
+
+Return `order_date`, `order_total`, `running_total`, ordered oldest first. Nine rows; the last `running_total` is the 8450.00 grand total.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+with order_totals as (
+  select o.id, o.created_at, sum(i.quantity * i.unit_price) as total
+  from orders o
+  join order_items i on i.order_id = o.id
+  where o.status = 'paid'
+  group by o.id, o.created_at
+)
+select created_at::date as order_date,
+       total as order_total,
+       sum(total) over (order by created_at, id) as running_total
+from order_totals
+order by created_at, id;
+```
+
+| order_date | order_total | running_total |
+|---|---|---|
+| 2026-06-05 | 1380.00 | 1380.00 |
+| 2026-06-25 | 270.00 | 1650.00 |
+| 2026-07-03 | 1200.00 | 2850.00 |
+| 2026-07-15 | 800.00 | 3650.00 |
+| 2026-08-04 | 890.00 | 4540.00 |
+| 2026-08-20 | 550.00 | 5090.00 |
+| 2026-09-01 | 100.00 | 5190.00 |
+| 2026-09-02 | 1600.00 | 6790.00 |
+| 2026-09-03 | 1660.00 | 8450.00 |
+
+An `ORDER BY` inside `OVER ()` implies the frame `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — that is what makes it cumulative rather than a grand total on every row.
+
+**Trap:** with the default `RANGE` frame, rows that tie on the ordering column all get the *same* running total — the frame covers peers, not preceding rows. Adding `id` as a tie-break gives a strict order. If you need the frame to be strictly row-based regardless, spell it out: `rows between unbounded preceding and current row`.
+</details>
+
+### 10. Best-selling product in each category
+
+By paid revenue. Return `category`, `product`, `revenue` — one row per category, so three rows.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select category, product, revenue from (
+  select p.category, p.name as product,
+         sum(i.quantity * i.unit_price) as revenue,
+         row_number() over (
+           partition by p.category
+           order by sum(i.quantity * i.unit_price) desc
+         ) as rn
+  from products p
+  join order_items i on i.product_id = p.id
+  join orders o on o.id = i.order_id and o.status = 'paid'
+  group by p.id, p.category, p.name
+) ranked
+where rn = 1;
+```
+
+| category | product | revenue |
+|---|---|---|
+| electronics | 27" Monitor | 2000.00 |
+| furniture | Standing Desk | 3200.00 |
+| pantry | Espresso Beans | 100.00 |
+
+The full ranking, for checking your work:
+
+| category | product | revenue | rn |
+|---|---|---|---|
+| electronics | 27" Monitor | 2000.00 | 1 |
+| electronics | Mech Keyboard | 300.00 | 2 |
+| electronics | USB-C Hub | 180.00 | 3 |
+| furniture | Standing Desk | 3200.00 | 1 |
+| furniture | Aeron Chair | 2400.00 | 2 |
+| furniture | Desk Lamp | 270.00 | 3 |
+| pantry | Espresso Beans | 100.00 | 1 |
+
+Seven rows, not eight — the Tea Sampler has no paid line items and the inner join drops it.
+
+Window functions run *after* `GROUP BY`, so `row_number()` can order by an aggregate directly. But they also run after `WHERE`, which is why filtering needs the subquery wrapper — `where row_number() over (…) = 1` is a syntax error, not a slow query.
+
+`row_number()` picks exactly one winner per category. Use `rank()` if ties should all survive (with gaps in the numbering after), `dense_rank()` for ties without gaps.
+
+**Trap:** the Aeron Chair is the single most expensive furniture item and appears in three orders, which makes it the intuitive answer. The Standing Desk wins on volume — order 10 bought two of them. Ranking by `max(unit_price)` or by order count instead of revenue gets this wrong.
+</details>
+
+### 11. Each customer's most recent paid order
+
+Return `customer`, `order_id`, `order_date` — one row per customer who has paid, so five rows.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select distinct on (o.customer_id)
+       c.name as customer, o.id as order_id, o.created_at::date as order_date
+from orders o
+join customers c on c.id = o.customer_id
+where o.status = 'paid'
+order by o.customer_id, o.created_at desc, o.id desc;
+```
+
+| customer | order_id | order_date |
+|---|---|---|
+| Amara Okafor | 2 | 2026-06-25 |
+| Ben Tan | 7 | 2026-08-20 |
+| Chen Wei | 9 | 2026-09-02 |
+| Divya Rao | 10 | 2026-09-03 |
+| Elena Fischer | 8 | 2026-09-01 |
+
+Five rows — Farid has no orders. Note Elena's answer is order 8, not her later order 11: that one is still pending.
+
+`DISTINCT ON` is Postgres-specific and the shortest way to say "first row per group". Its `ORDER BY` **must** lead with the same expressions as the `DISTINCT ON` list, then the tie-break that decides which row survives — otherwise you get a syntax error, or worse, an arbitrary winner.
+
+The portable form:
+
+```sql
+select name, id, created_at from (
+  select c.name, o.id, o.created_at::date,
+         row_number() over (partition by o.customer_id order by o.created_at desc, o.id desc) as rn
+  from orders o join customers c on c.id = o.customer_id
+  where o.status = 'paid'
+) t where rn = 1;
+```
+
+**Trap:** `select customer_id, max(created_at) … group by customer_id` gives the right *date* but cannot give you the matching order `id` — any other column you add has to go into the `GROUP BY`, which changes the grouping. Getting the whole row requires `DISTINCT ON`, a window function, or a self-join back onto the max.
+</details>
+
+### 12. Month-over-month revenue change
+
+Return `month` (a `date`), `revenue`, and `delta` against the previous month, ordered by `month`. Four rows; the first `delta` is `NULL`.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+with monthly as (
+  select date_trunc('month', o.created_at) as month,
+         sum(i.quantity * i.unit_price) as revenue
+  from orders o
+  join order_items i on i.order_id = o.id
+  where o.status = 'paid'
+  group by 1
+)
+select month::date as month, revenue,
+       revenue - lag(revenue) over (order by month) as delta
+from monthly
+order by month;
+```
+
+| month | revenue | delta |
+|---|---|---|
+| 2026-06-01 | 1650.00 | *null* |
+| 2026-07-01 | 2000.00 | 350.00 |
+| 2026-08-01 | 1440.00 | −560.00 |
+| 2026-09-01 | 3360.00 | 1920.00 |
+
+The first row's `delta` is `NULL`, not zero — there is no previous month to subtract. `lag(revenue, 1, 0)` supplies a default if you'd rather see 0.00, but that fabricates a 100% jump into June.
+
+**Trap:** this version silently skips months with no orders, so a gap makes "previous month" mean "previous month *that had sales*" — the delta then compares across a hole. The data here is contiguous, so it doesn't bite; join a `generate_series` calendar (question 8) if it might.
+</details>
+
+---
+
+## CTEs and Subqueries
+
+### 13. Customers who spent above the average customer
+
+Average across customers who actually paid. Return `customer`, `revenue`, ordered by `revenue` descending. Three rows.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+with per_customer as (
+  select o.customer_id, sum(i.quantity * i.unit_price) as revenue
+  from orders o
+  join order_items i on i.order_id = o.id
+  where o.status = 'paid'
+  group by o.customer_id
+)
+select c.name as customer, p.revenue
+from per_customer p
+join customers c on c.id = p.customer_id
+where p.revenue > (select avg(revenue) from per_customer)
+order by p.revenue desc;
+```
+
+The average is 8450.00 / 5 = **1690.00**:
+
+| customer | revenue |
+|---|---|
+| Divya Rao | 2550.00 |
+| Chen Wei | 2400.00 |
+| Ben Tan | 1750.00 |
+
+Amara at 1650.00 misses by 40.00 — a good check that you averaged over customers and not over orders.
+
+**Trap:** "the average customer" is ambiguous and the two readings differ. Over the five paying customers it's 1690.00. Include Farid at 0.00 and it drops to 1408.33, which promotes Amara into the result. Decide which denominator the question means before you write the query — this is the single most common analytics bug, and it never throws an error.
+
+`avg(revenue)` over the CTE is *not* the same as `sum(...) / count(*)` over the raw join, which would average line items.
+
+One Postgres note: since v12 a CTE referenced more than once is **not** automatically materialised — the planner inlines it unless you write `with … as materialized`. Usually what you want, but "compute this once" is a hint here, not a promise.
+</details>
+
+### 14. Orders by traffic source
+
+`metadata` is `jsonb`, shaped `{"source": "web"}`. Return `source`, `orders`, most orders first. Two rows.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+select metadata->>'source' as source, count(*) as orders
+from orders
+group by 1
+order by 2 desc;
+```
+
+| source | orders |
+|---|---|
+| web | 6 |
+| mobile | 5 |
+
+For paid orders only, add `where status = 'paid'` → mobile 5, web 4.
+
+`->>` returns `text`; `->` returns `jsonb`. Mixing them up is the usual first error: `metadata->'source' = 'web'` fails, because the left side is the JSON string `"web"` — quotes included. You'd need `metadata->'source' = '"web"'::jsonb`.
+
+For *filtering* rather than extracting, prefer containment: `where metadata @> '{"source":"web"}'`. It reads the same and it's the only form a `GIN` index can serve:
+
+```sql
+create index on orders using gin (metadata);
+```
+
+**Trap:** a missing key returns `NULL`, not an error, so `where metadata->>'surce' = 'web'` (typo) returns zero rows and looks like a legitimate empty result. There is no schema to catch it.
+</details>
+
+---
+
+## Writing Data and Indexes
+
+### 15. Refund the stale pending orders, then make question 4 fast
+
+Mark every `pending` order older than 30 days as `refunded`, returning `id`, `created_at`, `status` for each row you changed. Then name the two indexes question 4 needs.
+
+<details>
+<summary>Solution</summary>
+
+```sql
+update orders
+set status = 'refunded'
+where status = 'pending'
+  and created_at < now() - interval '30 days'
+returning id, created_at, status;
+```
+
+Against the seed data as loaded, order 11 is dated 2026-09-04 — whether it matches depends on your clock. Run the `SELECT` first to see:
+
+```sql
+select id, created_at from orders
+where status = 'pending' and created_at < now() - interval '30 days';
+```
+
+`RETURNING` gives you the affected rows without a second query — the cheap way to confirm an `UPDATE` hit what you meant, and the only way to see it inside a transaction you're about to roll back. A `WHERE` typo on an `UPDATE` is not recoverable without a backup; get in the habit of writing the `SELECT`, eyeballing it, then swapping the verb.
+
+**Indexes for question 4.** That query walks `orders` by `customer_id` filtered on `status`, then `order_items` by `order_id`:
+
+```sql
+create index on order_items (order_id);
+create index on orders (customer_id) where status = 'paid';
+```
+
+**Postgres does not index foreign keys for you** — it creates one for a primary key and a unique constraint, and nothing else. `order_items(order_id)` is the highest-value index in this schema: without it every order lookup is a sequential scan of the line items, and it's also what makes `on delete cascade` on `orders` cheap instead of a full scan per deleted row.
+
+The partial index on `orders` is smaller than the plain equivalent because it stores only the rows the query wants; the cost is that it can serve queries mentioning `status = 'paid'` and no others.
+
+Confirm rather than assume:
+
+```sql
+explain (analyze, buffers) select …;
+```
+
+Look for `Index Scan` replacing `Seq Scan`, and for estimated rows roughly matching actual rows — a large mismatch means stale statistics, so run `analyze`.
+
+**Trap:** on 18 rows Postgres will pick `Seq Scan` no matter what you create. Reading one page beats reading an index *plus* the heap. That is the planner being right, not broken — index experiments need realistic row counts to tell you anything:
+
+```sql
+insert into order_items (order_id, product_id, quantity, unit_price)
+select 1, 1, 1, 100 from generate_series(1, 500000);
+```
+</details>

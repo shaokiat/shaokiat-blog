@@ -40,9 +40,8 @@ const config = {
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-        gtag: {
-          trackingID: "G-VS62WFN2SY",
-        },
+        // gtag disabled — noisy console errors in local dev.
+        // Re-enable for production: gtag: { trackingID: "G-VS62WFN2SY" },
       }),
     ],
   ],

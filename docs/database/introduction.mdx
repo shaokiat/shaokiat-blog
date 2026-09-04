@@ -1,0 +1,134 @@
+---
+draft: true
+sidebar_position: 1
+---
+
+# Introduction to Supabase
+
+## What is Supabase?
+
+Supabase is an open-source **Backend-as-a-Service (BaaS)** built on top of PostgreSQL. It bundles the backend infrastructure most applications need — database, authentication, file storage, realtime subscriptions, and serverless functions — into a single managed platform.
+
+A common mistake is positioning Supabase as just a "hosted Postgres". That undersells it. The more accurate framing for a client conversation is: *Supabase eliminates the need to build and maintain commodity backend infrastructure, while keeping the full power of a relational database.* The team ships features on day one instead of spending weeks on auth, storage, and API boilerplate.
+
+Unlike proprietary BaaS solutions, Supabase is built entirely on open-source tools:
+
+| Layer | Tool |
+|---|---|
+| Database | PostgreSQL |
+| REST API | PostgREST |
+| Authentication | GoTrue |
+| Realtime | Elixir Phoenix |
+| Storage | S3-compatible |
+| Edge Functions | Deno |
+
+Because the foundation is standard Postgres, there is no vendor lock-in at the data layer — the database can be migrated out or self-hosted at any time.
+
+## Supabase vs Firebase
+
+Firebase is the most common comparison a customer will raise. Both offer a similar developer experience, but they differ fundamentally in data model and openness.
+
+| | Supabase | Firebase |
+|---|---|---|
+| Database | PostgreSQL (relational) | Firestore (document/NoSQL) |
+| Querying | Full SQL + PostgREST | Limited query API |
+| Open source | Yes (Apache 2.0) | No |
+| Self-hostable | Yes | No |
+| Realtime | Yes (via Postgres replication) | Yes (native) |
+| Full-text search | Built-in (`tsvector`) | Limited |
+| Complex joins | Native SQL | Manual client-side |
+| Pricing | Predictable, generous free tier | Can escalate with read volume |
+
+**Recommend Supabase when:** the data is relational, the team needs complex queries or joins, compliance requires self-hosting, or the customer wants to avoid NoSQL data modelling.
+
+**Recommend Firebase when:** the use case is mobile-first with heavy offline support, or the team has deep Firebase expertise and no relational data requirements.
+
+## The Postgres-First Approach
+
+Supabase does not build an abstraction layer on top of Postgres — it exposes Postgres directly. This is a deliberate design decision with significant implications:
+
+- **Every Supabase project is a real Postgres database.** It can be connected to with `psql`, TablePlus, or any Postgres-compatible client — no proprietary driver needed.
+- **You write real SQL.** Migrations, functions, triggers, and indexes are all native Postgres — skills that transfer and are not Supabase-specific.
+- **The REST API is auto-generated**, not hand-written. PostgREST introspects the schema and generates endpoints automatically — adding a table immediately creates an API endpoint.
+- **Extensions are first-class.** `pgvector` for AI embeddings, `PostGIS` for geospatial, `pgcrypto` for encryption — all available with a single `CREATE EXTENSION`.
+
+This matters in customer conversations because it directly answers the "what happens if we outgrow Supabase?" concern. The answer is: you take your Postgres database and go — nothing is proprietary at the data layer.
+
+## Architecture Overview
+
+```
+Your App
+   │
+   ├── Supabase JS/Python SDK  ──►  PostgREST (REST API)  ──►  PostgreSQL
+   │                           ──►  GoTrue (Auth)
+   │                           ──►  Realtime Server
+   │                           ──►  Storage API
+   └── Direct SQL connection  ──►  PostgreSQL (port 5432)
+```
+
+All services sit in front of the same Postgres instance. The JWT issued by the auth server flows into the database itself, where Row Level Security policies use it to filter rows — security rules live at the data layer, not scattered across application middleware.
+
+## Schema Design
+
+A Supabase project starts with a fresh Postgres database. Schemas organize tables into logical namespaces — Supabase uses three by default:
+
+- `public` — your application tables live here
+- `auth` — managed by GoTrue; contains `auth.users`
+- `storage` — managed by the storage service
+
+You reference the authenticated user in RLS policies via `auth.uid()`, which reads from the `auth` schema at query time.
+
+Good schema design habits that matter most in Supabase:
+
+- Use `uuid` primary keys (Supabase generates them by default) to avoid enumerable integer IDs.
+- Keep user-specific data linked to `auth.users` via a `profiles` table rather than extending `auth.users` directly.
+- Enable RLS on every table in `public` from the start — it is off by default and easy to forget.
+
+## Data Types
+
+Postgres has a rich type system. The ones you will reach for most often in Supabase:
+
+| Type | Use case |
+|---|---|
+| `uuid` | Primary keys, foreign keys to `auth.users` |
+| `text` | Variable-length strings (no need for `varchar`) |
+| `timestamptz` | Timestamps — always prefer timezone-aware |
+| `boolean` | Flags |
+| `jsonb` | Semi-structured data with indexing support |
+| `integer` / `bigint` | Counts, quantities |
+| `numeric` | Monetary values — avoids floating-point errors |
+| `vector` | AI embeddings via `pgvector` extension |
+
+Prefer `timestamptz` over `timestamp` — Postgres stores it in UTC and converts on read, which prevents timezone bugs as your userbase grows.
+
+## Constraints & Relationships
+
+Constraints enforce data integrity at the database level, which is always more reliable than application-level validation alone.
+
+**Primary key**
+```sql
+id uuid primary key default gen_random_uuid()
+```
+
+**Foreign key with cascade delete**
+```sql
+user_id uuid references auth.users(id) on delete cascade
+```
+
+**Not null + default**
+```sql
+created_at timestamptz not null default now()
+```
+
+**Unique constraint**
+```sql
+email text unique not null
+```
+
+**Check constraint**
+```sql
+price numeric check (price >= 0)
+```
+
+Defining these in migrations (rather than only through the Table Editor) keeps your schema reproducible and version-controlled.
+

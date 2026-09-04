@@ -1,0 +1,137 @@
+---
+draft: true
+sidebar_position: 2
+---
+
+# Architecture
+
+## Supabase is a Hybrid BaaS, Not a Pure Database
+
+A common misconception is that Supabase is just a hosted Postgres database. It is more accurately described as a **Backend-as-a-Service (BaaS)** — a managed collection of server components that sit in front of a Postgres database and provide a complete backend out of the box.
+
+This distinction matters in client conversations. When a customer asks "what am I actually getting?", the answer is not just a database — it is an entire backend stack with no server code to write.
+
+## Component Breakdown
+
+| Component | Technology | Role |
+|---|---|---|
+| Database | PostgreSQL | Primary data store |
+| Auth server | GoTrue | Issues and manages JWTs |
+| REST API | PostgREST | Auto-generates REST endpoints from the schema |
+| Realtime server | Elixir + Phoenix | WebSocket subscriptions to DB changes |
+| Storage server | S3-compatible API | File and object storage |
+| Edge Functions | Deno runtime | Serverless functions at the edge |
+| API Gateway | Kong | Routes requests to the correct service |
+
+All components are **open source** and maintained by Supabase. The managed cloud offering is essentially these components running on AWS infrastructure, with the Supabase team handling provisioning, scaling, and upgrades.
+
+## High-Level Request Flow
+
+```
+                        ┌─────────────────────────────────┐
+                        │         Supabase Project         │
+                        │                                  │
+Client                  │  Kong (API Gateway)              │
+  │                     │    │                             │
+  ├─ Auth requests  ────┼───►│─► GoTrue ──────────────────┼─► issues JWT
+  │                     │    │                             │
+  ├─ Data requests  ────┼───►│─► PostgREST ───────────────┼─► PostgreSQL
+  │   (with JWT)        │    │      │ sets auth.uid()      │   (RLS evaluated)
+  │                     │    │      └──────────────────────┼─►
+  ├─ Realtime  ─────────┼───►│─► Phoenix/Realtime server  │
+  │                     │    │                             │
+  ├─ File uploads   ────┼───►│─► Storage API              │
+  │                     │    │                             │
+  └─ Edge Functions ────┼───►│─► Deno runtime             │
+                        │                                  │
+                        └─────────────────────────────────┘
+```
+
+The key architectural property: **Kong is the single entry point**. Every request from the client — whether auth, data, realtime, storage, or a function — goes through the same API gateway and is routed to the correct backend service. This is why the SDK can use a single `SUPABASE_URL` for everything.
+
+## How Auth Flows Into the Database
+
+The JWT-to-RLS flow is what makes Supabase's security model coherent. Understanding this is essential for explaining it to a technical customer.
+
+```
+1. User signs in
+      └─► GoTrue validates credentials, issues JWT (signed with project's JWT secret)
+
+2. Client stores JWT, attaches it as Bearer token on every request
+
+3. PostgREST receives request
+      └─► Extracts JWT, validates signature
+      └─► Sets `request.jwt.claims` as a Postgres session variable
+
+4. PostgreSQL executes query
+      └─► RLS policy calls auth.uid()
+      └─► auth.uid() reads `sub` claim from the session variable
+      └─► Policy evaluates: does this user own this row?
+      └─► Rows that fail the policy are silently excluded
+```
+
+The server components (GoTrue, PostgREST) are intentionally thin — they do not contain authorization logic. All access control lives in the database as RLS policies, which means it applies uniformly regardless of how the database is accessed.
+
+## Supabase vs Conventional Backend Architecture
+
+| | Conventional (e.g. Express + Postgres) | Supabase |
+|---|---|---|
+| Auth | You build it or integrate a provider | Included (GoTrue) |
+| API layer | You write controllers and routes | Auto-generated from schema (PostgREST) |
+| Authorization | Middleware + manual row filters in code | RLS policies in the database |
+| Realtime | You build it (WebSockets, polling) | Included |
+| Storage | You integrate S3 or similar | Included |
+| Time to first working backend | Days to weeks | Minutes |
+| Flexibility | Full control | Constrained by PostgREST conventions |
+| Operational burden | High (you manage everything) | Low (managed service) |
+
+The trade-off is flexibility vs speed. Supabase is optimised for teams that want to move fast without building commodity infrastructure. Complex business logic that doesn't map cleanly to REST + RLS still requires Edge Functions or a separate application server.
+
+## Self-Hosting and Vendor Lock-in
+
+Supabase is designed so that customers are **not locked in**. This is a deliberate product and licensing decision — the entire stack is Apache 2.0 licensed.
+
+**Self-hosting options:**
+
+The full stack ships as a Docker Compose file maintained in the official repo. Any team can run the identical services on their own infrastructure:
+
+```
+supabase/
+├── docker-compose.yml   # Postgres, GoTrue, PostgREST, Realtime, Storage, Kong
+└── .env.example         # Configuration for all services
+```
+
+**Escape hatches at every layer:**
+
+| Layer | Lock-in risk | Escape hatch |
+|---|---|---|
+| Database | None | Standard Postgres — `pg_dump` and move anywhere |
+| Auth (GoTrue) | Low | Replace with Auth0, Clerk, or custom JWT issuer; configure the signing secret in Postgres |
+| REST API (PostgREST) | Low | Bypass entirely, connect a traditional server directly to Postgres |
+| Realtime | Medium | Replace with Ably, Pusher, or self-hosted solution |
+| Storage | Low | Replace with direct S3 or any S3-compatible service |
+| Edge Functions | Low | Move to AWS Lambda, Cloudflare Workers, or your own server |
+
+**Contrast with Firebase:** Firebase is fully proprietary — no self-hosting, no data portability without a rewrite, and the data model (document/NoSQL) requires migration effort to move to a relational store.
+
+## Positioning for Client Conversations
+
+When positioning Supabase to a technical decision-maker:
+
+**For startups / small teams:**
+> "You get auth, a REST API, realtime, file storage, and a Postgres database — fully managed, no backend code to write. You're shipping features on day one instead of building infrastructure."
+
+**For enterprises with compliance requirements:**
+> "The entire stack is open source and self-hostable. You can run it in your own VPC, on your own infrastructure, with no dependency on Supabase's cloud. You own the data and the deployment."
+
+**For teams currently on Firebase:**
+> "You keep the developer experience — client SDK, realtime, auth — but you get a relational database with full SQL, complex joins, and no per-read pricing surprises."
+
+**Common objections and responses:**
+
+| Objection | Response |
+|---|---|
+| "We can't use a managed service for compliance reasons" | Supabase is fully self-hostable via Docker; the same open-source stack runs on your own infrastructure |
+| "We need complex business logic" | RLS handles data-layer authorization; Edge Functions handle custom logic; you can also connect any server directly to the Postgres instance |
+| "What happens if Supabase shuts down?" | The database is standard Postgres — portable anywhere. The other services are open source and self-hostable |
+| "PostgREST feels limiting" | It handles 80% of CRUD; for the rest, bypass it with a direct Postgres connection or Edge Functions |

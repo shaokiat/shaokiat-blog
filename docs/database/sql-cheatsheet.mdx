@@ -1,0 +1,523 @@
+---
+sidebar_position: 1
+---
+
+# SQL Cheatsheet
+
+Scenario-first reference for querying Postgres. Every section is a question you'd actually get asked, the query that answers it, and the trap that makes the naive version wrong.
+
+Every query runs against the four-table toy schema — `customers` → `orders` → `order_items` → `products` — described in full on the [Practice Questions](./practice.mdx) page, which also has the setup instructions and fifteen exercises against it.
+
+---
+
+## Reading Data
+
+**Scenario:** customers who signed up this month, newest first.
+
+```sql
+select name, country, created_at
+from customers
+where created_at >= date_trunc('month', now())
+order by created_at desc;
+```
+
+`date_trunc('month', now())` beats `where extract(month from created_at) = 9` — the second wraps the column in a function, so no index on `created_at` can ever be used. **Keep the column bare on the left of the comparison.**
+
+### NULL is not a value
+
+The single most common source of silently-wrong results. `NULL` means *unknown*, so any comparison with it returns `NULL`, not `false`.
+
+| Expression | Result | Note |
+|---|---|---|
+| `null = null` | `null` | never use `=` for null |
+| `null is null` | `true` | the only correct test |
+| `1 not in (2, null)` | `null` | `NOT IN` with a null in the list returns **no rows** |
+| `coalesce(null, 'n/a')` | `'n/a'` | first non-null wins |
+| `nullif(0, 0)` | `null` | guard against divide-by-zero |
+
+```sql
+-- Safe average order value: nullif stops a division by zero
+select sum(quantity * unit_price) / nullif(sum(quantity), 0) as avg_unit_price
+from order_items;
+```
+
+Prefer `not exists` over `not in` whenever the subquery column is nullable.
+
+---
+
+## Joins
+
+**Scenario:** every customer *and* their order count — including the ones who never ordered.
+
+```sql
+select c.name, count(o.id) as order_count
+from customers c
+left join orders o on o.customer_id = c.id
+group by c.name
+order by order_count desc;
+```
+
+```
+ name          | order_count
+---------------+-------------
+ Amara Okafor  |           3
+ Ben Tan       |           2
+ Chen Wei      |           2
+ Divya Rao     |           2
+ Elena Fischer |           2
+ Farid Hassan  |           0
+```
+
+**The trap:** write `count(*)` instead of `count(o.id)` and Farid returns **1**. `count(*)` counts rows, and the LEFT JOIN produced one row for him with all-null order columns. `count(o.id)` skips nulls. Same bug in reverse: moving `o.status = 'paid'` from the `ON` clause to `WHERE` turns a LEFT JOIN back into an inner join, because `WHERE` filters the null rows out after the join.
+
+```sql
+-- Correct: filter the right side inside the join
+left join orders o on o.customer_id = c.id and o.status = 'paid'
+```
+
+| Join | Keeps | Use when |
+|---|---|---|
+| `inner join` | rows matching on both sides | the default; you only care about matches |
+| `left join` | all left rows, nulls on the right | "every X, with their Y if any" — counts, reports |
+| `right join` | all right rows | rare; flip the tables and use `left` instead |
+| `full join` | all rows from both | reconciling two sources, finding orphans on either side |
+| `cross join` | every combination | generating grids (all months × all categories) |
+| self join | table joined to itself | comparing rows to other rows in the same table |
+| `lateral join` | right side referencing the left | "top N per group" without a window function |
+
+**Lateral** is the one people forget. The subquery on the right can see columns from the left, so it runs once per left row:
+
+```sql
+-- Each customer's most recent order
+select c.name, o.id, o.created_at
+from customers c
+left join lateral (
+  select id, created_at from orders
+  where customer_id = c.id
+  order by created_at desc
+  limit 1
+) o on true;
+```
+
+---
+
+## Aggregation
+
+**Scenario:** revenue per month, showing only months above $2,000.
+
+```sql
+select date_trunc('month', o.created_at)::date as month,
+       sum(oi.quantity * oi.unit_price) as revenue
+from orders o
+join order_items oi on oi.order_id = o.id
+where o.status = 'paid'
+group by 1
+having sum(oi.quantity * oi.unit_price) > 2000
+order by 1;
+```
+
+```
+   month    | revenue
+------------+---------
+ 2026-09-01 | 3360.00
+```
+
+`WHERE` and `HAVING` are not interchangeable — they run at different times:
+
+| | Runs | Sees | Use for |
+|---|---|---|---|
+| `WHERE` | before grouping | individual rows | `status = 'paid'` |
+| `HAVING` | after grouping | aggregate results | `sum(...) > 2000` |
+
+Filtering rows in `HAVING` still works but forces the database to group rows it will throw away. Push every row-level filter into `WHERE`.
+
+### FILTER: several conditional aggregates in one pass
+
+**Scenario:** paid vs refunded revenue side by side, without scanning the table twice.
+
+```sql
+select
+  count(*) as total_orders,
+  count(*) filter (where status = 'paid')     as paid_orders,
+  count(*) filter (where status = 'refunded') as refunded_orders,
+  round(100.0 * count(*) filter (where status = 'refunded') / count(*), 1) as refund_pct
+from orders;
+```
+
+`FILTER` is the Postgres-native version of the `sum(case when ... then 1 else 0 end)` trick, and it reads far better.
+
+---
+
+## Window Functions
+
+A window function adds a column computed across *related* rows without collapsing them. `GROUP BY` gives you one row per group; a window keeps every row and attaches the group's answer to it.
+
+**Scenario:** the top 3 products by revenue in each category.
+
+```sql
+with product_revenue as (
+  select p.category,
+         p.name,
+         sum(oi.quantity * oi.unit_price) as revenue
+  from order_items oi
+  join products p on p.id = oi.product_id
+  join orders o on o.id = oi.order_id
+  where o.status = 'paid'
+  group by p.category, p.name
+)
+select category, name, revenue, rank
+from (
+  select *, row_number() over (partition by category order by revenue desc) as rank
+  from product_revenue
+) ranked
+where rank <= 3
+order by category, rank;
+```
+
+The window function must be wrapped in a subquery or CTE before you can filter on it — `WHERE rank <= 3` in the same `SELECT` fails, because window functions are computed *after* `WHERE`.
+
+| Function | Ties | Use for |
+|---|---|---|
+| `row_number()` | broken arbitrarily | "exactly N per group", deduplication |
+| `rank()` | share a rank, next rank skips (1,1,3) | leaderboards |
+| `dense_rank()` | share a rank, no gap (1,1,2) | tiering, "top 3 price bands" |
+| `lag()` / `lead()` | — | comparing a row to the previous/next one |
+| `ntile(4)` | — | quartiles, cohort bucketing |
+
+**Scenario:** each order with the customer's running lifetime total.
+
+```sql
+select c.name,
+       o.created_at::date as order_date,
+       sum(oi.quantity * oi.unit_price) as order_total,
+       sum(sum(oi.quantity * oi.unit_price)) over (
+         partition by c.id order by o.created_at
+         rows between unbounded preceding and current row
+       ) as lifetime_total
+from orders o
+join customers c on c.id = o.customer_id
+join order_items oi on oi.order_id = o.id
+where o.status = 'paid'
+group by c.id, c.name, o.id, o.created_at
+order by c.name, o.created_at;
+```
+
+```
+ name         | order_date | order_total | lifetime_total
+--------------+------------+-------------+----------------
+ Amara Okafor | 2026-06-05 |     1380.00 |        1380.00
+ Amara Okafor | 2026-06-25 |      270.00 |        1650.00
+ ...
+```
+
+The nested `sum(sum(...))` is legal and not a typo: the inner `sum` aggregates within the group, the outer one windows across groups.
+
+**Scenario:** month-over-month growth, using `lag()`.
+
+```sql
+select month, revenue,
+       revenue - lag(revenue) over (order by month) as change
+from (
+  select date_trunc('month', o.created_at)::date as month,
+         sum(oi.quantity * oi.unit_price) as revenue
+  from orders o join order_items oi on oi.order_id = o.id
+  where o.status = 'paid'
+  group by 1
+) m
+order by month;
+```
+
+---
+
+## CTEs and Subqueries
+
+**Scenario:** customers whose second order came within 30 days of their first — an early-retention signal.
+
+```sql
+with ordered as (
+  select customer_id,
+         created_at,
+         row_number() over (partition by customer_id order by created_at) as n
+  from orders
+),
+first_two as (
+  select customer_id,
+         min(created_at) filter (where n = 1) as first_order,
+         min(created_at) filter (where n = 2) as second_order
+  from ordered
+  where n <= 2
+  group by customer_id
+)
+select c.name,
+       f.first_order::date,
+       f.second_order::date,
+       (f.second_order - f.first_order) as gap
+from first_two f
+join customers c on c.id = f.customer_id
+where f.second_order - f.first_order <= interval '30 days';
+```
+
+Returns Amara (20 days), Divya (30), and Elena (3).
+
+### Recursive CTEs
+
+**Scenario:** a gapless month series, so months with zero revenue still appear in a report.
+
+```sql
+with recursive months(m) as (
+  select date '2026-06-01'
+  union all
+  select (m + interval '1 month')::date from months where m < date '2026-09-01'
+)
+select m, coalesce(sum(oi.quantity * oi.unit_price), 0) as revenue
+from months
+left join orders o on date_trunc('month', o.created_at)::date = m and o.status = 'paid'
+left join order_items oi on oi.order_id = o.id
+group by m order by m;
+```
+
+For a fixed range `generate_series(date '2026-06-01', date '2026-09-01', interval '1 month')` is shorter. Reach for `WITH RECURSIVE` when the depth is data-dependent: org charts, category trees, threaded comments.
+
+### The optimisation fence
+
+Before Postgres 12, every CTE was materialised — computed once, in full, with no predicate pushdown. From 12 onwards, a CTE used once is inlined like a subquery. Force it either way when the planner guesses wrong:
+
+```sql
+with heavy as materialized (...)      -- compute once, reuse
+with light as not materialized (...)  -- inline, let the planner push filters in
+```
+
+`MATERIALIZED` pays off when an expensive CTE is referenced several times.
+
+---
+
+## Writing Data
+
+**Scenario:** a nightly sync — insert rows that are new, update the ones that changed, in one statement.
+
+```sql
+insert into products (name, category, price)
+values ('Desk Lamp', 'furniture', 95.00)
+on conflict (name) do update
+  set price = excluded.price,
+      category = excluded.category
+where products.price is distinct from excluded.price
+returning id, name, price;
+```
+
+`excluded` is the row that *would* have been inserted. The `WHERE` clause makes it a no-op when nothing changed, so unchanged rows don't burn a row version. `ON CONFLICT` needs a unique constraint on the conflict target — add one on `products(name)` first, or use `on conflict do nothing` to swallow duplicates silently.
+
+| Statement | Scenario |
+|---|---|
+| `insert ... on conflict do update` | upsert / idempotent sync |
+| `insert ... on conflict do nothing` | tolerate duplicates in a batch load |
+| `update ... from other_table` | update using values from a join |
+| `delete ... using other_table` | delete based on another table |
+| `... returning *` | get the written rows back without a second query |
+
+```sql
+-- Denormalise the order total from its items, in one pass
+update orders o
+set metadata = o.metadata || jsonb_build_object('total', t.total)
+from (
+  select order_id, sum(quantity * unit_price) as total
+  from order_items group by order_id
+) t
+where t.order_id = o.id
+returning o.id, o.metadata;
+```
+
+`RETURNING` is the reason you rarely need a second round trip: insert and get the generated id, delete and log what you removed.
+
+---
+
+## Postgres Types
+
+**Scenario:** all orders whose `metadata` JSON came from mobile.
+
+```sql
+select id, metadata ->> 'source' as source, created_at::date
+from orders
+where metadata @> '{"source":"mobile"}';
+```
+
+Use `@>` (containment), not `metadata ->> 'source' = 'mobile'`. Only `@>` can use a GIN index; the `->>` version forces a full scan.
+
+| Operator | Returns | Example |
+|---|---|---|
+| `->` | jsonb | `metadata -> 'source'` → `"mobile"` |
+| `->>` | text | `metadata ->> 'source'` → `mobile` |
+| `#>>` | text at a path | `metadata #>> '{a,b}'` |
+| `@>` | boolean, containment | **indexable** — use in `WHERE` |
+| `?` | boolean, key exists | `metadata ? 'source'` |
+| `\|\|` | jsonb, merge | `metadata \|\| '{"x":1}'` |
+| `-` | jsonb, remove key | `metadata - 'source'` |
+
+```sql
+create index orders_metadata_idx on orders using gin (metadata);
+```
+
+`jsonb` over `json`: `json` stores the raw text and reparses on every read; `jsonb` stores a parsed binary form, supports indexes, and drops duplicate keys. Always `jsonb`.
+
+### Dates, arrays, and identity
+
+| Type | Choose it when | Trap |
+|---|---|---|
+| `timestamptz` | **always**, for any point in time | `timestamp` stores no zone and silently shifts across servers |
+| `date` | calendar day, no time | — |
+| `interval` | durations | `now() - created_at` yields one directly |
+| `text` | all strings | `varchar(n)` adds a length check and no performance gain |
+| `numeric` | money | never `float` — `0.1 + 0.2 != 0.3` |
+| `text[]` | short, fixed tag lists | a join table beats an array once you need to query across rows |
+| `uuid` | keys exposed to clients | `gen_random_uuid()` is built in from PG13 |
+| enum | a stable, tiny value set | adding a value is easy, removing one is a migration — a `check` constraint is easier to change |
+
+```sql
+-- Interval arithmetic reads like English
+select name from customers where created_at > now() - interval '30 days';
+```
+
+---
+
+## Indexes and EXPLAIN
+
+**Scenario:** a query is fine in dev and slow in production. Read the plan, add the index, read the plan again.
+
+Eleven rows will always be sequentially scanned — a scan is cheaper than an index lookup at that size. Load real volume first:
+
+```sql
+insert into orders (customer_id, status, metadata, created_at)
+select (random() * 5)::int + 1,
+       'paid',
+       '{"source":"web"}',
+       now() - (random() * 365) * interval '1 day'
+from generate_series(1, 500000);
+
+analyze orders;
+```
+
+```sql
+explain (analyze, buffers)
+select * from orders where customer_id = 3 and status = 'paid';
+```
+
+Before — a full scan of every row (plan output below is representative; your numbers will differ):
+
+```
+Seq Scan on orders  (cost=0.00..12043.00 rows=83500 width=72)
+                    (actual time=0.021..58.443 rows=83217 loops=1)
+  Filter: ((status = 'paid') AND (customer_id = 3))
+  Rows Removed by Filter: 416794
+  Buffers: shared hit=5543
+```
+
+```sql
+create index orders_customer_status_idx on orders (customer_id, status);
+analyze orders;
+```
+
+After:
+
+```
+Bitmap Heap Scan on orders  (cost=933.55..8564.21 rows=83500 width=72)
+                            (actual time=4.112..21.903 rows=83217 loops=1)
+  Recheck Cond: ((customer_id = 3) AND (status = 'paid'))
+  ->  Bitmap Index Scan on orders_customer_status_idx  (actual time=3.901..3.901 rows=83217)
+```
+
+What to read, in order:
+
+| Signal | Means |
+|---|---|
+| `Seq Scan` on a big table with a `Filter` | missing index — the usual finding |
+| `Rows Removed by Filter` is large | the scan did work it threw away |
+| estimated `rows=` far from `actual rows=` | stale statistics — run `ANALYZE` |
+| `Nested Loop` with high `loops=` | a per-row subquery; often fixable with a join |
+| `Buffers: shared read=` high | cache misses, actual disk I/O |
+| `external merge Disk:` | sort spilled to disk — raise `work_mem` |
+
+**Composite index column order:** equality columns first, range column last. `(customer_id, status)` serves `customer_id = 3` alone and `customer_id = 3 and status = 'paid'`, but *not* `status = 'paid'` alone. One well-ordered composite index beats three single-column ones.
+
+| Index type | Use for |
+|---|---|
+| B-tree (default) | equality and range on scalars; sorting |
+| GIN | `jsonb @>`, arrays, full-text search |
+| Partial (`where`) | when most rows are irrelevant — small index, same benefit |
+| Expression | when you must query `lower(email)` or `(metadata ->> 'x')` |
+| BRIN | huge, naturally time-ordered tables — tiny index, wide ranges |
+
+```sql
+-- Partial: pending orders are 1% of the table, so index only those
+create index orders_pending_idx on orders (created_at) where status = 'pending';
+
+-- Expression: makes case-insensitive lookups indexable
+create index customers_email_lower_idx on customers (lower(email));
+```
+
+Always `create index concurrently` in production — the plain form takes a lock that blocks writes for the duration.
+
+---
+
+## Schema and Constraints
+
+**Scenario:** add a `NOT NULL` column to a live table without locking out writes.
+
+```sql
+-- Safe from PG11+: a non-volatile default no longer rewrites the table
+alter table orders add column channel text not null default 'web';
+```
+
+Adding `NOT NULL` to an *existing* column is the dangerous one — it scans the whole table under an exclusive lock. Do it in three non-blocking steps:
+
+```sql
+alter table orders add constraint orders_channel_nn
+  check (channel is not null) not valid;   -- instant, applies to new rows
+
+alter table orders validate constraint orders_channel_nn;  -- scans, but takes a weaker lock
+```
+
+| Constraint | Guarantees |
+|---|---|
+| `primary key` | unique + not null identity |
+| `references` | the referenced row exists; add `on delete cascade` deliberately |
+| `unique` | no duplicates; required for `ON CONFLICT` |
+| `check` | any row-level rule — cheaper to change than an enum |
+| `not null` | the constraint that catches the most bugs |
+| generated column | a derived value that can't drift |
+
+```sql
+-- Generated columns keep a denormalised value honest
+alter table order_items
+  add column line_total numeric(10,2) generated always as (quantity * unit_price) stored;
+```
+
+**Rules that stay cheap:** every foreign key gets an index (Postgres does not create one for you). Constraints belong in the database, not only in application code — a script or a second service will bypass the app.
+
+---
+
+## psql Quick Reference
+
+| Command | Does |
+|---|---|
+| `\dt` | list tables |
+| `\d+ orders` | full table definition — columns, indexes, constraints |
+| `\di` | list indexes |
+| `\df` | list functions |
+| `\l` | list databases |
+| `\x` | toggle expanded output — essential for wide rows |
+| `\timing` | show query duration |
+| `\e` | edit the last query in `$EDITOR` |
+| `\copy t from 'f.csv' csv header` | client-side CSV import |
+
+Two catalogue queries worth memorising:
+
+```sql
+-- Which indexes are never used? (drop candidates)
+select relname, indexrelname, idx_scan
+from pg_stat_user_indexes where idx_scan = 0 order by relname;
+
+-- What is running right now, and what is blocking it?
+select pid, state, wait_event_type, now() - query_start as duration, query
+from pg_stat_activity where state != 'idle' order by duration desc;
+```
+

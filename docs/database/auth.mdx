@@ -1,0 +1,157 @@
+---
+draft: true
+sidebar_position: 3
+---
+
+# Authentication & Authorization
+
+## Auth + RLS: The Supabase Advantage
+
+In most conventional backend architectures, authentication and data access control are handled in two separate layers — the application layer and the database layer — and keeping them in sync is entirely the developer's responsibility.
+
+**The conventional approach:**
+
+```
+Client  →  API Server  →  Auth Middleware  →  Business Logic  →  Database
+                              (verify JWT)        (filter rows)     (no awareness of user)
+```
+
+In this model:
+- The database is a dumb store. It has no concept of who is making a request.
+- Authorization logic lives in application code — `if (post.userId !== req.user.id) throw 403`.
+- Every new endpoint, service, or background job must re-implement the same access checks.
+- A misconfigured route, a forgotten middleware, or a direct database query from a script can silently expose data.
+
+**The Supabase approach:**
+
+```
+Client  →  PostgREST / SDK  →  PostgreSQL (RLS evaluates auth.uid() per row)
+```
+
+The JWT issued by Supabase Auth flows directly into the database. PostgreSQL evaluates `auth.uid()` — extracted from the JWT — inside every query at the row level. Authorization is not a layer you can forget to add; it is enforced at the only place data actually lives.
+
+This closes an entire class of bugs:
+
+| Scenario | Conventional | Supabase + RLS |
+|---|---|---|
+| New API endpoint added | Developer must remember to add auth middleware | RLS applies automatically — no action needed |
+| Direct DB query from a script | Bypasses all application-layer checks | RLS still enforced (unless using `postgres` superuser role) |
+| Misconfigured middleware | Silent data leak | Not possible — the database itself rejects unauthorized reads |
+| Multi-tenant data isolation | Manual `WHERE user_id = ?` on every query | Declared once in a policy, applied everywhere |
+| Microservices / multiple backends | Each service must implement the same auth logic | Policies live in the DB, shared across all consumers |
+
+**The key insight** is that pushing authorization into the database removes it from the attack surface of your application code. You declare *who can see what* once, close to the data, and every client — your web app, mobile app, internal scripts, and third-party integrations — is subject to the same rules without any extra work.
+
+This is why RLS is not just a convenience feature in Supabase — it is the architecture. Skipping RLS and filtering rows in application code undermines the entire model.
+
+---
+
+## Authentication Methods
+
+Supabase Auth (powered by GoTrue) supports multiple sign-in methods out of the box. Understanding when to recommend each is key for scoping a customer's auth requirements.
+
+| Method | How it works | Best for |
+|---|---|---|
+| Email & Password | Traditional credentials, bcrypt-hashed | Most web apps, B2B SaaS |
+| OAuth (Social login) | Redirect to provider (Google, GitHub, etc.), returns JWT | Consumer apps, developer tools |
+| Magic Link | One-time sign-in link sent to email | Reducing password friction, internal tools |
+| OTP (Email / SMS) | 6-digit code via email or SMS (Twilio) | Mobile apps, 2FA flows |
+| SAML / SSO | Enterprise identity provider integration | Enterprise B2B customers |
+
+On sign-up, a record is created in `auth.users`. This is the source of truth for all user identity — application data links to it via foreign key rather than duplicating user fields.
+
+Key behaviours to understand:
+- Passwords are hashed with bcrypt — Supabase never stores plaintext.
+- Email confirmation is optional but recommended — until confirmed, the user's session is `null`.
+- OAuth flows require a client ID and secret configured per provider in the dashboard. In SSR frameworks (Next.js, SvelteKit), the code-to-session exchange must be handled server-side.
+- Magic links expire after 1 hour (configurable). The same method supports OTP codes for SMS via Twilio.
+
+## JWT Tokens
+
+Every authenticated Supabase session issues a **JSON Web Token (JWT)**. The JWT is signed with the project's JWT secret and carries claims the database can read directly — this is the bridge between the auth system and RLS.
+
+A decoded Supabase JWT payload:
+
+```json
+{
+  "sub": "a1b2c3d4-...",
+  "email": "user@example.com",
+  "role": "authenticated",
+  "aud": "authenticated",
+  "exp": 1700000000,
+  "app_metadata": { "provider": "email", "role": "admin" },
+  "user_metadata": { "full_name": "Alice" }
+}
+```
+
+| Claim | Description |
+|---|---|
+| `sub` | The user's UUID — same value returned by `auth.uid()` in RLS policies |
+| `role` | `"authenticated"` for signed-in users, `"anon"` for unauthenticated requests |
+| `exp` | Expiry timestamp (default: 1 hour, auto-refreshed by the SDK) |
+| `app_metadata` | Set server-side — auth provider, custom roles. Cannot be tampered with by the client |
+| `user_metadata` | Set client-side on sign-up — display name, preferences |
+
+The distinction between `app_metadata` and `user_metadata` matters for security: `app_metadata` is the right place to store roles or permissions because clients cannot self-assign it.
+
+## Session Management
+
+The SDK manages the session lifecycle automatically — storing tokens, refreshing before expiry, and emitting state change events. The two key methods to understand conceptually:
+
+- **`getSession()`** — reads from local storage, no network call. Fast, but can return a stale session. Safe for UI state.
+- **`getUser()`** — validates against the server. Slower, but authoritative. Required in middleware, server-side code, or anywhere the result is used for access control.
+
+In **SSR frameworks** (Next.js, SvelteKit), sessions must travel via cookies rather than `localStorage` since the server has no access to the browser's storage. Supabase provides `@supabase/ssr` for this, which handles cookie-based session reads and refresh on every server-side request.
+
+## Row Level Security (RLS)
+
+RLS is the mechanism that makes Supabase's auth model coherent. Without it, the JWT and auth system exist in isolation — the database still has no awareness of who is making a request. With it, every query is automatically filtered to what the current user is permitted to see.
+
+This is the single most important thing to convey when a customer asks how Supabase handles multi-tenancy: *there is no application code to write per-query — access control is declared once in the database and applies everywhere.*
+
+Key behaviours to know:
+- RLS is **disabled by default**. A table with RLS enabled but no policies defined is fully locked — zero rows returned. Enable it early and add policies incrementally.
+- Policies apply to **all access via PostgREST and the SDK**, including service-role requests through the API.
+- **Direct `psql` connections using the `postgres` superuser bypass RLS entirely.** This is a critical caveat to raise with customers who have scripts or background jobs connecting directly.
+
+## Writing Policies
+
+A policy is a per-operation SQL expression (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) that evaluates to `true` or `false` for each row. Two types:
+
+- **`USING`** — filters which existing rows are visible or affected. Applied to `SELECT`, `UPDATE`, `DELETE`. Think of it as the read-side filter.
+- **`WITH CHECK`** — validates the state of a row after a write. Applied to `INSERT`, `UPDATE`. Prevents a user writing data they shouldn't own.
+
+For `UPDATE`, both are typically needed: `USING` controls which rows the user can target, `WITH CHECK` ensures they can't change ownership to someone else.
+
+Multiple policies on the same table and operation are combined with **OR** — a row is accessible if any one policy permits it.
+
+```sql
+-- Illustrative: owner-only read and write
+create policy "owner select" on posts for select using (user_id = auth.uid());
+create policy "owner insert" on posts for insert with check (user_id = auth.uid());
+create policy "owner update" on posts for update using (user_id = auth.uid()) with check (user_id = auth.uid());
+```
+
+## Using auth.uid()
+
+`auth.uid()` and its related helpers are Postgres functions Supabase injects into every authenticated session. They read directly from the JWT claims — no extra lookup required.
+
+| Function | Returns | Common use |
+|---|---|---|
+| `auth.uid()` | UUID of the current user (`sub` claim) | Matching rows to the logged-in user |
+| `auth.jwt()` | Full JWT payload as `jsonb` | Accessing custom claims like roles |
+| `auth.role()` | `'authenticated'` or `'anon'` | Distinguishing logged-in vs public access |
+
+The security implication: `auth.uid()` is derived from a server-signed JWT — it cannot be spoofed by the client. This is what makes policy expressions like `user_id = auth.uid()` trustworthy without any additional validation in application code.
+
+## Real-World RLS Patterns
+
+| Pattern | When to use | How it works |
+|---|---|---|
+| **Owner-only** | Personal data (notes, profile, settings) | `user_id = auth.uid()` on all operations |
+| **Public read, owner write** | Content platforms (blogs, listings) | `SELECT` uses `true`; `INSERT`/`UPDATE` checks `author_id = auth.uid()` |
+| **Team / org access** | B2B SaaS with shared workspaces | Join to a `team_members` table inside an `EXISTS` subquery |
+| **Role-based (RBAC)** | Admin panels, tiered permissions | Read role from `auth.jwt() -> 'app_metadata' ->> 'role'` |
+| **Soft-delete visibility** | Audit trails, recoverable deletes | Add `deleted_at is null` to every `SELECT` policy |
+
+The practical rule for customers: **start maximally restrictive and relax policies deliberately.** A locked table is a visible failure; an over-permissive policy is a silent data leak.
