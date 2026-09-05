@@ -134,3 +134,53 @@ def search(self, nums):
     return -1
 
 ```
+
+<br />
+
+### Debugger Breakpoints
+
+:::note Context
+A CodeSignal single-function question. Given `codeLength` (the last line number), a sorted list of
+unique `breakpoints`, and a list of `actions`, return the line the debugger ends on. It starts on
+line 1. `"next"` moves forward one line; `"continue"` runs forward until it hits the next
+breakpoint **strictly after** the current line. Both are guaranteed to be legal when performed.
+:::
+
+`"continue"` is just "first breakpoint greater than `line`" — the [right border](#find-right-border)
+search from above, with the `<=` comparison so that a debugger already sitting on a breakpoint moves
+to the *next* one instead of staying put. `codeLength` never enters the logic; the guarantees mean
+you never run off either end of the list.
+
+#### Solution
+
+```py
+def firstAfter(breakpoints, line):
+  left, right = 0, len(breakpoints)
+  while left < right:  # [left, right)
+    mid = (left + right) // 2
+    if breakpoints[mid] <= line:  # too early, search right
+      left = mid + 1
+    else:  # candidate, but a smaller one may exist
+      right = mid
+  # guaranteed by the question to be in range
+  return breakpoints[left]
+
+def solution(codeLength, breakpoints, actions):
+  line = 1
+  for a in actions:
+    if a == "next":
+      line += 1
+    else:  # "continue"
+      line = firstAfter(breakpoints, line)
+  return line
+```
+
+```py
+assert solution(55, [2, 5, 21, 44], ["next", "next", "continue", "next", "next"]) == 7
+assert solution(10, [4, 10], ["continue", "continue"]) == 10
+```
+
+**Time Complexity**: `O(a log b)` for `a` actions and `b` breakpoints — well inside the allowed
+`O(codeLength + b * a)`.
+
+**Space Complexity**: `O(1)`.

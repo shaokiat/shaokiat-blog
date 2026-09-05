@@ -475,3 +475,74 @@ Time Complexity: `O(n)`
 Space Complexity: `O(1)`
 
 <br />
+
+<br />
+
+### Sort Matrix Borders (Clockwise)
+
+:::note Context
+A CodeSignal single-function question. Given an `n x n` matrix, the `0`-border is the union of its
+outermost rows and columns, the `1`-border is the border of the matrix left after peeling the
+`0`-border off, and so on up to `k = floor((n - 1) / 2)`. Sort each `k`-border and write the sorted
+values back in clockwise order, starting from the top-left corner of that border.
+:::
+
+Two independent pieces: **walking a ring clockwise**, and **sorting**. Once you can list a ring's
+coordinates in clockwise order, the rest is `sorted()` plus a `zip` back onto the same coordinates.
+
+Walk each side without its last cell so the corners are not visited twice:
+
+```
+lo = k, hi = n - 1 - k
+
+top    -> (lo, j) for j in lo..hi-1
+right  -> (i, hi) for i in lo..hi-1
+bottom -> (hi, j) for j in hi..lo+1
+left   -> (i, lo) for i in hi..lo+1
+```
+
+Odd `n` leaves a single centre cell where `lo == hi`. That is one coordinate, not four sides, so
+special-case it or the generic walk emits nothing.
+
+#### Solution
+
+```py
+def ring_coords(n, k):
+  lo, hi = k, n - 1 - k
+  if lo == hi:  # centre cell of an odd-sized matrix
+    return [(lo, lo)]
+  coords  = [(lo, j) for j in range(lo, hi)]       # top, left to right
+  coords += [(i, hi) for i in range(lo, hi)]       # right, top to bottom
+  coords += [(hi, j) for j in range(hi, lo, -1)]   # bottom, right to left
+  coords += [(i, lo) for i in range(hi, lo, -1)]   # left, bottom to top
+  return coords
+
+def sort_matrix_borders(matrix):
+  n = len(matrix)
+  for k in range((n + 1) // 2):
+    coords = ring_coords(n, k)
+    values = sorted(matrix[i][j] for i, j in coords)
+    for (i, j), v in zip(coords, values):
+      matrix[i][j] = v
+  return matrix
+```
+
+Example:
+
+```py
+matrix = [[9, 7, 4, 5],
+          [1, 6, 2, -6],
+          [-3, 7, -2, 8],
+          [-9, 4, 1, 0]]
+
+sort_matrix_borders(matrix)
+# [[-9, -6, -3, 0],
+#  [9, -2, 2, 1],
+#  [8, 7, 6, 1],
+#  [7, 5, 4, 4]]
+```
+
+**Time Complexity**: `O(n^2 log n)` — every cell belongs to exactly one ring, and each ring is
+sorted once. Comfortably inside the `O(n^3)` budget the question allows.
+
+**Space Complexity**: `O(n)` for the coordinate and value lists of the largest ring.

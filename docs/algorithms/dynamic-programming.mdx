@@ -207,3 +207,74 @@ def updateMatrix(self, mat):
 Time Complexity: `O(M * N)` due to the double for loops to run through the matrix.
 
 Space Complexity: `O(M * N)` due to the queue used.
+
+<br />
+
+### Count Digits 0, 2 and 4
+
+:::note Context
+Given `n`, count how many times the digits `0`, `2` and `4` appear across all integers from `1` to `n`.
+For `n = 100` the answer is `51`.
+:::
+
+Brute force is `O(n log n)` — loop to `n`, count digits. That dies for `n = 10^9`.
+The trick is to count **one digit at one place value at a time**, in `O(log n)`.
+
+#### Recurrence Relation
+
+Split `n` around the place value `p` (1, 10, 100, ...) you are counting at:
+
+```
+high = n // (p * 10)   # digits above p
+cur  = (n // p) % 10   # the digit at p
+low  = n % p           # digits below p
+
+# for d > 0
+cur > d  ->  (high + 1) * p
+cur == d ->  high * p + low + 1
+cur < d  ->  high * p
+```
+
+Reading of `cur > d`: every full block of `high + 1` prefixes contributes `p` numbers whose
+digit at `p` is `d`. When `cur == d` the last block is partial, so only `low + 1` of it counts.
+
+`d = 0` is the special case: a prefix of `0` means leading zeros, which are not real digits.
+So `high` becomes `high - 1`.
+
+#### Solution
+
+```py
+def count_digit(n, d):
+  total, p = 0, 1
+  while p <= n:
+    high, cur, low = n // (p * 10), (n // p) % 10, n % p
+    if d == 0:
+      # high - 1 skips the leading-zero prefix
+      total += (high - 1) * p + low + 1 if cur == 0 else high * p
+    elif cur > d:
+      total += (high + 1) * p
+    elif cur == d:
+      total += high * p + low + 1
+    else:
+      total += high * p
+    p *= 10
+  return total
+
+def count_024(n):
+  return sum(count_digit(n, d) for d in (0, 2, 4))
+```
+
+Sanity check against brute force:
+
+```py
+def brute(n, d):
+  return sum(str(i).count(str(d)) for i in range(1, n + 1))
+
+for n in range(1, 3000):
+  for d in range(10):
+    assert count_digit(n, d) == brute(n, d), (n, d)
+```
+
+**Time Complexity**: `O(log n)` — one iteration per digit of `n`, times 3 digits.
+
+**Space Complexity**: `O(1)`.
