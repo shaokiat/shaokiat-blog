@@ -146,12 +146,32 @@ line 1. `"next"` moves forward one line; `"continue"` runs forward until it hits
 breakpoint **strictly after** the current line. Both are guaranteed to be legal when performed.
 :::
 
-`"continue"` is just "first breakpoint greater than `line`" — the [right border](#find-right-border)
-search from above, with the `<=` comparison so that a debugger already sitting on a breakpoint moves
-to the *next* one instead of staying put. `codeLength` never enters the logic; the guarantees mean
-you never run off either end of the list.
+`"continue"` is just "first breakpoint greater than `line`". The bound the question allows,
+`O(codeLength + b * a)`, is loose enough that a plain scan of the breakpoint list per action passes:
 
-#### Solution
+```py
+def solution(codeLength, breakpoints, actions):
+  current = 1
+  for action in actions:
+    if action == "next":
+      current += 1
+    else:  # "continue"
+      # smallest breakpoint strictly greater than current
+      for bp in breakpoints:
+        if bp > current:
+          current = bp
+          break
+  return current
+```
+
+That is `O(a * b)`. Write it first in an interview, then offer the improvement below.
+
+#### Solution: binary search
+
+The list is sorted, so the inner scan is the [right border](#find-right-border) search from above.
+The comparison is `<=`, not `<`, so a debugger already sitting on a breakpoint moves to the *next*
+one instead of staying put. `codeLength` never enters the logic; the guarantees mean you never run
+off either end of the list.
 
 ```py
 def firstAfter(breakpoints, line):
