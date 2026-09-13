@@ -28,22 +28,23 @@ Every topic answers: *"A customer needed X — here's the architecture and trade
 | # | Topic | What it covers |
 |---|---|---|
 | 7 | [Model Serving](./ml-integration/model-serving.md) | Lifespan model loading, single vs batch inference, state across workers |
-| 8 | Background Tasks | `BackgroundTasks`, Celery/ARQ for distributed queues, job status polling |
-| 9 | Streaming Responses | SSE for LLM token streaming, WebSocket endpoints, `StreamingResponse` |
-| 10 | File & Data Ingestion | `UploadFile` for images/CSVs, chunked uploads, async S3 with aiobotocore |
-| 11 | Async DB Integration | SQLAlchemy 2.0 async, asyncpg, pgvector for embedding search |
-| 12 | LLM / Agent Endpoints | Wrapping Claude SDK / LangChain, tool-calling, streaming agent responses |
+| 8 | [vLLM](./ml-integration/vllm-serving.md) | PagedAttention, continuous batching, chunked prefill, prefix caching, quantization |
+| 9 | Background Tasks | `BackgroundTasks`, Celery/ARQ for distributed queues, job status polling |
+| 10 | Streaming Responses | SSE for LLM token streaming, WebSocket endpoints, `StreamingResponse` |
+| 11 | File & Data Ingestion | `UploadFile` for images/CSVs, chunked uploads, async S3 with aiobotocore |
+| 12 | Async DB Integration | SQLAlchemy 2.0 async, asyncpg, pgvector for embedding search |
+| 13 | LLM / Agent Endpoints | Wrapping Claude SDK / LangChain, tool-calling, streaming agent responses |
 
 ### Tier 3 — Production Engineering
 
 | # | Topic | What it covers |
 |---|---|---|
-| 13 | Testing | `TestClient`, `AsyncClient`, `dependency_overrides`, integration tests |
-| 14 | Observability | Structured JSON logging, OpenTelemetry tracing, Prometheus metrics |
-| 15 | Containerisation & Deployment | Multi-stage Dockerfile, `/healthz` + `/readyz`, Cloud Run & GKE |
-| 16 | Error Handling | Global exception handlers, custom error schemas, validation error formatting |
-| 17 | Rate Limiting & Concurrency | `slowapi`, Redis-backed rate limiting, semaphore concurrency control |
-| 18 | API Versioning | Prefix-based versioning, shared routers with overrides, deprecation headers |
+| 14 | Testing | `TestClient`, `AsyncClient`, `dependency_overrides`, integration tests |
+| 15 | Observability | Structured JSON logging, OpenTelemetry tracing, Prometheus metrics |
+| 16 | Containerisation & Deployment | Multi-stage Dockerfile, `/healthz` + `/readyz`, Cloud Run & GKE |
+| 17 | Error Handling | Global exception handlers, custom error schemas, validation error formatting |
+| 18 | Rate Limiting & Concurrency | `slowapi`, Redis-backed rate limiting, semaphore concurrency control |
+| 19 | API Versioning | Prefix-based versioning, shared routers with overrides, deprecation headers |
 
 ---
 
