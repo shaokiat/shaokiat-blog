@@ -10,8 +10,8 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Shao Kiat&#39;s Blog" href="/shaokiat-blog/opensearch.xml"><link rel="stylesheet" href="/shaokiat-blog/assets/css/styles.83ef85a6.css">
-<script src="/shaokiat-blog/assets/js/runtime~main.c56da471.js" defer="defer"></script>
-<script src="/shaokiat-blog/assets/js/main.15828860.js" defer="defer"></script>
+<script src="/shaokiat-blog/assets/js/runtime~main.b09eb94d.js" defer="defer"></script>
+<script src="/shaokiat-blog/assets/js/main.741954e6.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -29,7 +29,7 @@
 </blockquote>
 <table><thead><tr><th></th><th>Batch</th><th>Online (API)</th></tr></thead><tbody><tr><td><strong>Prediction needed</strong></td><td>On a schedule</td><td>Mid-request, per event</td></tr><tr><td><strong>Latency</strong></td><td>Hours are fine</td><td>Milliseconds matter</td></tr><tr><td><strong>Infrastructure</strong></td><td>A scheduled job + a table</td><td>Service, scaling, uptime, on-call</td></tr><tr><td><strong>Failure mode</strong></td><td>Job fails → rerun it</td><td>Service down → product feature down</td></tr><tr><td><strong>Plant-floor examples</strong></td><td>Monthly inspection list, spare-parts planning</td><td>Emergency shutdown on live sensor spike, real-time quality rejection</td></tr></tbody></table>
 <p>Our failure model is the easy call: the planners build next month&#x27;s inspection schedule from the list, so a <strong>monthly batch job</strong> scoring all 10,000 machines into a table is the whole architecture. No API, no uptime SLO, no scaling question. A surprising fraction of &quot;we need a model API&quot; requests are actually batch problems wearing ambition.</p>
-<p>If the decision genuinely is per-event (tripping a machine on a live sensor spike), you&#x27;re building a service. That&#x27;s the hand-off to <a class="" href="/shaokiat-blog/docs/ml-engineering/ml-integration/model-serving">ML Engineering&#x27;s model serving page</a>: lifespan loading, batch endpoints, worker state.</p>
+<p>If the decision genuinely is per-event (tripping a machine on a live sensor spike), you&#x27;re building a service. That&#x27;s the hand-off to <a class="" href="/shaokiat-blog/docs/ml-engineering/llm-inference/model-serving">ML Engineering&#x27;s model serving page</a>: lifespan loading, batch endpoints, worker state.</p>
 <hr>
 <h2 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="serialization-the-pkl-file-will-bite-you">Serialization: the .pkl File Will Bite You<a href="#serialization-the-pkl-file-will-bite-you" class="hash-link" aria-label="Direct link to Serialization: the .pkl File Will Bite You" title="Direct link to Serialization: the .pkl File Will Bite You" translate="no">​</a></h2>
 <blockquote>
@@ -41,7 +41,7 @@
 <li class=""><strong>Serialize the <code>Pipeline</code>, not the classifier.</strong> If you save only the XGBoost step, the serving side must reimplement imputation, scaling, and encoding: instant <a href="#trainingserving-skew" class="">skew</a>.</li>
 <li class=""><strong>Pickles are not portable across versions.</strong> A model saved under scikit-learn 1.3 and loaded under 1.5 may crash. Or worse, load and predict differently with no error. Pin exact versions in the serving image and record them next to the artifact.</li>
 <li class=""><strong>Version the artifact</strong> (<code>failure_model_2026-07.joblib</code>, data range, code commit, validation score). &quot;Which model is in prod?&quot; must have a one-line answer.</li>
-<li class="">Smoke-test at load: score 100 known machines, assert outputs match the values saved at training time. Three lines that catch an entire class of silent corruption. (This is the counterpart to the startup loading in <a class="" href="/shaokiat-blog/docs/ml-engineering/ml-integration/model-serving">ML Engineering&#x27;s serving page</a>.)</li>
+<li class="">Smoke-test at load: score 100 known machines, assert outputs match the values saved at training time. Three lines that catch an entire class of silent corruption. (This is the counterpart to the startup loading in <a class="" href="/shaokiat-blog/docs/ml-engineering/llm-inference/model-serving">ML Engineering&#x27;s serving page</a>.)</li>
 </ul>
 <hr>
 <h2 class="anchor anchorTargetHideOnScrollNavbar_vjPI" id="trainingserving-skew">Training/Serving Skew<a href="#trainingserving-skew" class="hash-link" aria-label="Direct link to Training/Serving Skew" title="Direct link to Training/Serving Skew" translate="no">​</a></h2>
