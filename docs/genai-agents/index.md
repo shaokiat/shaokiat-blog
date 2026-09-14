@@ -45,12 +45,6 @@ Scoring a RAG pipeline component by component with RAGAS — context recall and 
 
 - [RAG Evaluation with RAGAS](../ml-engineering/rag/evaluation.md)
 
-### AI Slide Deck Making
-
-Evaluating open-source tools across complexity tiers — from single-pass generators (slide-deck-ai) to Gamma-like agentic pipelines (Presenton), with Marp as a future code-first option.
-
-- [Overview & Tool Comparison](./ai-slide-decks/overview.md)
-
 ---
 
 *Pages are added as each topic is explored hands-on.*
