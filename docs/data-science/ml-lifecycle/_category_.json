@@ -4,5 +4,6 @@
   "link": {
     "type": "doc",
     "id": "data-science/ml-lifecycle/index"
-  }
+  },
+  "collapsed": true
 }
