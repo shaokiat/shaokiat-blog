@@ -28,7 +28,7 @@ Scoring agent outputs against a rubric with a judge model; where it's reliable a
 
 Attributing a bad answer to the retriever or the generator, using claim-level metrics scored by a judge model.
 
-→ Guide: [RAG Evaluation with RAGAS](../rag-evaluation.md)
+→ Guide: [RAG Evaluation with RAGAS](../../ml-engineering/rag/evaluation.md)
 
 ## Token and cost tracking
 

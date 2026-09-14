@@ -1,4 +1,5 @@
 ---
+draft: true
 sidebar_position: 4
 ---
 
@@ -153,7 +154,7 @@ def predict(payload: PredictRequest, request: Request):
 Never load a model inside a route handler — the cost is paid on every request. Load once in lifespan and access via `app.state`.
 :::
 
-→ See [Model Serving](../ml-integration/model-serving.md) for patterns around multi-model state, versioning, and readiness checks.
+→ See [Model Serving](../llm-inference/model-serving.md) for patterns around multi-model state, versioning, and readiness checks.
 
 ## When to Split vs Stay Flat
 

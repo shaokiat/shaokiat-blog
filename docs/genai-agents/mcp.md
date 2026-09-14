@@ -70,7 +70,7 @@ MCP exposes three primitives. Most guides only cover Tools; knowing all three pr
 
 MCP servers communicate over **HTTP** — either SSE or Streamable HTTP. Both options will be covered in a dedicated page.
 
-HTTP servers need their own auth layer. Credentials must never be tool call arguments — inject them via environment variables or an auth header at the host level. → [Auth Patterns](../ml-engineering/foundation/auth-patterns.md)
+HTTP servers need their own auth layer. Credentials must never be tool call arguments — inject them via environment variables or an auth header at the host level.
 
 ---
 
@@ -523,7 +523,7 @@ Most server problems aren't in the code. They're in the interface.
 
 | Check | Severity | Why |
 |---|---|---|
-| No credentials accepted as arguments | **Critical** | Prompt injection vector — inject auth via env vars → [Auth Patterns](../ml-engineering/foundation/auth-patterns.md) |
+| No credentials accepted as arguments | **Critical** | Prompt injection vector — inject auth via env vars |
 | Every `tools/call` logged with inputs, outputs, latency | **Critical** | MCP calls are your agent's action history; you will need them for debugging |
 | Every description answers "when should I call this?" | **Should** | Vague descriptions cause wrong tool choices |
 | Inputs as narrow as possible | **Should** | `enum`, `pattern`, `minimum` all reduce hallucinated arguments |
