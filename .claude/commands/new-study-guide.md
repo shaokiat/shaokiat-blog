@@ -50,7 +50,7 @@ Short explanation. Then, as fits:
 - **Memory hooks.** Every major section opens with `> **Remember one thing:** ...`.
 - **Admonitions**: `:::danger` for leakage/correctness traps, `:::warning` for common mistakes, `:::tip` for defaults, `:::note` for nuance.
 - **Link, don't repeat.** Each concept has one home page. Other pages link to it: metrics live in classification.md, CV mechanics in supervised/index.md, serving code in ml-engineering. If tempted to re-explain, link instead.
-- **Diagrams** (SVG/mermaid) only when they carry intuition prose can't; label axes with the running example's variables, not "x (feature)".
+- **Diagrams** (SVG/mermaid) only when they carry intuition prose can't; label axes with the running example's variables, not "x (feature)". Mechanics are in `CLAUDE.md` → Writing & Diagram Style.
 
 ## Repo gotchas
 

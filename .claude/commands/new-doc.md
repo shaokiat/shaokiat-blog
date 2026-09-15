@@ -16,14 +16,17 @@ Before writing anything, ask for:
 | LLM Inference | `docs/ml-engineering/llm-inference/` | New file per topic |
 | RAG | `docs/ml-engineering/rag/` | **Append to an existing page.** Only create a new file if a page becomes unwieldy. |
 
-RAG has four content pages covering the whole pipeline. A new RAG technique is a new `##` section or a new table row on the page that owns that decision, not a new file:
+RAG has five content pages covering the whole pipeline. A new RAG technique is a new `##` section or a new table row on the page that owns that decision, not a new file:
 
 | Decision area | Page |
 |---|---|
-| Parsing, chunking, embeddings, metadata, vector store, index | `rag/ingestion-and-indexing.md` |
-| Dense/hybrid search, reranking, prompt assembly, citations, agentic retrieval | `rag/retrieval-and-generation.md` |
+| Parsing, chunking, embeddings, metadata storage, vector store, index | `rag/ingestion-and-indexing.md` |
+| Dense/sparse/hybrid search, RRF, metadata filtering, reranking, agentic retrieval | `rag/retrieval.md` |
+| Prompt assembly, grounding, citations | `rag/generation.md` |
 | Offline metrics, eval sets, runtime guardrails, escalation | `rag/evaluation.md` |
 | Latency, scaling, isolation, on-prem, monitoring | `rag/production.md` |
+
+The retrieval/generation boundary is the shortlist: `retrieval.md` ends when the top ~5 chunks are chosen.
 
 File name for a new page: kebab-case of the topic. "Background Tasks" → `background-tasks.md`.
 
@@ -61,18 +64,13 @@ One-liner rule the reader should remember.
 
 ## Style rules
 
-- **Customer framing** — every page opens with a blockquote in the form "A customer needed X. Here is the architecture and the tradeoffs." Frame the problem from the customer's perspective, not the technology's.
-- **Official docs block** — always include a list of official doc links immediately after the framing. No content without a cited link.
-- **`---` separator** — always place a horizontal rule between the docs block and the first section.
-- **`:::info Best practice`** — use for key one-liner takeaways only. Not for general information. Close with `:::`.
-- **Cross-references** — use `→ See [Page Title](./filename.md#section)` instead of repeating content. Prefer linking over duplicating.
-- **Tables for comparisons**, bullet lists for options, bold for service/package names.
-- **Code examples** — every section that introduces a concept should have a working code snippet.
-- **Tight and opinionated** — short declarative sentences. Prefer a period over an em-dash; chains of em-dashes read as machine-written. Cut hedges ("it's worth noting", "genuinely").
-- **No fluff** — omit background that doesn't change a decision. Prefer "use X when Y" over "X is a tool that does Y".
-- **No comments in code** unless the WHY is non-obvious.
-- **RAG pages share one running example**: Meridian Support Assist, a multi-tenant internal-docs assistant (~400k chunks, 120 tenants, 3 airgapped). Reuse it rather than inventing a new scenario.
-- **MDX gotcha**: a bare `<` followed by a digit breaks the build. Write "under 10", not the symbol.
+**Prose, tables, diagrams, and the code-is-a-last-resort rule live in `CLAUDE.md` → Writing & Diagram Style.** Read that section before writing. Page-specific additions:
+
+- **Customer framing** — every page opens with a blockquote in the form "A customer needed X. Here is the architecture and the tradeoffs." Frame from the customer's perspective, not the technology's.
+- **Official docs block** — a list of official doc links immediately after the framing, then a `---`. No content without a cited link.
+- **`:::info Best practice`** — key one-liner takeaways only, not general information.
+- **RAG pages share one running example**: Meridian Support Assist, a multi-tenant internal-docs assistant (~400k chunks, 120 tenants, 3 airgapped). Reuse it rather than inventing a scenario.
+- **Open each page with a pipeline diagram** where the topic is a sequence of stages, followed by a stage table giving each stage's job and the cost of getting it wrong.
 
 ## After creating the file
 
@@ -84,7 +82,7 @@ One-liner rule the reader should remember.
 
 **Stub:** frontmatter, customer framing, official docs, `---`, and a `## Topics to cover` bullet list. No code yet.
 
-**Expanded:** every subtopic becomes a `##` section with explanation, code example, and a `:::info Best practice` where applicable.
+**Expanded:** every subtopic becomes a `##` section with explanation, a comparison table or diagram, and a `:::info Best practice` where applicable. Code only if the reader will paste it.
 
 ## Existing cross-reference map
 
@@ -96,7 +94,8 @@ Use these to add `→ See` links without duplicating content:
 | PagedAttention, continuous batching, quantization, GPU sizing | `llm-inference/vllm-serving.md` | `#prefill-vs-decode`, `#static-vs-continuous-batching`, `#quantization`, `#sizing-a-deployment` |
 | Pipeline map, when RAG beats long context | `rag/index.md` | `#rag-is-a-retrieval-problem`, `#do-you-need-rag-at-all` |
 | Parsing, chunking, embeddings, isolation, HNSW | `rag/ingestion-and-indexing.md` | `#parsing-comes-first`, `#chunking`, `#metadata-and-multi-tenant-isolation`, `#hnsw-vs-ivfflat` |
-| Hybrid search, reranking, citations, agentic retrieval | `rag/retrieval-and-generation.md` | `#hybrid-search`, `#reranking`, `#grounding-and-citations`, `#agentic-and-multi-hop-retrieval` |
+| Hybrid search, BM25, RRF, metadata filtering, reranking, agentic retrieval | `rag/retrieval.md` | `#why-hybrid-search`, `#sparse-search-terms`, `#combining-them-with-rrf`, `#metadata-the-filter-both-retrievers-share`, `#reranking`, `#agentic-and-multi-hop-retrieval` |
+| Context budget, chunk ordering, grounding, citations | `rag/generation.md` | `#building-the-prompt`, `#grounding-and-citations` |
 | Recall@k, RAGAS, eval sizing, escalation | `rag/evaluation.md` | `#retrieval-metrics-first`, `#how-much-eval-is-enough`, `#faithfulness-and-the-escalation-threshold` |
 | Latency, scaling, tenant isolation, on-prem | `rag/production.md` | `#latency-budget`, `#scaling-the-corpus`, `#airgapped-and-on-prem`, `#what-to-monitor` |
 | Agent loop shapes, context across hops | `../genai-agents/agent_design_patterns.md`, `../genai-agents/concepts/context-engineering.md` | — |

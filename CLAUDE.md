@@ -13,6 +13,45 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 
 ---
 
+## Writing & Diagram Style
+
+Applies to every page under `docs/ml-engineering/` and `docs/google-professional-cloud-architect/`, when editing as well as when creating. `docs/genai-agents/` implementation pages are the exception — there the code *is* the artifact, so they keep it.
+
+**Prose**
+- Short declarative sentences. Prefer a period over an em-dash; chains of em-dashes read as machine-written.
+- Cut hedges ("it's worth noting", "genuinely", "in practice"). Omit background that doesn't change a decision.
+- "Use X when Y", never "X is a tool that does Y".
+- Name the failure a thing prevents. A stage or rule whose failure you can't name should be cut.
+
+**Prefer a table or a diagram to a paragraph.** In order of preference:
+
+| Content | Form |
+|---|---|
+| Comparison, options, trade-offs | Table |
+| A rule with wrong answers worth showing | Table with a Result column, wrong rows included |
+| A sequence of stages | Mermaid `flowchart LR` + a stage table |
+| Spatial or quantitative intuition (curves, layers, waterfalls) | Inline SVG using the `.ml-diagram` classes in `src/css/custom.css` |
+| A formula | One-line blockquote in plain words, not notation |
+
+**Code is a last resort, not a default.** Include a block only when the reader will copy it verbatim (a prompt, a schema). Do not include library calls, function implementations, or DDL — name the operator, the setting, or the knob inline and let the linked docs carry the syntax. A table of knobs with defaults beats the `CREATE INDEX` that sets them.
+
+**Formulas**: state the intuition, not the algebra. `tfidf = tf × log(N/df)` became "how often the term appears here × how rare it is across the corpus". Keep parameter names and their defaults in a table.
+
+**Diagrams**
+- Mermaid pipelines: wrap in `<div className="mermaid-scroll" style={{maxWidth: "900px", margin: "0 auto"}}>` so they scroll on mobile instead of shrinking.
+- Node labels: one bold word plus a `<small>` detail line. Never a sentence.
+- `classDef accent` marks the stages that matter; `classDef optional` (dashed) marks skippable ones. Both are styled in `custom.css` — never inline colours, the global mermaid CSS overrides them.
+- Every coloured diagram needs a one-line legend beneath it saying what the colour *means* on that page.
+- A diagram earns its place by showing a mechanism prose can't. Skip it for anything a table already handles.
+
+**Cross-linking**: `→ See [Page](./file.md#anchor)`. Link instead of restating — if two pages explain the same mechanism, one of them should be a pointer.
+
+**MDX gotchas**: a bare `<` before a digit breaks the build (write "under 10"). Use `className`, not `class`, in inline JSX.
+
+Run `npm run build` after editing. It catches broken links and anchors. If it flags a link to a page that exists, `npm run clear` first.
+
+---
+
 ## GenAI & Agents Section
 
 Content lives under `docs/genai-agents/`. Three layers, cross-linked:
