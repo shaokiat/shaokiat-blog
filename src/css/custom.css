@@ -81,6 +81,9 @@
   --mermaid-node-border: #3a6f9a;
   --mermaid-node-text:   #1e3a4f;
   --mermaid-edge:        #3a6f9a;
+  --mermaid-accent-fill:   #fef3c7;
+  --mermaid-accent-border: #d97706;
+  --mermaid-accent-text:   #713f12;
 }
 
 [data-theme='dark'] {
@@ -97,6 +100,9 @@
   --mermaid-node-border: #4a7fa5;
   --mermaid-node-text:   #c5d5e8;
   --mermaid-edge:        #4a7fa5;
+  --mermaid-accent-fill:   #3d3320;
+  --mermaid-accent-border: #a5822f;
+  --mermaid-accent-text:   #e0cfa8;
 }
 
 /* ─── ML Diagram SVG Layout & Colors ────────────────────────────────────── */
@@ -164,6 +170,50 @@
 
 .docusaurus-mermaid-container marker path {
   fill: var(--mermaid-edge) !important;
+}
+
+/* Accent-coloured mermaid nodes: `classDef accent` + `class A,B accent` */
+.docusaurus-mermaid-container .node.accent .label-container,
+.docusaurus-mermaid-container .node.accent rect,
+.docusaurus-mermaid-container .node.accent polygon,
+.docusaurus-mermaid-container .node.accent circle {
+  fill:   var(--mermaid-accent-fill)   !important;
+  stroke: var(--mermaid-accent-border) !important;
+}
+
+.docusaurus-mermaid-container .node.accent .nodeLabel,
+.docusaurus-mermaid-container .node.accent .nodeLabel p {
+  color: var(--mermaid-accent-text) !important;
+}
+
+/* Wide inline SVG diagrams (encoder comparison, attention curve) */
+.ml-diagram.wide { max-width: 640px; }
+.ml-diagram .box-fill    { fill: var(--mermaid-node-fill); stroke: var(--mermaid-node-border); }
+.ml-diagram .box-accent  { fill: var(--mermaid-accent-fill); stroke: var(--mermaid-accent-border); }
+.ml-diagram .box-text    { fill: var(--mermaid-node-text); }
+.ml-diagram .box-text-accent { fill: var(--mermaid-accent-text); }
+.ml-diagram .flow-line   { stroke: var(--mermaid-edge); fill: none; }
+.ml-diagram .curve-line  { stroke: var(--ml-blue); fill: none; }
+.ml-diagram .sag-fill    { fill: var(--ml-error); opacity: 0.12; }
+
+/* Optional mermaid stages: `classDef optional` + `class X optional` */
+.docusaurus-mermaid-container .node.optional .label-container,
+.docusaurus-mermaid-container .node.optional rect,
+.docusaurus-mermaid-container .node.optional polygon {
+  stroke-dasharray: 5 3 !important;
+  fill: transparent !important;
+}
+
+/* Wide flowcharts: scroll on narrow screens instead of shrinking to unreadable */
+.mermaid-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+@media (max-width: 996px) {
+  .mermaid-scroll .docusaurus-mermaid-container {
+    min-width: 720px;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

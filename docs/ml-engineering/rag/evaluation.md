@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # Evaluation & Guardrails
@@ -16,6 +16,28 @@ sidebar_position: 4
 ## Two failure points, one output
 
 A RAG answer can be wrong because retrieval missed, or because the generator ignored what it got. From the outside both look identical. Evaluation exists to tell them apart, because the fixes are completely different.
+
+<div className="mermaid-scroll" style={{maxWidth: "900px", margin: "0 auto"}}>
+
+```mermaid
+flowchart LR
+    Q(["Query"]) --> R["Retrieve<br/><small>hybrid · rerank</small>"] --> G["Generate"] --> A(["Answer"])
+    R -.-> M1["recall@k · MRR · nDCG<br/><small>free · seconds · every PR</small>"]
+    G -.-> M2["faithfulness · answer relevancy<br/><small>judge calls · minutes · per release</small>"]
+
+    classDef accent fill:#f2e4cc,stroke:#a5762f
+    classDef optional stroke-dasharray: 5 3
+    class M2 accent
+    class M1,M2 optional
+```
+
+</div>
+
+<div style={{maxWidth: "900px", margin: "0 auto 1.5rem", textAlign: "center", fontSize: "0.85rem", opacity: 0.75}}>
+
+Measure left to right. 🟧 amber metrics cost money per run — earn the right to need them.
+
+</div>
 
 | Retrieval is wrong | Generation is wrong |
 |---|---|
@@ -38,18 +60,15 @@ You need a set of questions with the chunk IDs that should have been retrieved. 
 | **nDCG@k** | Are the good chunks ranked above the mediocre ones? | Tuning fusion weights and reranker choice |
 | **Hit rate** | Fraction of questions with at least one relevant chunk | A blunt dashboard number for non-engineers |
 
-```python
-def recall_at_k(retrieved: list[str], relevant: set[str], k: int) -> float:
-    return len(set(retrieved[:k]) & relevant) / len(relevant)
+**Measure recall at two points**: after retrieval — and the pair tells you which half to fix:
 
-def mrr(retrieved: list[str], relevant: set[str]) -> float:
-    for rank, doc_id in enumerate(retrieved, start=1):
-        if doc_id in relevant:
-            return 1 / rank
-    return 0.0
-```
+| recall@50 *(before rerank)* | recall@5 *(after rerank)* | Diagnosis |
+|---|---|---|
+| 0.95 | 0.60 | The reranker is dropping good chunks |
+| 0.60 | 0.55 | The reranker is irrelevant. You have a retrieval problem. |
+| 0.95 | 0.90 | Healthy. Move on to generation metrics. |
 
-Measure recall at two points: after retrieval, before reranking (that is the ceiling), and after reranking (that is what the model sees). If recall@50 before reranking is 0.95 and recall@5 after is 0.60, your reranker is the problem. If recall@50 is already 0.60, the reranker is irrelevant and you have a retrieval problem.
+Before-rerank recall is the ceiling; after-rerank recall is what the model actually sees.
 
 :::info Best practice
 Gate every pull request that touches the pipeline on recall@k. It runs in seconds and it is the cheapest regression net you will ever build.
@@ -68,17 +87,7 @@ RAGAS decomposes answers into claims and scores them with a judge LLM. Use it wh
 | **Context precision** | Are the retrieved chunks mostly relevant, and ranked well | Retriever |
 | **Context recall** | Did retrieval cover everything the reference answer needs | Retriever |
 
-```python
-from ragas import evaluate
-from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
-
-result = evaluate(
-    dataset,  # question, answer, contexts, ground_truth
-    metrics=[faithfulness, answer_relevancy, context_precision, context_recall],
-)
-```
-
-Read the combinations, not the individual numbers:
+RAGAS takes a dataset of question, answer, contexts, and ground truth, and returns one score per metric. Read the combinations, not the individual numbers:
 
 | Pattern | Diagnosis |
 |---|---|
@@ -106,16 +115,7 @@ Where Meridian's questions come from:
 
 Include unanswerable questions and assert refusal. A system that never refuses is a system that hallucinates, and you will not see it until a customer does.
 
-```python
-{
-  "question": "What is the key rotation period for API keys?",
-  "relevant_chunks": ["POLICY-4471#api-keys"],
-  "ground_truth": "90 days.",
-  "tenant_id": "meridian-demo",
-}
-```
-
-Keep it per-tenant where isolation matters. A question that retrieves correctly for a large tenant can retrieve nothing for a small one.
+Four fields per question: the question, the chunk IDs that should be retrieved, the ground-truth answer, and the tenant. Keep it per-tenant where isolation matters. A question that retrieves correctly for a large tenant can retrieve nothing for a small one.
 
 ---
 
@@ -159,15 +159,6 @@ Score groundedness at runtime and route on it:
 | Middle | Answer, but hedge and surface sources prominently |
 | Low | Do not answer. Escalate to a human, and pass the retrieved chunks along. |
 | No retrieval hits | Refuse immediately, do not generate |
-
-```python
-score = groundedness(answer, chunks)   # judge call, or an NLI model
-if score < ESCALATE_BELOW:
-    return escalate(question, chunks, reason="low_groundedness")
-if score < HEDGE_BELOW:
-    return hedge(answer, chunks)
-return answer
-```
 
 Two things make this affordable. Use a small NLI model or a cheap judge model rather than your generation model. And sample rather than scoring every answer, once you trust the distribution: score 100 percent while the thresholds are new, then drop to a sample plus every escalation.
 

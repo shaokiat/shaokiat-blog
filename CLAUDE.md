@@ -30,10 +30,12 @@ Linking convention: use case pages link into concepts with `→ Concept: [Title]
 Content lives under `docs/ml-engineering/`. Two active subfolders plus an archive:
 
 - `llm-inference/` (sidebar position 2) — model serving, vLLM, streaming, agent endpoints
-- `rag/` (position 3) — `index.md`, `ingestion-and-indexing.md`, `retrieval-and-generation.md`, `evaluation.md`, `production.md`, in that sidebar order
+- `rag/` (position 3) — `index.md`, `ingestion-and-indexing.md`, `retrieval.md`, `generation.md`, `evaluation.md`, `production.md`, in that sidebar order
 - `archive/` — the old Tier 1 FastAPI foundation pages. Every page carries `draft: true`, so they are excluded from the production build and visible only via `npm start` (same pattern as the Supabase pages in `docs/database/`). Do not link to them from published pages: a link to a draft page breaks `npm run build`.
 
-RAG pages share one running example: **Meridian Support Assist**, a multi-tenant internal-docs assistant. Keep it when adding sections. New RAG material is appended to one of the four existing pages; add a fifth only when a page becomes unwieldy.
+RAG pages share one running example: **Meridian Support Assist**, a multi-tenant internal-docs assistant. Keep it when adding sections. New RAG material is appended to one of the five existing pages; add a sixth only when a page becomes unwieldy.
+
+The retrieval/generation boundary is the shortlist: `retrieval.md` ends when the top ~5 chunks are chosen, `generation.md` starts there. Metadata is split the same way — `ingestion-and-indexing.md` owns what is attached and how it is indexed, `retrieval.md` owns how it gates, boosts, and interacts with ANN selectivity.
 
 ---
 

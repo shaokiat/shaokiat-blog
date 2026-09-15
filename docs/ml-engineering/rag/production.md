@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 # Production
@@ -17,6 +17,42 @@ sidebar_position: 5
 ## Latency budget
 
 Budget the whole path to first token, then attack the largest slice. Meridian's target is 2 seconds to first token.
+
+<svg className="ml-diagram wide" viewBox="0 0 600 250" role="img" aria-label="Latency waterfall to first token, showing generation and CPU reranking dominating">
+  <text x="8" y="16" fontSize="10.5" fontWeight="600" className="box-text">Path to first token · GPU rerank</text>
+  <rect x="8" y="26" width="52" height="18" rx="2" className="box-fill" />
+  <rect x="62" y="26" width="8" height="18" rx="2" className="box-fill" />
+  <rect x="72" y="26" width="14" height="18" rx="2" className="box-fill" />
+  <rect x="88" y="26" width="10" height="18" rx="2" className="box-accent" />
+  <rect x="100" y="26" width="200" height="18" rx="2" className="box-fill" opacity="0.85" />
+  <text x="312" y="40" fontSize="10" className="axis-label">≈ 900 ms</text>
+
+  <text x="8" y="74" fontSize="10.5" fontWeight="600" className="overfit-label">Path to first token · CPU rerank</text>
+  <rect x="8" y="84" width="52" height="18" rx="2" className="box-fill" />
+  <rect x="62" y="84" width="8" height="18" rx="2" className="box-fill" />
+  <rect x="72" y="84" width="14" height="18" rx="2" className="box-fill" />
+  <rect x="88" y="84" width="72" height="18" rx="2" className="box-accent" />
+  <text x="124" y="97" textAnchor="middle" fontSize="9" className="box-text-accent">rerank</text>
+  <rect x="162" y="84" width="200" height="18" rx="2" className="box-fill" opacity="0.85" />
+  <text x="374" y="98" fontSize="10" className="overfit-label">≈ 1.2 s — rerank now costs more than search</text>
+
+  <line x1="8" y1="126" x2="560" y2="126" className="axis-line" />
+  <text x="34" y="142" textAnchor="middle" fontSize="9" className="axis-label">rewrite</text>
+  <text x="34" y="154" textAnchor="middle" fontSize="8.5" className="axis-label">150–400</text>
+  <text x="66" y="142" textAnchor="middle" fontSize="9" className="axis-label">embed</text>
+  <text x="66" y="154" textAnchor="middle" fontSize="8.5" className="axis-label">10–30</text>
+  <text x="79" y="168" textAnchor="middle" fontSize="9" className="axis-label">search</text>
+  <text x="79" y="180" textAnchor="middle" fontSize="8.5" className="axis-label">5–50</text>
+  <text x="124" y="142" textAnchor="middle" fontSize="9" className="box-text-accent">rerank</text>
+  <text x="124" y="154" textAnchor="middle" fontSize="8.5" className="box-text-accent">15 GPU / 200+ CPU</text>
+  <text x="240" y="142" textAnchor="middle" fontSize="9" className="axis-label">generation, first token</text>
+  <text x="240" y="154" textAnchor="middle" fontSize="8.5" className="axis-label">300–1500</text>
+  <text x="560" y="142" textAnchor="end" fontSize="9" className="axis-label">ms</text>
+
+  <line x1="8" y1="196" x2="470" y2="196" className="margin-line" strokeWidth="2" strokeDasharray="5 4" />
+  <text x="478" y="200" fontSize="10" className="fit-label">2 s target</text>
+  <text x="8" y="228" fontSize="10" className="axis-label">Streaming moves the user-visible number to the left edge of generation, not to its right.</text>
+</svg>
 
 | Stage | Typical | Dominated by |
 |---|---|---|
@@ -57,11 +93,11 @@ Stream first, then parallelise, then cache. Only trade recall for latency once t
 
 Index memory is the constraint that arrives first.
 
-```
-400,000 chunks x 1536 dims x 4 bytes  = 2.4 GB vectors
-HNSW graph overhead, roughly 40%      = 1.0 GB
-Total                                 ≈ 3.4 GB, must stay in RAM
-```
+| | |
+|---|---|
+| 400,000 chunks × 1536 dims × 4 bytes | 2.4 GB vectors |
+| HNSW graph overhead, roughly 40% | 1.0 GB |
+| **Total** | **≈ 3.4 GB, and it must stay in RAM** |
 
 Growth options, cheapest first:
 

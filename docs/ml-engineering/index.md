@@ -27,7 +27,7 @@ Every topic answers: *"A customer needed X — here's the architecture and trade
 |---|---|---|
 | 6 | [RAG](./rag/index.md) | Pipeline map, when RAG beats long context, the four failure points |
 | 7 | [Ingestion & Indexing](./rag/ingestion-and-indexing.md) | Parsing/OCR, chunking, embeddings, multi-tenant metadata, HNSW vs IVFFlat |
-| 8 | [Retrieval & Generation](./rag/retrieval-and-generation.md) | Hybrid search, reranking, context budgeting, citations, agentic retrieval |
+| 8 | [Retrieval](./rag/retrieval.md) | Hybrid search, BM25, RRF, metadata filtering, reranking, agentic retrieval |
 | 9 | [Evaluation & Guardrails](./rag/evaluation.md) | Recall@k and MRR, RAGAS, how much eval is enough, escalation thresholds |
 | 10 | [Production](./rag/production.md) | Latency budget, corpus scaling, tenant isolation, airgapped deployment |
 

@@ -34,23 +34,39 @@ The numbers are made up. The shape is not.
 
 The generator is rarely the reason an answer is wrong. If the right chunk never reaches the prompt, no model and no prompt rescues it. Tune retrieval first, and only then argue about the wording of the system prompt.
 
+<div className="mermaid-scroll" style={{maxWidth: "900px", margin: "0 auto"}}>
+
 ```mermaid
 flowchart LR
-  A[Source docs] --> B[Parse]
-  B --> C[Chunk]
-  C --> D[Embed]
-  D --> E[(Vector index)]
-  F[User query] --> G[Retrieve]
-  E --> G
-  G --> H[Rerank]
-  H --> I[Assemble prompt]
-  I --> J[Generate + cite]
+    subgraph OFF ["offline · once per document"]
+        direction LR
+        A(["Docs"]) --> B["Parse"] --> C["Chunk"] --> D["Embed"]
+    end
+    D --> E[("Index<br/><small>vectors · terms · metadata</small>")]
+    subgraph ON ["online · every query"]
+        direction LR
+        G["Retrieve<br/><small>hybrid + RRF</small>"] --> H["Rerank"] --> I["Assemble"] --> J["Generate<br/><small>+ cite</small>"]
+    end
+    E --> G
+    F(["Query"]) --> G
+
+    classDef accent fill:#f2e4cc,stroke:#a5762f
+    class G,H accent
 ```
+
+</div>
+
+<div style={{maxWidth: "900px", margin: "0 auto 1.5rem", textAlign: "center", fontSize: "0.85rem", opacity: 0.75}}>
+
+🟧 the two stages that decide whether the right chunk reaches the model
+
+</div>
 
 | Stage | Page |
 |---|---|
 | Parse, chunk, embed, index | [Ingestion & Indexing](./ingestion-and-indexing.md) |
-| Retrieve, rerank, assemble, generate | [Retrieval & Generation](./retrieval-and-generation.md) |
+| Retrieve, filter, fuse, rerank | [Retrieval](./retrieval.md) |
+| Assemble the prompt, ground and cite | [Generation & Grounding](./generation.md) |
 | Measure it, then guard it at runtime | [Evaluation & Guardrails](./evaluation.md) |
 | Latency, scale, isolation, on-prem | [Production](./production.md) |
 
@@ -62,7 +78,7 @@ flowchart LR
 |---|---|---|
 | Bad parse | Answer cites a table that reads as scrambled numbers | [Parsing](./ingestion-and-indexing.md#parsing-comes-first) |
 | Chunk boundary | Answer is half right and stops mid-thought | [Chunking](./ingestion-and-indexing.md#chunking) |
-| Retrieval miss | Assistant says the corpus has nothing, but it does | [Hybrid search](./retrieval-and-generation.md#hybrid-search) |
+| Retrieval miss | Assistant says the corpus has nothing, but it does | [Hybrid search](./retrieval.md#why-hybrid-search) |
 | Generator ignored context | Answer is fluent, confident, and unsupported | [Faithfulness](./evaluation.md#faithfulness-and-the-escalation-threshold) |
 
 Each failure has a metric attached to it. Guessing which one you have is the expensive way to debug a RAG system.
