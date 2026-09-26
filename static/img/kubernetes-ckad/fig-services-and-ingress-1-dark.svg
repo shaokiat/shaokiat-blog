@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Request path: client to Ingress to Service to EndpointSlice to Pods; the Service selects Pods only by label, and NetworkPolicy gates traffic entering the namespace">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="172" width="110" height="66" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="75" y="200" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Client</text>
+  <text x="75" y="219" text-anchor="middle" font-size="11" fill="#8896a8">shop.example.com</text>
+  <rect x="150" y="10" width="935" height="380" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="166" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">CLUSTER</text>
+  <rect x="180" y="172" width="130" height="66" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="245" y="200" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Ingress</text>
+  <text x="245" y="219" text-anchor="middle" font-size="11" fill="#8896a8">host + path rules</text>
+  <rect x="370" y="172" width="150" height="66" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="445" y="200" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Service api</text>
+  <text x="445" y="219" text-anchor="middle" font-size="11" fill="#8896a8">selector app=api</text>
+  <rect x="580" y="172" width="150" height="66" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="655" y="200" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">EndpointSlice</text>
+  <text x="655" y="219" text-anchor="middle" font-size="11" fill="#8896a8">Ready Pod IPs :8080</text>
+  <rect x="790" y="40" width="285" height="330" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="804" y="59" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">NAMESPACE · SHOP</text>
+  <polyline points="132,205 178,205" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="155" y="197" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#202329" stroke-width="4" paint-order="stroke">HTTPS</text>
+  <polyline points="312,205 368,205" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="340" y="197" text-anchor="middle" font-size="11" fill="#8896a8">/api</text>
+  <polyline points="522,205 578,205" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="550" y="197" text-anchor="middle" font-size="11" fill="#8896a8">resolves</text>
+  <polyline points="732,205 760,205" fill="none" stroke="#4a7fa5" stroke-width="1.5"/>
+  <polyline points="760,105 760,205" fill="none" stroke="#4a7fa5" stroke-width="1.5"/>
+  <polyline points="760,105 828,105" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="760,205 828,205" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="830" y="70" width="230" height="70" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="838" y="85" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="945" y="109" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">api-7d4f-x2k</text>
+  <text x="945" y="125" text-anchor="middle" font-size="10.5" fill="#8896a8">10.244.1.5 · Ready</text>
+  <rect x="989" y="76" width="63" height="18" rx="9" fill="#3d3320" stroke="#a5822f" stroke-width="1.2"/><text x="1020.5" y="89" text-anchor="middle" font-size="10.5" font-weight="600" fill="#e0cfa8">app=api</text>
+  <rect x="830" y="170" width="230" height="70" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="838" y="185" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="945" y="209" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">api-7d4f-m9p</text>
+  <text x="945" y="225" text-anchor="middle" font-size="10.5" fill="#8896a8">10.244.2.7 · Ready</text>
+  <rect x="989" y="176" width="63" height="18" rx="9" fill="#3d3320" stroke="#a5822f" stroke-width="1.2"/><text x="1020.5" y="189" text-anchor="middle" font-size="10.5" font-weight="600" fill="#e0cfa8">app=api</text>
+  <rect x="830" y="270" width="230" height="70" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="838" y="285" font-size="9" font-weight="600" letter-spacing="1" fill="#5b6675">POD</text>
+  <text x="945" y="309" text-anchor="middle" font-size="12" font-weight="600" fill="#8896a8">web-5c9b-q7m</text>
+  <text x="945" y="325" text-anchor="middle" font-size="10.5" fill="#8896a8">no matching label</text>
+  <rect x="989" y="276" width="63" height="18" rx="9" fill="#2a2f37" stroke="#5b6675" stroke-width="1.2"/><text x="1020.5" y="289" text-anchor="middle" font-size="10.5" font-weight="600" fill="#8896a8">app=web</text>
+  <rect x="786" y="94" width="8" height="22" rx="2" fill="#8896a8"/>
+  <rect x="786" y="194" width="8" height="22" rx="2" fill="#8896a8"/>
+  <text x="790" y="234" text-anchor="middle" font-size="10" fill="#8896a8" font-weight="600">NetworkPolicy</text>
+  <text x="790" y="247" text-anchor="middle" font-size="10" fill="#8896a8">gate</text>
+  <text x="180" y="312" text-anchor="start" font-size="11" fill="#e0cfa8" font-weight="600">The Service finds Pods only by label.</text>
+  <text x="180" y="329" text-anchor="start" font-size="11" fill="#8896a8">No name, IP or ownership link exists. A typo in either label</text>
+  <text x="180" y="344" text-anchor="start" font-size="11" fill="#8896a8">means an empty EndpointSlice and no traffic.</text>
+</svg>
