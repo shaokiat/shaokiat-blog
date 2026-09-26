@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 420" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Reconciliation loop: kubectl apply sends desired state to the API server, which stores it in etcd; a controller watches, diffs desired against actual, acts, and observes again">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <!-- desired state → apiserver → etcd ← actual state -->
+  <rect x="20" y="68" width="180" height="64" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="110" y="95" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">Desired state</text>
+  <text x="110" y="114" text-anchor="middle" font-size="11" fill="#4a5568">deployment.yaml · replicas: 3</text>
+
+  <rect x="280" y="68" width="170" height="64" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="365" y="95" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">kube-apiserver</text>
+  <text x="365" y="114" text-anchor="middle" font-size="11" fill="#4a5568">validates, then stores</text>
+
+  <rect x="280" y="184" width="170" height="64" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="365" y="211" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">etcd</text>
+  <text x="365" y="230" text-anchor="middle" font-size="11" fill="#4a5568">spec + status</text>
+
+  <rect x="280" y="298" width="170" height="64" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="365" y="325" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5c3d">Actual state</text>
+  <text x="365" y="344" text-anchor="middle" font-size="11" fill="#4a5568">2 Pods running</text>
+
+  <g stroke="#3a6f9a" stroke-width="1.5" fill="none" marker-end="url(#a)">
+    <line x1="202" y1="100" x2="278" y2="100"/>
+    <line x1="365" y1="134" x2="365" y2="182"/>
+    <line x1="365" y1="296" x2="365" y2="250"/>
+    <line x1="452" y1="100" x2="628" y2="100"/>
+    <line x1="628" y1="330" x2="452" y2="330"/>
+  </g>
+  <g font-size="11" fill="#4a5568">
+    <text x="240" y="92" text-anchor="middle">kubectl apply</text>
+    <text x="373" y="162">persist spec</text>
+    <text x="373" y="277">kubelet reports status</text>
+    <text x="540" y="92" text-anchor="middle">watch events</text>
+    <text x="540" y="322" text-anchor="middle">create 1 Pod</text>
+  </g>
+
+  <!-- controller loop -->
+  <rect x="500" y="30" width="390" height="370" rx="12" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="514" y="49" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">REPLICASET CONTROLLER</text>
+
+  <g stroke="#3a6f9a" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M768.9 126.9A115 115 0 0 1 801.6 171.9"/>
+    <path d="M801.6 258.1A115 115 0 0 1 768.9 303.1"/>
+    <path d="M621.1 303.1A115 115 0 0 1 588.4 258.1"/>
+    <path d="M588.4 171.9A115 115 0 0 1 621.1 126.9"/>
+  </g>
+
+  <g stroke="#3a6f9a" stroke-width="1.5" fill="#dce8f5">
+    <rect x="630" y="74" width="130" height="52" rx="8"/>
+    <rect x="745" y="189" width="130" height="52" rx="8"/>
+    <rect x="630" y="304" width="130" height="52" rx="8"/>
+    <rect x="515" y="189" width="130" height="52" rx="8"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="695" y="96" font-size="13" font-weight="700" fill="#1e3a4f">Watch</text>
+    <text x="695" y="114" font-size="11" fill="#4a5568">spec change arrives</text>
+    <text x="810" y="211" font-size="13" font-weight="700" fill="#1e3a4f">Diff</text>
+    <text x="810" y="229" font-size="11" fill="#4a5568">want 3 · have 2</text>
+    <text x="695" y="326" font-size="13" font-weight="700" fill="#1e3a4f">Act</text>
+    <text x="695" y="344" font-size="11" fill="#4a5568">write a new Pod</text>
+    <text x="580" y="211" font-size="13" font-weight="700" fill="#1e3a4f">Observe</text>
+    <text x="580" y="229" font-size="11" fill="#4a5568">read new status</text>
+    <text x="695" y="212" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">RECONCILE</text>
+    <text x="695" y="228" font-size="11" fill="#4a5568">loops forever</text>
+  </g>
+</svg>

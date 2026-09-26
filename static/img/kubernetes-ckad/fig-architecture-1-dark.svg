@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 440" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Kubernetes cluster architecture: control plane components talk only through the API server; each worker node runs kubelet, kube-proxy and a container runtime hosting Pods">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <!-- cluster -->
+  <rect x="10" y="10" width="930" height="420" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">CLUSTER</text>
+
+  <!-- control plane -->
+  <rect x="30" y="44" width="440" height="370" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="44" y="63" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">CONTROL PLANE</text>
+
+  <rect x="50" y="90" width="190" height="64" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="145" y="117" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">etcd</text>
+  <text x="145" y="136" text-anchor="middle" font-size="11" fill="#8896a8">key-value store of all state</text>
+
+  <rect x="50" y="200" width="190" height="64" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="145" y="227" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">kube-scheduler</text>
+  <text x="145" y="246" text-anchor="middle" font-size="11" fill="#8896a8">assigns Pods to nodes</text>
+
+  <rect x="50" y="310" width="190" height="64" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="145" y="337" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">kube-controller-manager</text>
+  <text x="145" y="356" text-anchor="middle" font-size="11" fill="#8896a8">runs reconcile loops</text>
+
+  <rect x="330" y="90" width="120" height="284" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="390" y="222" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">kube-apiserver</text>
+  <text x="390" y="242" text-anchor="middle" font-size="11" fill="#8896a8">the only component</text>
+  <text x="390" y="256" text-anchor="middle" font-size="11" fill="#8896a8">that talks to etcd</text>
+
+  <g stroke="#4a7fa5" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)">
+    <line x1="242" y1="122" x2="328" y2="122"/>
+    <line x1="242" y1="232" x2="328" y2="232"/>
+    <line x1="242" y1="342" x2="328" y2="342"/>
+  </g>
+  <g font-size="11" fill="#8896a8" text-anchor="middle">
+    <text x="285" y="114">read / write</text>
+    <text x="285" y="224">watch · bind</text>
+    <text x="285" y="334">watch · update</text>
+  </g>
+
+  <!-- worker node 1 -->
+  <rect x="490" y="44" width="440" height="175" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="504" y="63" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">WORKER NODE 1</text>
+  <rect x="510" y="78" width="170" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="595" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">kubelet</text>
+  <text x="595" y="119" text-anchor="middle" font-size="11" fill="#8896a8">runs Pods, reports status</text>
+  <rect x="510" y="148" width="170" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="595" y="171" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">kube-proxy</text>
+  <text x="595" y="189" text-anchor="middle" font-size="11" fill="#8896a8">routes Service traffic</text>
+  <rect x="720" y="78" width="195" height="126" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="817" y="98" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">container runtime</text>
+  <text x="817" y="113" text-anchor="middle" font-size="11" fill="#8896a8">e.g. containerd</text>
+  <rect x="734" y="126" width="80" height="64" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="742" y="141" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="774" y="167" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">app</text>
+  <rect x="822" y="126" width="80" height="64" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="830" y="141" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="862" y="167" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">api</text>
+
+  <!-- worker node 2 -->
+  <rect x="490" y="239" width="440" height="175" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="504" y="258" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">WORKER NODE 2</text>
+  <rect x="510" y="273" width="170" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="595" y="296" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">kubelet</text>
+  <text x="595" y="314" text-anchor="middle" font-size="11" fill="#8896a8">runs Pods, reports status</text>
+  <rect x="510" y="343" width="170" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="595" y="366" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">kube-proxy</text>
+  <text x="595" y="384" text-anchor="middle" font-size="11" fill="#8896a8">routes Service traffic</text>
+  <rect x="720" y="273" width="195" height="126" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="817" y="293" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">container runtime</text>
+  <text x="817" y="308" text-anchor="middle" font-size="11" fill="#8896a8">e.g. containerd</text>
+  <rect x="734" y="321" width="80" height="64" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="742" y="336" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="774" y="362" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">app</text>
+  <rect x="822" y="321" width="80" height="64" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="830" y="336" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="862" y="362" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">worker</text>
+
+  <!-- kubelet ↔ runtime (CRI), apiserver ↔ kubelets -->
+  <g stroke="#4a7fa5" stroke-width="1.5">
+    <line x1="682" y1="106" x2="718" y2="106" marker-end="url(#a)"/>
+    <line x1="682" y1="301" x2="718" y2="301" marker-end="url(#a)"/>
+    <line x1="452" y1="106" x2="508" y2="106" marker-start="url(#a)" marker-end="url(#a)"/>
+    <line x1="452" y1="301" x2="508" y2="301" marker-start="url(#a)" marker-end="url(#a)"/>
+  </g>
+  <g font-size="11" fill="#8896a8" text-anchor="middle" stroke="#202329" stroke-width="4" paint-order="stroke">
+    <text x="700" y="98">CRI</text>
+    <text x="700" y="293">CRI</text>
+    <text x="480" y="98">watch</text>
+    <text x="480" y="293">watch</text>
+  </g>
+</svg>
