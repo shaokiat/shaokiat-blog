@@ -169,41 +169,87 @@ kubectl -n lab5 rollout history deployment/web
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab5
-# create the Deployment from the manifest above, saved as web.yaml
-kubectl -n lab5 apply -f web.yaml
-# wait until all 3 Pods are Ready
-kubectl -n lab5 rollout status deployment/web
+1. Create the lab namespace.
 
-# change the container image; this starts a rolling update
-kubectl -n lab5 set image deployment/web nginx=nginx:1.28
-# record why, so rollout history shows it
-kubectl -n lab5 annotate deployment/web kubernetes.io/change-cause="nginx 1.28"
-# watch the ReplicaSets: new RS 0->1->2->3, old RS 3->2->1->0
-kubectl -n lab5 get rs -w
+   ```bash
+   kubectl create namespace lab5
+   ```
 
-# roll out an image tag that doesn't exist
-kubectl -n lab5 set image deployment/web nginx=nginx:1.99-typo
-# check the Pods: one new Pod in ImagePullBackOff, 3 old Pods still Ready
-kubectl -n lab5 get pods
-#   maxUnavailable: 0 means no old Pod is removed until a new one is Ready. Users see no outage.
-# wait briefly for the rollout: it times out because it's stuck
-kubectl -n lab5 rollout status deployment/web --timeout=30s
+2. Create the Deployment from the manifest above, saved as `web.yaml`.
 
-# go back to the previous revision
-kubectl -n lab5 rollout undo deployment/web
-# wait until the rollback finishes
-kubectl -n lab5 rollout status deployment/web
-# list revisions: the 1.28 revision moved to the newest number
-kubectl -n lab5 rollout history deployment/web
-#   The broken revision also says "nginx 1.28": change-cause is copied from the Deployment's
-#   annotation, so it goes stale unless you update it with every change.
+   ```bash
+   kubectl -n lab5 apply -f web.yaml
+   ```
 
-# delete everything the lab created
-kubectl delete namespace lab5
-```
+3. Wait until all 3 Pods are Ready.
+
+   ```bash
+   kubectl -n lab5 rollout status deployment/web
+   ```
+
+4. Change the container image; this starts a rolling update.
+
+   ```bash
+   kubectl -n lab5 set image deployment/web nginx=nginx:1.28
+   ```
+
+5. Record why, so rollout history shows it.
+
+   ```bash
+   kubectl -n lab5 annotate deployment/web kubernetes.io/change-cause="nginx 1.28"
+   ```
+
+6. Watch the ReplicaSets: new RS 0→1→2→3, old RS 3→2→1→0.
+
+   ```bash
+   kubectl -n lab5 get rs -w
+   ```
+
+7. Roll out an image tag that doesn't exist.
+
+   ```bash
+   kubectl -n lab5 set image deployment/web nginx=nginx:1.99-typo
+   ```
+
+8. Check the Pods: one new Pod in ImagePullBackOff, 3 old Pods still Ready.
+
+   ```bash
+   kubectl -n lab5 get pods
+   ```
+
+   maxUnavailable: 0 means no old Pod is removed until a new one is Ready. Users see no outage.
+
+9. Wait briefly for the rollout: it times out because it's stuck.
+
+   ```bash
+   kubectl -n lab5 rollout status deployment/web --timeout=30s
+   ```
+
+10. Go back to the previous revision.
+
+    ```bash
+    kubectl -n lab5 rollout undo deployment/web
+    ```
+
+11. Wait until the rollback finishes.
+
+    ```bash
+    kubectl -n lab5 rollout status deployment/web
+    ```
+
+12. List revisions: the 1.28 revision moved to the newest number.
+
+    ```bash
+    kubectl -n lab5 rollout history deployment/web
+    ```
+
+    The broken revision also says "nginx 1.28": change-cause is copied from the Deployment's annotation, so it goes stale unless you update it with every change.
+
+13. Delete everything the lab created.
+
+    ```bash
+    kubectl delete namespace lab5
+    ```
 
 </details>
 :::

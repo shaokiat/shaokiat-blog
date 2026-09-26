@@ -60,7 +60,7 @@ Every Lab is written once and read at three levels. Pick one per lab; drop a lev
 |---|---|---|
 | 🔴 **Challenge** | Only **Goal** and **Verify** | You could do this in the exam. Time yourself. |
 | 🟡 **Hints** | Goal, Verify, and the collapsed **🟡 Hints**: which command family or `-h` to look at, never the full command | You know the concept but not the commands yet |
-| 🟢 **Guided** | The collapsed **🟢 Guided** block: every command, each with a one-line comment saying what it does | First contact with a topic |
+| 🟢 **Guided** | The collapsed **🟢 Guided** block: numbered steps, each one sentence saying what it does, its command, and the output to expect | First contact with a topic |
 
 The Guided commands come from [Command Patterns](./command-patterns.md). Once you can predict each one before reading it, move up a tier.
 

@@ -191,31 +191,62 @@ kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <u
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab8
-# create the LimitRange and ResourceQuota above, saved together as limits.yaml
-kubectl -n lab8 apply -f limits.yaml
-# create the CPU-heavy app with no resources set
-kubectl -n lab8 create deployment web --image=registry.k8s.io/hpa-example --port=80
-# read the Pod's QoS class: Burstable, because the LimitRange injected requests
-kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}{"\n"}'
-# put a Service in front of it
-kubectl -n lab8 expose deployment web --port=80
-# autoscale on 50% of the CPU request, between 1 and 5 replicas
-kubectl -n lab8 autoscale deployment web --min=1 --max=5 --cpu=50%
+1. Create the lab namespace.
 
-# generate load from a second terminal; Ctrl-C to stop
-kubectl -n lab8 run load --rm -it --image=busybox:1.36 --restart=Never -- \
-  sh -c 'while true; do wget -q -O- http://web; done'
+   ```bash
+   kubectl create namespace lab8
+   ```
 
-# watch utilisation climb above 50% and replicas grow within about a minute
-kubectl -n lab8 get hpa web -w
-#   After stopping the load, scale-in waits for the 5-minute stabilization window.
+2. Create the LimitRange and ResourceQuota above, saved together as `limits.yaml`.
 
-# delete everything the lab created
-kubectl delete namespace lab8
-```
+   ```bash
+   kubectl -n lab8 apply -f limits.yaml
+   ```
+
+3. Create the CPU-heavy app with no resources set.
+
+   ```bash
+   kubectl -n lab8 create deployment web --image=registry.k8s.io/hpa-example --port=80
+   ```
+
+4. Read the Pod's QoS class: Burstable, because the LimitRange injected requests.
+
+   ```bash
+   kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}{"\n"}'
+   ```
+
+5. Put a Service in front of it.
+
+   ```bash
+   kubectl -n lab8 expose deployment web --port=80
+   ```
+
+6. Autoscale on 50% of the CPU request, between 1 and 5 replicas.
+
+   ```bash
+   kubectl -n lab8 autoscale deployment web --min=1 --max=5 --cpu=50%
+   ```
+
+7. Generate load from a second terminal; Ctrl-C to stop.
+
+   ```bash
+   kubectl -n lab8 run load --rm -it --image=busybox:1.36 --restart=Never -- \
+     sh -c 'while true; do wget -q -O- http://web; done'
+   ```
+
+8. Watch utilisation climb above 50% and replicas grow within about a minute.
+
+   ```bash
+   kubectl -n lab8 get hpa web -w
+   ```
+
+   After stopping the load, scale-in waits for the 5-minute stabilization window.
+
+9. Delete everything the lab created.
+
+   ```bash
+   kubectl delete namespace lab8
+   ```
 
 </details>
 :::

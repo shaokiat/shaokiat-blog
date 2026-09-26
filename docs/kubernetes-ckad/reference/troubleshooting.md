@@ -173,38 +173,84 @@ kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab13
-# apply the broken manifest
-kubectl -n lab13 apply -f broken.yaml
-# read the status: ErrImagePull / ImagePullBackOff
-kubectl -n lab13 get pods
-# read the first Pod's events: Failed to pull image "nginx:1.27-alpinee": not found (tag typo)
-kubectl -n lab13 describe pod -l app=web | grep -A3 Events -m1
-# fix the tag on the Deployment
-kubectl -n lab13 set image deployment/web nginx=nginx:1.27-alpine
+1. Create the lab namespace.
 
-# read the status again: CreateContainerConfigError
-kubectl -n lab13 get pods
-# find the message: configmap "web-config" not found (the ConfigMap is called web-conf)
-kubectl -n lab13 describe pod -l app=web | grep -i configmap
-# point the env var at the right ConfigMap
-kubectl -n lab13 patch deployment web --type=json \
-  -p '[{"op":"replace","path":"/spec/template/spec/containers/0/env/0/valueFrom/configMapKeyRef/name","value":"web-conf"}]'
-# wait for the fixed Pods
-kubectl -n lab13 rollout status deployment/web
+   ```bash
+   kubectl create namespace lab13
+   ```
 
-# call the Service: Connection refused
-kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
-# see why: app=webapp, Endpoints: <none>
-kubectl -n lab13 describe svc web | grep -E "Selector|Endpoints"
-# fix the selector; Verify now succeeds
-kubectl -n lab13 patch svc web -p '{"spec":{"selector":{"app":"web"}}}'
+2. Apply the broken manifest.
 
-# delete everything the lab created
-kubectl delete namespace lab13
-```
+   ```bash
+   kubectl -n lab13 apply -f broken.yaml
+   ```
+
+3. Read the status: ErrImagePull / ImagePullBackOff.
+
+   ```bash
+   kubectl -n lab13 get pods
+   ```
+
+4. Read the first Pod's events: Failed to pull image `nginx:1.27-alpinee`: not found (tag typo).
+
+   ```bash
+   kubectl -n lab13 describe pod -l app=web | grep -A3 Events -m1
+   ```
+
+5. Fix the tag on the Deployment.
+
+   ```bash
+   kubectl -n lab13 set image deployment/web nginx=nginx:1.27-alpine
+   ```
+
+6. Read the status again: CreateContainerConfigError.
+
+   ```bash
+   kubectl -n lab13 get pods
+   ```
+
+7. Find the message: configmap "web-config" not found (the ConfigMap is called web-conf).
+
+   ```bash
+   kubectl -n lab13 describe pod -l app=web | grep -i configmap
+   ```
+
+8. Point the env var at the right ConfigMap.
+
+   ```bash
+   kubectl -n lab13 patch deployment web --type=json \
+     -p '[{"op":"replace","path":"/spec/template/spec/containers/0/env/0/valueFrom/configMapKeyRef/name","value":"web-conf"}]'
+   ```
+
+9. Wait for the fixed Pods.
+
+   ```bash
+   kubectl -n lab13 rollout status deployment/web
+   ```
+
+10. Call the Service: Connection refused.
+
+    ```bash
+    kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
+    ```
+
+11. See why: `app=webapp`, Endpoints: `<none>`.
+
+    ```bash
+    kubectl -n lab13 describe svc web | grep -E "Selector|Endpoints"
+    ```
+
+12. Fix the selector; Verify now succeeds.
+
+    ```bash
+    kubectl -n lab13 patch svc web -p '{"spec":{"selector":{"app":"web"}}}'
+    ```
+
+13. Delete everything the lab created.
+
+    ```bash
+    kubectl delete namespace lab13
+    ```
 
 </details>
 :::

@@ -167,34 +167,67 @@ kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab1
-# create a Deployment with 3 replicas
-kubectl -n lab1 create deployment web --image=nginx --replicas=3
+1. Create the lab namespace.
 
-# stream Pod changes in the background
-kubectl -n lab1 get pods -w &
-# delete one Pod to trigger a replacement
-kubectl -n lab1 delete pod "$(kubectl -n lab1 get pods -o name | head -n 1)"
-# stop the background watch
-kill %1
-# list recent events in time order; the source column names each component
-kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
-#   SuccessfulCreate  replicaset-controller  Created pod: web-...   <- controller-manager
-#   Scheduled         default-scheduler      Assigned ... to node   <- scheduler
-#   Pulled / Started  kubelet                                       <- kubelet
+   ```bash
+   kubectl create namespace lab1
+   ```
 
-# scale the ReplicaSet directly, behind the Deployment's back
-kubectl -n lab1 scale rs "$(kubectl -n lab1 get rs -o name | head -n 1)" --replicas=5
-# watch the replica count
-kubectl -n lab1 get rs -w
-#   It jumps to 5, then the Deployment controller scales it back to 3.
-#   The Deployment owns the ReplicaSet's replica count, just as the ReplicaSet owns its Pods.
+2. Create a Deployment with 3 replicas.
 
-# delete everything the lab created
-kubectl delete namespace lab1
-```
+   ```bash
+   kubectl -n lab1 create deployment web --image=nginx --replicas=3
+   ```
+
+3. Stream Pod changes in the background.
+
+   ```bash
+   kubectl -n lab1 get pods -w &
+   ```
+
+4. Delete one Pod to trigger a replacement.
+
+   ```bash
+   kubectl -n lab1 delete pod "$(kubectl -n lab1 get pods -o name | head -n 1)"
+   ```
+
+5. Stop the background watch.
+
+   ```bash
+   kill %1
+   ```
+
+6. List recent events in time order; the source column names each component.
+
+   ```bash
+   kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
+   ```
+
+   ```text
+   SuccessfulCreate  replicaset-controller  Created pod: web-...   <- controller-manager
+   Scheduled         default-scheduler      Assigned ... to node   <- scheduler
+   Pulled / Started  kubelet                                       <- kubelet
+   ```
+
+7. Scale the ReplicaSet directly, behind the Deployment's back.
+
+   ```bash
+   kubectl -n lab1 scale rs "$(kubectl -n lab1 get rs -o name | head -n 1)" --replicas=5
+   ```
+
+8. Watch the replica count.
+
+   ```bash
+   kubectl -n lab1 get rs -w
+   ```
+
+   It jumps to 5, then the Deployment controller scales it back to 3. The Deployment owns the ReplicaSet's replica count, just as the ReplicaSet owns its Pods.
+
+9. Delete everything the lab created.
+
+   ```bash
+   kubectl delete namespace lab1
+   ```
 
 </details>
 :::

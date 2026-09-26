@@ -167,58 +167,103 @@ helm history web -n lab6-helm                                  # 3 revisions, th
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the directory layout and enter it
-mkdir -p app/base app/overlays/prod && cd app
-# write the base Deployment; it reads every key of web-config as env vars
-cat > base/deployment.yaml <<'EOF'
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: web
-spec:
-  replicas: 1
-  selector:
-    matchLabels: {app: web}
-  template:
-    metadata:
-      labels: {app: web}
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.27
-        envFrom:
-        - configMapRef: {name: web-config}
-EOF
-# (write base/kustomization.yaml as shown above)
-# (write overlays/prod/kustomization.yaml as shown above, but with namespace: lab6)
+1. Create the directory layout and enter it.
 
-# create the target namespace
-kubectl create namespace lab6
-# render the overlay without applying: names prefixed, configMapRef rewritten to the hashed name
-kubectl kustomize overlays/prod | less
-# apply the rendered overlay
-kubectl apply -k overlays/prod
+   ```bash
+   mkdir -p app/base app/overlays/prod && cd app
+   ```
 
-# (edit the overlay: change LOG_LEVEL=info to LOG_LEVEL=warn)
-# apply again
-kubectl apply -k overlays/prod
-# list ReplicaSets: a new one appeared
-kubectl -n lab6 get rs
-#   The ConfigMap name (hash) changed, so the Pod template changed, so a rollout happened.
+2. Write the base Deployment; it reads every key of web-config as env vars.
 
-# install the chart as release "web" with 2 replicas (needs: helm repo add podinfo https://stefanprodan.github.io/podinfo)
-helm install web podinfo/podinfo -n lab6-helm --create-namespace --set replicaCount=2
-# upgrade, keeping the earlier values and adding a message
-helm upgrade web podinfo/podinfo -n lab6-helm --reuse-values --set ui.message=hello
-# roll back to revision 1
-helm rollback web 1 -n lab6-helm
-# list the release's revisions
-helm history web -n lab6-helm
+   ```bash
+   cat > base/deployment.yaml <<'EOF'
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: web
+   spec:
+     replicas: 1
+     selector:
+       matchLabels: {app: web}
+     template:
+       metadata:
+         labels: {app: web}
+       spec:
+         containers:
+         - name: nginx
+           image: nginx:1.27
+           envFrom:
+           - configMapRef: {name: web-config}
+   EOF
+   ```
 
-# delete everything the lab created
-kubectl delete namespace lab6 lab6-helm
-```
+3. Write `base/kustomization.yaml` as shown above.
+
+4. Write `overlays/prod/kustomization.yaml` as shown above, but with `namespace: lab6`.
+
+5. Create the target namespace.
+
+   ```bash
+   kubectl create namespace lab6
+   ```
+
+6. Render the overlay without applying: names prefixed, configMapRef rewritten to the hashed name.
+
+   ```bash
+   kubectl kustomize overlays/prod | less
+   ```
+
+7. Apply the rendered overlay.
+
+   ```bash
+   kubectl apply -k overlays/prod
+   ```
+
+8. Edit the overlay: change `LOG_LEVEL=info` to `LOG_LEVEL=warn`.
+
+9. Apply again.
+
+   ```bash
+   kubectl apply -k overlays/prod
+   ```
+
+10. List ReplicaSets: a new one appeared.
+
+    ```bash
+    kubectl -n lab6 get rs
+    ```
+
+    The ConfigMap name (hash) changed, so the Pod template changed, so a rollout happened.
+
+11. Install the chart as release "web" with 2 replicas (needs: helm repo add podinfo https://stefanprodan.github.io/podinfo).
+
+    ```bash
+    helm install web podinfo/podinfo -n lab6-helm --create-namespace --set replicaCount=2
+    ```
+
+12. Upgrade, keeping the earlier values and adding a message.
+
+    ```bash
+    helm upgrade web podinfo/podinfo -n lab6-helm --reuse-values --set ui.message=hello
+    ```
+
+13. Roll back to revision 1.
+
+    ```bash
+    helm rollback web 1 -n lab6-helm
+    ```
+
+14. List the release's revisions.
+
+    ```bash
+    helm history web -n lab6-helm
+    ```
+
+15. Delete everything the lab created.
+
+    ```bash
+    kubectl delete namespace lab6 lab6-helm
+    ```
 
 </details>
 :::

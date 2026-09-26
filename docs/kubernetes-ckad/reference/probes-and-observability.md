@@ -187,48 +187,68 @@ kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab12
-# create the Pod: two marker files, a readiness probe on one, a liveness probe on the other
-kubectl -n lab12 apply -f - <<'EOF'
-apiVersion: v1
-kind: Pod
-metadata:
-  name: probe
-  labels: {app: probe}
-spec:
-  containers:
-  - name: app
-    image: busybox:1.36
-    command: ["sh", "-c", "touch /tmp/healthy /tmp/ready; sleep 3600"]
-    readinessProbe:
-      exec: {command: ["cat", "/tmp/ready"]}
-      periodSeconds: 5
-    livenessProbe:
-      exec: {command: ["cat", "/tmp/healthy"]}
-      periodSeconds: 5
-EOF
-# give it a Service so it has an endpoint to lose
-kubectl -n lab12 expose pod probe --port=80
-# wait until both probes pass
-kubectl -n lab12 wait --for=condition=Ready pod/probe
+1. Create the lab namespace.
 
-# make readiness fail
-kubectl -n lab12 exec probe -- rm /tmp/ready
-#   ~15s later (3 failures × 5s): READY 0/1, RESTARTS 0. The endpoint is marked not ready:
-#   no traffic, no restart.
+   ```bash
+   kubectl create namespace lab12
+   ```
 
-# make liveness fail
-kubectl -n lab12 exec probe -- rm /tmp/healthy
-#   ~15s later: events show "Liveness probe failed" then "Killing".
-#   RESTARTS only ticks up ~30s after that: sh runs as PID 1 and ignores SIGTERM, so the kubelet
-#   waits out terminationGracePeriodSeconds (30s) before SIGKILL. Real apps must handle SIGTERM.
-#   The restarted container recreates both files and becomes Ready again.
+2. Create the Pod: two marker files, a readiness probe on one, a liveness probe on the other.
 
-# delete everything the lab created
-kubectl delete namespace lab12
-```
+   ```bash
+   kubectl -n lab12 apply -f - <<'EOF'
+   apiVersion: v1
+   kind: Pod
+   metadata:
+     name: probe
+     labels: {app: probe}
+   spec:
+     containers:
+     - name: app
+       image: busybox:1.36
+       command: ["sh", "-c", "touch /tmp/healthy /tmp/ready; sleep 3600"]
+       readinessProbe:
+         exec: {command: ["cat", "/tmp/ready"]}
+         periodSeconds: 5
+       livenessProbe:
+         exec: {command: ["cat", "/tmp/healthy"]}
+         periodSeconds: 5
+   EOF
+   ```
+
+3. Give it a Service so it has an endpoint to lose.
+
+   ```bash
+   kubectl -n lab12 expose pod probe --port=80
+   ```
+
+4. Wait until both probes pass.
+
+   ```bash
+   kubectl -n lab12 wait --for=condition=Ready pod/probe
+   ```
+
+5. Make readiness fail.
+
+   ```bash
+   kubectl -n lab12 exec probe -- rm /tmp/ready
+   ```
+
+   ~15s later (3 failures × 5s): READY 0/1, RESTARTS 0. The endpoint is marked not ready: no traffic, no restart.
+
+6. Make liveness fail.
+
+   ```bash
+   kubectl -n lab12 exec probe -- rm /tmp/healthy
+   ```
+
+   ~15s later: events show "Liveness probe failed" then "Killing". RESTARTS only ticks up ~30s after that: sh runs as PID 1 and ignores SIGTERM, so the kubelet waits out terminationGracePeriodSeconds (30s) before SIGKILL. Real apps must handle SIGTERM. The restarted container recreates both files and becomes Ready again.
+
+7. Delete everything the lab created.
+
+   ```bash
+   kubectl delete namespace lab12
+   ```
 
 </details>
 :::

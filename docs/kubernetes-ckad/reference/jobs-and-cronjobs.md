@@ -158,29 +158,54 @@ kubectl -n lab3 get jobs
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab3
-# generate a CronJob manifest that runs every minute and sleeps 90s
-kubectl -n lab3 create cronjob slow --image=busybox:1.36 --schedule="* * * * *" \
-  --dry-run=client -o yaml -- sleep 90 > slow.yaml
-# (edit slow.yaml: add "concurrencyPolicy: Forbid" under spec:)
-# create the CronJob from the edited file
-kubectl -n lab3 apply -f slow.yaml
-# watch Jobs appear
-kubectl -n lab3 get jobs -w
-#   A 90s run spans two schedule ticks. Forbid skips every tick that finds a run active,
-#   so you see roughly one Job every 2 minutes.
+1. Create the lab namespace.
 
-# start a Job from the CronJob's template right now
-kubectl -n lab3 create job slow-manual --from=cronjob/slow
-#   Manual Jobs bypass concurrencyPolicy. That rule is the CronJob controller's, not the Job's.
+   ```bash
+   kubectl create namespace lab3
+   ```
 
-# pause the schedule without deleting the CronJob
-kubectl -n lab3 patch cronjob slow -p '{"spec":{"suspend":true}}'
-# delete everything the lab created
-kubectl delete namespace lab3
-```
+2. Generate a CronJob manifest that runs every minute and sleeps 90s.
+
+   ```bash
+   kubectl -n lab3 create cronjob slow --image=busybox:1.36 --schedule="* * * * *" \
+     --dry-run=client -o yaml -- sleep 90 > slow.yaml
+   ```
+
+3. Edit `slow.yaml`: add `concurrencyPolicy: Forbid` under `spec:`.
+
+4. Create the CronJob from the edited file.
+
+   ```bash
+   kubectl -n lab3 apply -f slow.yaml
+   ```
+
+5. Watch Jobs appear.
+
+   ```bash
+   kubectl -n lab3 get jobs -w
+   ```
+
+   A 90s run spans two schedule ticks. Forbid skips every tick that finds a run active, so you see roughly one Job every 2 minutes.
+
+6. Start a Job from the CronJob's template right now.
+
+   ```bash
+   kubectl -n lab3 create job slow-manual --from=cronjob/slow
+   ```
+
+   Manual Jobs bypass concurrencyPolicy. That rule is the CronJob controller's, not the Job's.
+
+7. Pause the schedule without deleting the CronJob.
+
+   ```bash
+   kubectl -n lab3 patch cronjob slow -p '{"spec":{"suspend":true}}'
+   ```
+
+8. Delete everything the lab created.
+
+   ```bash
+   kubectl delete namespace lab3
+   ```
 
 </details>
 :::

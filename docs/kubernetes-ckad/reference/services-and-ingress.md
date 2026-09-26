@@ -186,44 +186,98 @@ kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab10
-# run 2 agnhost Pods serving HTTP on 8080 (create deployment: the words after -- replace the entrypoint)
-kubectl -n lab10 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
-  --replicas=2 --port=8080 -- /agnhost netexec --http-port=8080
-# create a Service: port 80 on the Service, 8080 on the Pods
-kubectl -n lab10 expose deployment api --port=80 --target-port=8080
-# call it from a throwaway Pod: prints the serving Pod's name
-kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+1. Create the lab namespace.
 
-# break the selector with a typo
-kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"apii"}}}'
-# call it again: Connection refused, although DNS still resolves
-kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
-# see why: Endpoints: <none>
-kubectl -n lab10 describe svc api
-# the Pods are app=api; the selector says app=apii
-kubectl -n lab10 get pods --show-labels
+   ```bash
+   kubectl create namespace lab10
+   ```
 
-# fix the selector
-kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"api"}}}'
-# send traffic to a port nothing listens on
-kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":9090}]'
-# call it: also "Connection refused", but now describe svc lists endpoints; the Pod itself refuses
-kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
-# put targetPort back
-kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":8080}]'
+2. Run 2 agnhost Pods serving HTTP on 8080 (create deployment: the words after -- replace the entrypoint).
 
-# route shop.example.com/api to the Service
-kubectl -n lab10 create ingress shop --rule="shop.example.com/api*=api:80"
-# check the backends: api:80 (10.244.x.x:8080,...)
-kubectl -n lab10 describe ingress shop
-#   Traffic flows only once an Ingress controller is installed (on kind, see kind's ingress guide).
+   ```bash
+   kubectl -n lab10 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
+     --replicas=2 --port=8080 -- /agnhost netexec --http-port=8080
+   ```
 
-# delete everything the lab created
-kubectl delete namespace lab10
-```
+3. Create a Service: port 80 on the Service, 8080 on the Pods.
+
+   ```bash
+   kubectl -n lab10 expose deployment api --port=80 --target-port=8080
+   ```
+
+4. Call it from a throwaway Pod: prints the serving Pod's name.
+
+   ```bash
+   kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+   ```
+
+5. Break the selector with a typo.
+
+   ```bash
+   kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"apii"}}}'
+   ```
+
+6. Call it again: Connection refused, although DNS still resolves.
+
+   ```bash
+   kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+   ```
+
+7. See why: Endpoints: `<none>`.
+
+   ```bash
+   kubectl -n lab10 describe svc api
+   ```
+
+8. The Pods are `app=api`; the selector says `app=apii`.
+
+   ```bash
+   kubectl -n lab10 get pods --show-labels
+   ```
+
+9. Fix the selector.
+
+   ```bash
+   kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"api"}}}'
+   ```
+
+10. Send traffic to a port nothing listens on.
+
+    ```bash
+    kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":9090}]'
+    ```
+
+11. Call it: also "Connection refused", but now describe svc lists endpoints; the Pod itself refuses.
+
+    ```bash
+    kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+    ```
+
+12. Put targetPort back.
+
+    ```bash
+    kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":8080}]'
+    ```
+
+13. Route shop.example.com/api to the Service.
+
+    ```bash
+    kubectl -n lab10 create ingress shop --rule="shop.example.com/api*=api:80"
+    ```
+
+14. Check the backends: api:80 (10.244.x.x:8080,...).
+
+    ```bash
+    kubectl -n lab10 describe ingress shop
+    ```
+
+    Traffic flows only once an Ingress controller is installed (on kind, see kind's ingress guide).
+
+15. Delete everything the lab created.
+
+    ```bash
+    kubectl delete namespace lab10
+    ```
 
 </details>
 :::

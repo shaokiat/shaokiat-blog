@@ -125,48 +125,112 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab0
-# create a Deployment with 3 replicas of nginx
-kubectl -n lab0 create deployment web --image=nginx:1.27 --replicas=3
-# wait until all 3 Pods are Ready
-kubectl -n lab0 rollout status deployment/web
+1. Create the lab namespace.
 
-# stream Pod changes in the background so you see the replacement appear
-kubectl -n lab0 get pods -w &
-# delete the first Pod; the ReplicaSet controller sees 2 of 3 and creates one (step 3 of the chain)
-kubectl -n lab0 delete "$(kubectl -n lab0 get pods -o name | head -n 1)"
-# stop the background watch
-kill %1
+   ```bash
+   kubectl create namespace lab0
+   ```
 
-# show which object owns a Pod
-kubectl -n lab0 describe "$(kubectl -n lab0 get pods -o name | head -n 1)" | grep "Controlled By"
-#   Controlled By:  ReplicaSet/web-69c6f74b8b
-# show which object owns the ReplicaSet
-kubectl -n lab0 describe rs | grep "Controlled By"
-#   Controlled By:  Deployment/web
+2. Create a Deployment with 3 replicas of nginx.
 
-# create a Service that selects the Deployment's Pods by label (step 6)
-kubectl -n lab0 expose deployment web --port=80
-# list the Pod IPs the Service found
-kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web
-#   web-pz927   IPv4   80   10.244.0.8,10.244.0.5,10.244.0.6
+   ```bash
+   kubectl -n lab0 create deployment web --image=nginx:1.27 --replicas=3
+   ```
 
-# point the Service at a label no Pod carries
-kubectl -n lab0 patch service web -p '{"spec":{"selector":{"app":"wrong"}}}'
-# confirm the selector changed and the endpoints emptied
-kubectl -n lab0 describe svc web | grep -E "Selector|Endpoints"
-#   Selector:   app=wrong
-#   Endpoints:              <- empty: no Pod carries app=wrong
-# call the Service from a throwaway Pod
-kubectl -n lab0 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
-#   wget: can't connect to remote host (...): Connection refused
-#   The Pods are fine and the Service exists. Only the label link is gone.
+3. Wait until all 3 Pods are Ready.
 
-# delete everything the lab created
-kubectl delete namespace lab0
-```
+   ```bash
+   kubectl -n lab0 rollout status deployment/web
+   ```
+
+4. Stream Pod changes in the background so you see the replacement appear.
+
+   ```bash
+   kubectl -n lab0 get pods -w &
+   ```
+
+5. Delete the first Pod; the ReplicaSet controller sees 2 of 3 and creates one (step 3 of the chain).
+
+   ```bash
+   kubectl -n lab0 delete "$(kubectl -n lab0 get pods -o name | head -n 1)"
+   ```
+
+6. Stop the background watch.
+
+   ```bash
+   kill %1
+   ```
+
+7. Show which object owns a Pod.
+
+   ```bash
+   kubectl -n lab0 describe "$(kubectl -n lab0 get pods -o name | head -n 1)" | grep "Controlled By"
+   ```
+
+   ```text
+   Controlled By:  ReplicaSet/web-69c6f74b8b
+   ```
+
+8. Show which object owns the ReplicaSet.
+
+   ```bash
+   kubectl -n lab0 describe rs | grep "Controlled By"
+   ```
+
+   ```text
+   Controlled By:  Deployment/web
+   ```
+
+9. Create a Service that selects the Deployment's Pods by label (step 6).
+
+   ```bash
+   kubectl -n lab0 expose deployment web --port=80
+   ```
+
+10. List the Pod IPs the Service found.
+
+    ```bash
+    kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web
+    ```
+
+    ```text
+    web-pz927   IPv4   80   10.244.0.8,10.244.0.5,10.244.0.6
+    ```
+
+11. Point the Service at a label no Pod carries.
+
+    ```bash
+    kubectl -n lab0 patch service web -p '{"spec":{"selector":{"app":"wrong"}}}'
+    ```
+
+12. Confirm the selector changed and the endpoints emptied.
+
+    ```bash
+    kubectl -n lab0 describe svc web | grep -E "Selector|Endpoints"
+    ```
+
+    ```text
+    Selector:   app=wrong
+    Endpoints:              <- empty: no Pod carries app=wrong
+    ```
+
+13. Call the Service from a throwaway Pod.
+
+    ```bash
+    kubectl -n lab0 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
+    ```
+
+    ```text
+    wget: can't connect to remote host (...): Connection refused
+    ```
+
+    The Pods are fine and the Service exists. Only the label link is gone.
+
+14. Delete everything the lab created.
+
+    ```bash
+    kubectl delete namespace lab0
+    ```
 
 </details>
 :::

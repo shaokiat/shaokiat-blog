@@ -155,37 +155,89 @@ k -n lab14 get cronjob tick
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the namespace and make it the default for every command below
-k create namespace lab14 && k config set-context --current --namespace=lab14
-# 1. a Pod with a label
-k run nginx --image=nginx:1.27 --labels=tier=web
-# 2. a Deployment with 3 replicas
-k create deployment api --image=nginx:1.27 --replicas=3 --port=80
-# 2. a ClusterIP Service in front of it
-k expose deployment api --port=80
-# 3. a ConfigMap with one key
-k create configmap cfg --from-literal=MODE=prod
-# 3. inject it into the Deployment as env vars
-k set env deployment/api --from=configmap/cfg
-# 4. scale to 5
-k scale deployment api --replicas=5
-# 4. ship a new image
-k set image deployment/api nginx=nginx:1.28
-# 4. roll it back
-k rollout undo deployment/api
-# 5. a one-off Job
-k create job once --image=busybox:1.36 -- echo done
-# 6. a CronJob every 5 minutes
-k create cronjob tick --image=busybox:1.36 --schedule="*/5 * * * *" -- date
-# 7. one line per Pod: name and node
-k get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
-# 8. every container image, counted
-k get pods -o jsonpath='{.items[*].spec.containers[*].image}' | tr ' ' '\n' | sort | uniq -c
+1. Create the namespace and make it the default for every command below.
 
-# switch the default back and delete everything the lab created
-k config set-context --current --namespace=default && k delete namespace lab14
-```
+   ```bash
+   k create namespace lab14 && k config set-context --current --namespace=lab14
+   ```
+
+2. A Pod with a label.
+
+   ```bash
+   k run nginx --image=nginx:1.27 --labels=tier=web
+   ```
+
+3. A Deployment with 3 replicas.
+
+   ```bash
+   k create deployment api --image=nginx:1.27 --replicas=3 --port=80
+   ```
+
+4. A ClusterIP Service in front of it.
+
+   ```bash
+   k expose deployment api --port=80
+   ```
+
+5. A ConfigMap with one key.
+
+   ```bash
+   k create configmap cfg --from-literal=MODE=prod
+   ```
+
+6. Inject it into the Deployment as env vars.
+
+   ```bash
+   k set env deployment/api --from=configmap/cfg
+   ```
+
+7. Scale to 5.
+
+   ```bash
+   k scale deployment api --replicas=5
+   ```
+
+8. Ship a new image.
+
+   ```bash
+   k set image deployment/api nginx=nginx:1.28
+   ```
+
+9. Roll it back.
+
+   ```bash
+   k rollout undo deployment/api
+   ```
+
+10. A one-off Job.
+
+    ```bash
+    k create job once --image=busybox:1.36 -- echo done
+    ```
+
+11. A CronJob every 5 minutes.
+
+    ```bash
+    k create cronjob tick --image=busybox:1.36 --schedule="*/5 * * * *" -- date
+    ```
+
+12. One line per Pod: name and node.
+
+    ```bash
+    k get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
+    ```
+
+13. Every container image, counted.
+
+    ```bash
+    k get pods -o jsonpath='{.items[*].spec.containers[*].image}' | tr ' ' '\n' | sort | uniq -c
+    ```
+
+14. Switch the default back and delete everything the lab created.
+
+    ```bash
+    k config set-context --current --namespace=default && k delete namespace lab14
+    ```
 
 </details>
 :::

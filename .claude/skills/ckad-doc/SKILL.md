@@ -81,7 +81,19 @@ See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Ho
 <details>
 <summary>🟢 Guided</summary>
 
-(bash block: a `# comment` line above every command saying what it does; expected output as `#   ` lines after it; creates the namespace first, ends with kubectl delete namespace lab5)
+1. One sentence saying what this step does.
+
+   ```bash
+   one command (heredocs and continuation lines stay in one block)
+   ```
+
+   ```text
+   literal output the reader should see, captured from a real run
+   ```
+
+   Prose for anything that explains rather than shows.
+
+(Step 1 creates the namespace; the last step is kubectl delete namespace lab5. File edits are text-only steps: "Edit `slow.yaml`: add `concurrencyPolicy: Forbid` under `spec:`.")
 
 </details>
 :::
@@ -110,5 +122,6 @@ Labs must run on a plain kind cluster. Difficulty: ★ recall, ★★ apply, ★
 
 - Write as the candidate would say it out loud: concrete, first-person in interview blocks, trade-offs named.
 - Quote real error text in backticks; it is what the reader will search for.
+- Wrap every `<placeholder>` and output token such as `<none>` in backticks when it sits in prose. MDX parses a bare `<none>` as a JSX tag and the build fails.
 - First mention of a glossary term links to `start-here/glossary.md#<term>`. New terms get a row there with a `<Link id="term" />` anchor.
 - Cross-page links carry an anchor when a section exists (`./storage.md#access-modes`), so the reader lands on the answer.

@@ -164,32 +164,66 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
 <details>
 <summary>🟢 Guided</summary>
 
-```bash
-# create the lab namespace
-kubectl create namespace lab2
-# create the Pod from the manifest above, saved as pod.yaml
-kubectl -n lab2 apply -f pod.yaml
-# wait until the init container finished and both long-running containers are Ready
-kubectl -n lab2 wait --for=condition=Ready pod/web --timeout=60s
-# check the Pod: READY 2/2. The sidecar counts, the init container doesn't.
-kubectl -n lab2 get pod web
+1. Create the lab namespace.
 
-# fetch time.txt through the Pod IP; run it again 5+ seconds later and the time changes
-kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
-  wget -qO- "http://$(kubectl -n lab2 get pod web -o jsonpath='{.status.podIP}')/time.txt"
+   ```bash
+   kubectl create namespace lab2
+   ```
 
-# break the init container: replace its echo command with exit 1
-sed -i.bak 's#echo .*index.html#exit 1#' pod.yaml
-# Pod specs are mostly immutable, so delete and recreate the Pod
-kubectl -n lab2 replace --force -f pod.yaml
-# watch the status: Init:Error -> Init:CrashLoopBackOff. nginx never starts.
-kubectl -n lab2 get pod web -w
-# read the failing init container's output
-kubectl -n lab2 logs web -c init-page
+2. Create the Pod from the manifest above, saved as `pod.yaml`.
 
-# delete everything the lab created
-kubectl delete namespace lab2
-```
+   ```bash
+   kubectl -n lab2 apply -f pod.yaml
+   ```
+
+3. Wait until the init container finished and both long-running containers are Ready.
+
+   ```bash
+   kubectl -n lab2 wait --for=condition=Ready pod/web --timeout=60s
+   ```
+
+4. Check the Pod: READY 2/2. The sidecar counts, the init container doesn't.
+
+   ```bash
+   kubectl -n lab2 get pod web
+   ```
+
+5. Fetch `time.txt` through the Pod IP; run it again 5+ seconds later and the time changes.
+
+   ```bash
+   kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
+     wget -qO- "http://$(kubectl -n lab2 get pod web -o jsonpath='{.status.podIP}')/time.txt"
+   ```
+
+6. Break the init container: replace its echo command with exit 1.
+
+   ```bash
+   sed -i.bak 's#echo .*index.html#exit 1#' pod.yaml
+   ```
+
+7. Pod specs are mostly immutable, so delete and recreate the Pod.
+
+   ```bash
+   kubectl -n lab2 replace --force -f pod.yaml
+   ```
+
+8. Watch the status: Init:Error → Init:CrashLoopBackOff. nginx never starts.
+
+   ```bash
+   kubectl -n lab2 get pod web -w
+   ```
+
+9. Read the failing init container's output.
+
+   ```bash
+   kubectl -n lab2 logs web -c init-page
+   ```
+
+10. Delete everything the lab created.
+
+    ```bash
+    kubectl delete namespace lab2
+    ```
 
 </details>
 :::
