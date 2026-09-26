@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Probe timeline: the startup probe fails until the app is up, then readiness and liveness begin; a readiness failure removes the Pod from Service endpoints without restarting it; three liveness failures make the kubelet restart the container">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="960" height="380" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">ONE CONTAINER&#x27;S LIFE · TIME →</text>
+  <text x="30" y="88" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">startupProbe</text>
+  <text x="30" y="104" text-anchor="start" font-size="11" fill="#4a5568">gates the other two</text>
+  <text x="30" y="158" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">readinessProbe</text>
+  <text x="30" y="174" text-anchor="start" font-size="11" fill="#4a5568">controls traffic</text>
+  <text x="30" y="228" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">livenessProbe</text>
+  <text x="30" y="244" text-anchor="start" font-size="11" fill="#4a5568">controls restarts</text>
+  <text x="30" y="298" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">In Service endpoints?</text>
+  <text x="30" y="314" text-anchor="start" font-size="11" fill="#4a5568">result of readiness</text>
+  <rect x="220" y="76" width="180" height="28" rx="6" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.2"/><text x="310" y="94" text-anchor="middle" font-size="10.5" font-weight="600" fill="#52606d">failing, within 30 × 10s budget</text>
+  <rect x="400" y="76" width="40" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="420" y="94" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">pass</text>
+  <text x="450" y="94" text-anchor="start" font-size="11" fill="#4a5568">stops after first success</text>
+  <rect x="870" y="76" width="80" height="28" rx="6" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.2"/><text x="910" y="94" text-anchor="middle" font-size="10.5" font-weight="600" fill="#52606d">again</text>
+  <rect x="220" y="146" width="180" height="28" rx="6" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/><text x="310" y="164" text-anchor="middle" font-size="10.5" font-weight="600" fill="#4a5568">not run yet</text>
+  <rect x="400" y="146" width="160" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="480" y="164" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">passing</text>
+  <rect x="560" y="146" width="100" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/><text x="610" y="164" text-anchor="middle" font-size="10.5" font-weight="600" fill="#713f12">failing</text>
+  <rect x="660" y="146" width="200" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="760" y="164" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">passing</text>
+  <rect x="870" y="146" width="80" height="28" rx="6" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <rect x="220" y="216" width="180" height="28" rx="6" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/><text x="310" y="234" text-anchor="middle" font-size="10.5" font-weight="600" fill="#4a5568">not run yet</text>
+  <rect x="400" y="216" width="370" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="585" y="234" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">passing</text>
+  <rect x="770" y="216" width="90" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/><text x="815" y="234" text-anchor="middle" font-size="10.5" font-weight="600" fill="#713f12">3 failures</text>
+  <rect x="870" y="216" width="80" height="28" rx="6" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <rect x="220" y="286" width="180" height="28" rx="6" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.2"/><text x="310" y="304" text-anchor="middle" font-size="10.5" font-weight="600" fill="#52606d">no traffic</text>
+  <rect x="400" y="286" width="160" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="480" y="304" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">receiving traffic</text>
+  <rect x="560" y="286" width="100" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/><text x="610" y="304" text-anchor="middle" font-size="10.5" font-weight="600" fill="#713f12">removed</text>
+  <rect x="660" y="286" width="200" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="760" y="304" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">receiving traffic</text>
+  <rect x="870" y="286" width="80" height="28" rx="6" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.2"/><text x="910" y="304" text-anchor="middle" font-size="10.5" font-weight="600" fill="#52606d">no traffic</text>
+  <line x1="400" y1="52" x2="400" y2="330" stroke="#3a6f9a" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <line x1="865" y1="52" x2="865" y2="330" stroke="#d97706" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="400" y="48" text-anchor="middle" font-size="11" fill="#1e3a4f" font-weight="600">startup passes</text>
+  <text x="865" y="48" text-anchor="end" font-size="11" fill="#713f12" font-weight="600">kubelet restarts the container</text>
+  <text x="610" y="350" text-anchor="middle" font-size="11" fill="#713f12">Readiness fails → removed, not restarted</text>
+  <text x="950" y="350" text-anchor="end" font-size="11" fill="#713f12">Liveness fails → restarted</text>
+  <polyline points="220,372 950,372" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="220" y="366" text-anchor="start" font-size="10" fill="#52606d">container starts</text>
+</svg>
