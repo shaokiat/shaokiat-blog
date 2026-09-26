@@ -1,14 +1,14 @@
 ---
 title: "Local Setup: kind & kubectl"
 sidebar_label: Local Setup
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Local Setup: kind & kubectl
 
 > Docs: [kind quick start](https://kind.sigs.k8s.io/docs/user/quick-start/) · [Install kubectl](https://kubernetes.io/docs/tasks/tools/) · [Organizing cluster access with kubeconfig](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/)
 
-Every Lab in this section assumes the setup below. Terms are defined in the [Glossary](./glossary.md).
+Every Lab in this section assumes the setup below. Do it once, then read [Command Patterns](./command-patterns.md) for the commands the labs use. Terms are defined in the [Glossary](./glossary.md).
 
 ## Standard lab setup
 
@@ -33,30 +33,36 @@ Every Lab in this section assumes the setup below. Terms are defined in the [Glo
    kubectl get nodes
    ```
 
-3. **Create a lab namespace and make it the default.** It isolates the lab, cleans up in one command, and saves typing `-n`.
+3. **Give each lab its own namespace.** Every lab names one (`lab0`, `lab5`…). It isolates the lab and cleans up in one command. The Guided tier passes `-n lab<N>` on every command; to save typing, make it the default instead.
 
    ```bash
-   kubectl create namespace lab1
-   kubectl config set-context --current --namespace=lab1
+   kubectl create namespace lab5
+   kubectl config set-context --current --namespace=lab5    # optional: now -n can be dropped
    ```
 
-4. **Generate YAML, then apply it.** Faster and less error-prone than typing manifests by hand.
+4. **Clean up.** Delete the namespace to reset one lab. Delete the cluster to remove everything, including its context.
 
    ```bash
-   kubectl create deployment web --image=nginx:1.27 --dry-run=client -o yaml > web.yaml
-   kubectl apply -f web.yaml
-   ```
-
-5. **Clean up.** Delete the namespace to reset one lab. Delete the cluster to remove everything, including its context.
-
-   ```bash
-   kubectl delete namespace lab1
+   kubectl delete namespace lab5
+   kubectl config set-context --current --namespace=default # if you changed it in step 3
    kind delete cluster --name ckad
    ```
 
 :::tip
 Always check `kubectl config current-context` before destructive commands.
 :::
+
+## Lab tiers
+
+Every Lab is written once and read at three levels. Pick one per lab; drop a level when a lab feels easy.
+
+| Tier | What you use | Use it when |
+|---|---|---|
+| 🔴 **Challenge** | Only **Goal** and **Verify** | You could do this in the exam. Time yourself. |
+| 🟡 **Hints** | Goal, Verify, and the collapsed **🟡 Hints**: which command family or `-h` to look at, never the full command | You know the concept but not the commands yet |
+| 🟢 **Guided** | The collapsed **🟢 Guided** block: every command, each with a one-line comment saying what it does | First contact with a topic |
+
+The Guided commands come from [Command Patterns](./command-patterns.md). Once you can predict each one before reading it, move up a tier.
 
 ## Context vs Namespace
 
@@ -65,6 +71,21 @@ Always check `kubectl config current-context` before destructive commands.
 | **Lives in** | Your laptop (kubeconfig) | The cluster (etcd) |
 | **Holds** | Cluster address, credentials, default namespace | Namespaced objects: Deployments, Pods, Services, ConfigMaps… |
 | **Deleting it** | Removes the shortcut only. The cluster is unaffected. | Deletes everything inside it. |
+
+### What a namespace isolates
+
+| Isolated | Not isolated |
+|---|---|
+| Resource names: two `web` Deployments can coexist in different namespaces | Network traffic: open across namespaces by default |
+| RBAC: Role and RoleBinding | Nodes and the kernel |
+| ResourceQuota and LimitRange | Cluster-scoped resources |
+| References: Pods can only use ConfigMaps, Secrets, ServiceAccounts and PVCs from their own namespace | Cluster admins |
+| NetworkPolicy scope | |
+| Lifecycle: deleting the namespace deletes everything in it | |
+
+A namespace is a boundary for names, access and quotas, not a security wall. Combine it with RBAC, NetworkPolicy, quotas and Pod Security admission. → See [Multi-Tenant Platform](../scenarios/multi-tenant-platform.md).
+
+Which namespace a command uses: → [Command Patterns](./command-patterns.md#which-namespace-does-my-command-use). DNS across namespaces: → [DNS names](../reference/services-and-ingress.md#dns-names).
 
 ## Who manages what
 

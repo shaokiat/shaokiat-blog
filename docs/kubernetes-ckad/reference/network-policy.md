@@ -134,11 +134,13 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 11-1 ★★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Lock a namespace down, then open exactly one path.**
 
 kind's default CNI (kindnet) enforces NetworkPolicy. On minikube, start with `--cni=calico`.
+
+**Goal**
 
 1. In namespace `lab11`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, command `/agnhost netexec --http-port=8080`) and a Service `api` on port 80 → 8080.
 2. Confirm a Pod labelled `app=frontend` and an unlabelled Pod can both reach `http://api/hostname`.
@@ -153,23 +155,46 @@ kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. Same as Lab 10-1 steps 1–2.
+2. `kubectl run -h`: `-l` sets labels on the Pod you run.
+3. There's no NetworkPolicy generator. Save the skeletons above as files. With egress denied, what does a Pod need before it can even find `api`?
+4. `kubectl apply -f` accepts several `-f` flags. A connection needs an egress allow on the client **and** an ingress allow on the server.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab11
+# run agnhost serving HTTP on 8080
 kubectl -n lab11 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
   --port=8080 -- /agnhost netexec --http-port=8080
+# put a Service in front: 80 -> 8080
 kubectl -n lab11 expose deployment api --port=80 --target-port=8080
-# step 2: both Verify commands succeed
-
-kubectl -n lab11 apply -f default-deny.yaml
+# call it as a frontend-labelled Pod: works
 kubectl -n lab11 run fe --rm -it --image=busybox:1.36 --restart=Never -l app=frontend -- wget -qO- -T 3 http://api/hostname
-# wget: download timed out. It never got past DNS: egress to kube-dns is denied too.
-# nslookup api fails the same way ("no servers could be reached").
+# call it as an unlabelled Pod: also works, because nothing is denied yet
+kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
 
-kubectl -n lab11 apply -f allow-dns.yaml -f allow-frontend.yaml   # allow-frontend.yaml holds both policies
-# run both Verify commands: frontend succeeds, the unlabelled Pod times out
+# deny all ingress and egress for every Pod (the default-deny skeleton above, saved as default-deny.yaml)
+kubectl -n lab11 apply -f default-deny.yaml
+# try the frontend again
+kubectl -n lab11 run fe --rm -it --image=busybox:1.36 --restart=Never -l app=frontend -- wget -qO- -T 3 http://api/hostname
+#   wget: download timed out. It never got past DNS: egress to kube-dns is denied too.
+#   nslookup api fails the same way ("no servers could be reached").
 
+# allow DNS, and the frontend -> api path in both directions (allow-frontend.yaml holds both of those policies)
+kubectl -n lab11 apply -f allow-dns.yaml -f allow-frontend.yaml
+# frontend: succeeds
+kubectl -n lab11 run fe --rm -it --image=busybox:1.36 --restart=Never -l app=frontend -- wget -qO- -T 3 http://api/hostname
+# unlabelled Pod: times out, because only app=frontend is allowed in
+kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+
+# delete everything the lab created
 kubectl delete namespace lab11
 ```
 

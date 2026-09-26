@@ -157,11 +157,13 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 8-1 ★★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Quota, defaults, then autoscaling under load.**
 
 Needs metrics-server. On kind: `kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml`, then add `--kubelet-insecure-tls` to its args.
+
+**Goal**
 
 1. In namespace `lab8`, create the LimitRange and ResourceQuota above.
 2. Create Deployment `web` (`registry.k8s.io/hpa-example`, port 80) without any resources. Check which QoS class and requests its Pod got.
@@ -177,23 +179,41 @@ kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <u
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. No generator for LimitRange. Save both objects above in one file, separated by `---`, and apply it.
+2. The QoS class is in the Pod's `.status.qosClass`. Resources it didn't ask for came from the LimitRange.
+3. "Autoscale" in [Command Patterns](../start-here/command-patterns.md#configure-it).
+4. A busybox loop calling `wget` against the Service makes load. Watch with `kubectl get hpa -w`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab8
-kubectl -n lab8 apply -f limits.yaml             # the LimitRange + ResourceQuota above
+# create the LimitRange and ResourceQuota above, saved together as limits.yaml
+kubectl -n lab8 apply -f limits.yaml
+# create the CPU-heavy app with no resources set
 kubectl -n lab8 create deployment web --image=registry.k8s.io/hpa-example --port=80
-kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}{"\n"}'   # Burstable
+# read the Pod's QoS class: Burstable, because the LimitRange injected requests
+kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}{"\n"}'
+# put a Service in front of it
 kubectl -n lab8 expose deployment web --port=80
+# autoscale on 50% of the CPU request, between 1 and 5 replicas
 kubectl -n lab8 autoscale deployment web --min=1 --max=5 --cpu=50%
 
-# load generator in a second terminal; Ctrl-C to stop
+# generate load from a second terminal; Ctrl-C to stop
 kubectl -n lab8 run load --rm -it --image=busybox:1.36 --restart=Never -- \
   sh -c 'while true; do wget -q -O- http://web; done'
 
-kubectl -n lab8 get hpa web -w                   # climbs above 50%, replicas grow within ~1 min
-# after stopping the load, scale-in waits for the 5-minute stabilization window
+# watch utilisation climb above 50% and replicas grow within about a minute
+kubectl -n lab8 get hpa web -w
+#   After stopping the load, scale-in waits for the 5-minute stabilization window.
 
+# delete everything the lab created
 kubectl delete namespace lab8
 ```
 

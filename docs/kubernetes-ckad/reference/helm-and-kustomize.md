@@ -135,9 +135,11 @@ patches:
 ## 🧪 Lab
 
 :::tip Lab 6-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **One base, two environments.**
+
+**Goal**
 
 1. Create `base/` with a Deployment `web` (`nginx:1.27`, 1 replica) that reads `LOG_LEVEL` from a generated ConfigMap `web-config`.
 2. Create `overlays/prod/` that sets namespace `lab6`, prefix `prod-`, 3 replicas, tag `1.28` and `LOG_LEVEL=info`.
@@ -153,10 +155,22 @@ helm history web -n lab6-helm                                  # 3 revisions, th
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. Generate the Deployment with `--dry-run=client -o yaml`, then add `envFrom` pointing at `web-config`. The ConfigMap comes from `configMapGenerator`, not from a file.
+2. The fields you need are in the Kustomize features table above: `namespace`, `namePrefix`, `replicas`, `images`, and a generator with `behavior: merge`.
+3. `kubectl kustomize <dir>` renders; `kubectl apply -k <dir>` applies. Compare the ConfigMap name before and after.
+4. `helm repo add`, then `helm install -h`, `helm upgrade --reuse-values`, `helm rollback`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the directory layout and enter it
 mkdir -p app/base app/overlays/prod && cd app
+# write the base Deployment; it reads every key of web-config as env vars
 cat > base/deployment.yaml <<'EOF'
 apiVersion: apps/v1
 kind: Deployment
@@ -176,24 +190,33 @@ spec:
         envFrom:
         - configMapRef: {name: web-config}
 EOF
-# base/kustomization.yaml: as shown above
-# overlays/prod/kustomization.yaml: as shown above, but with namespace: lab6
+# (write base/kustomization.yaml as shown above)
+# (write overlays/prod/kustomization.yaml as shown above, but with namespace: lab6)
 
+# create the target namespace
 kubectl create namespace lab6
-kubectl kustomize overlays/prod | less        # names prefixed, configMapRef rewritten to the hashed name
+# render the overlay without applying: names prefixed, configMapRef rewritten to the hashed name
+kubectl kustomize overlays/prod | less
+# apply the rendered overlay
 kubectl apply -k overlays/prod
 
-# change LOG_LEVEL=info to LOG_LEVEL=warn in the overlay, then:
+# (edit the overlay: change LOG_LEVEL=info to LOG_LEVEL=warn)
+# apply again
 kubectl apply -k overlays/prod
-kubectl -n lab6 get rs                        # a new ReplicaSet: the ConfigMap name (hash) changed,
-                                              # so the Pod template changed, so a rollout happened
+# list ReplicaSets: a new one appeared
+kubectl -n lab6 get rs
+#   The ConfigMap name (hash) changed, so the Pod template changed, so a rollout happened.
 
-# Helm part
+# install the chart as release "web" with 2 replicas (needs: helm repo add podinfo https://stefanprodan.github.io/podinfo)
 helm install web podinfo/podinfo -n lab6-helm --create-namespace --set replicaCount=2
+# upgrade, keeping the earlier values and adding a message
 helm upgrade web podinfo/podinfo -n lab6-helm --reuse-values --set ui.message=hello
+# roll back to revision 1
 helm rollback web 1 -n lab6-helm
+# list the release's revisions
 helm history web -n lab6-helm
 
+# delete everything the lab created
 kubectl delete namespace lab6 lab6-helm
 ```
 

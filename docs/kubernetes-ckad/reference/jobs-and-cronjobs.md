@@ -127,9 +127,11 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 3-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Watch `concurrencyPolicy: Forbid` skip a run.**
+
+**Goal**
 
 1. In namespace `lab3`, create a CronJob `slow` that runs every minute, sleeps 90 seconds, and uses `concurrencyPolicy: Forbid`.
 2. Watch Jobs for 4 minutes. Explain why there are fewer Jobs than minutes.
@@ -144,22 +146,39 @@ kubectl -n lab3 get jobs
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. `kubectl create cronjob -h`. The generator can't set `concurrencyPolicy`: [generate, edit, apply](../start-here/command-patterns.md#generate-edit-apply).
+2. `kubectl get jobs -w`. Compare each run's length with the schedule interval.
+3. `kubectl create job -h` has a `--from` flag.
+4. `suspend` is a boolean in the CronJob's spec. `kubectl patch` sets one field.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab3
+# generate a CronJob manifest that runs every minute and sleeps 90s
 kubectl -n lab3 create cronjob slow --image=busybox:1.36 --schedule="* * * * *" \
   --dry-run=client -o yaml -- sleep 90 > slow.yaml
-# add under spec:   concurrencyPolicy: Forbid
+# (edit slow.yaml: add "concurrencyPolicy: Forbid" under spec:)
+# create the CronJob from the edited file
 kubectl -n lab3 apply -f slow.yaml
+# watch Jobs appear
 kubectl -n lab3 get jobs -w
-# A 90s run spans two schedule ticks. Forbid skips every tick that finds a run active,
-# so you see roughly one Job every 2 minutes.
+#   A 90s run spans two schedule ticks. Forbid skips every tick that finds a run active,
+#   so you see roughly one Job every 2 minutes.
 
+# start a Job from the CronJob's template right now
 kubectl -n lab3 create job slow-manual --from=cronjob/slow
-# Manual Jobs bypass concurrencyPolicy. That rule is the CronJob controller's, not the Job's.
+#   Manual Jobs bypass concurrencyPolicy. That rule is the CronJob controller's, not the Job's.
 
+# pause the schedule without deleting the CronJob
 kubectl -n lab3 patch cronjob slow -p '{"spec":{"suspend":true}}'
+# delete everything the lab created
 kubectl delete namespace lab3
 ```
 

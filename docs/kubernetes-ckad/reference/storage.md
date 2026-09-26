@@ -114,9 +114,11 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 4-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Prove that data outlives the Pod.**
+
+**Goal**
 
 1. In namespace `lab4`, create the PVC `data` (1Gi, RWO). Check its status before any Pod uses it.
 2. Create the Pod `writer` above. Check the PVC again and find the PV it bound to.
@@ -133,24 +135,46 @@ kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. There's no PVC generator. Copy the skeleton above into `pvc.yaml`. `kubectl get storageclass` shows why it stays `Pending`.
+2. Save the `writer` Pod above as `writer.yaml`. The PVC's `VOLUME` column names the PV.
+3. Write a `reader` Pod that mounts claim `data` and runs `cat /data/log.txt`. `kubectl run --overrides` or a copy of `writer.yaml` both work.
+4. The PV is cluster-scoped, so no `-n`. The field is `spec.persistentVolumeReclaimPolicy`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab4
+# create the claim from the PVC skeleton above, saved as pvc.yaml
 kubectl -n lab4 apply -f pvc.yaml
-kubectl -n lab4 get pvc data            # Pending: kind's "standard" class is WaitForFirstConsumer
+# check it: Pending, because kind's "standard" class is WaitForFirstConsumer
+kubectl -n lab4 get pvc data
+# create the writer Pod from the manifest above, saved as writer.yaml
 kubectl -n lab4 apply -f writer.yaml
+# wait until the writer is running (this is what triggers provisioning)
 kubectl -n lab4 wait --for=condition=Ready pod/writer --timeout=90s
-kubectl -n lab4 get pvc data            # Bound, VOLUME shows the PV name
+# check again: Bound, and VOLUME shows the PV name
+kubectl -n lab4 get pvc data
 
+# delete the writer; the claim and its data stay
 kubectl -n lab4 delete pod writer
+# start a reader Pod that mounts the same claim and prints the file
 kubectl -n lab4 run reader --image=busybox:1.36 --restart=Never \
   --overrides='{"spec":{"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"data"}}],
   "containers":[{"name":"reader","image":"busybox:1.36","command":["cat","/data/log.txt"],
   "volumeMounts":[{"name":"data","mountPath":"/data"}]}]}}'
-kubectl -n lab4 logs reader             # the line writer appended
+# read what the reader printed: the line the writer appended
+kubectl -n lab4 logs reader
 
-# Reclaim policy is Delete: deleting the PVC deletes the PV and its data.
+# read the PV's reclaim policy: Delete, so deleting the PVC deletes the PV and its data
+kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')" \
+  -o jsonpath='{.spec.persistentVolumeReclaimPolicy}{"\n"}'
+# delete everything the lab created
 kubectl delete namespace lab4
 ```
 

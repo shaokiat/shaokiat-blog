@@ -131,9 +131,11 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 2-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Build a three-container Pod.**
+
+**Goal**
 
 1. In namespace `lab2`, create the Pod `web` above: an init container writes `index.html`, a native sidecar writes the time to `time.txt` every 5 seconds, and nginx serves both.
 2. Confirm the init container finished and the sidecar is still running.
@@ -150,22 +152,42 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. There's no generator for init containers or sidecars. Copy the manifest above into `pod.yaml` and apply it. `kubectl explain pod.spec.initContainers.restartPolicy` explains the sidecar field.
+2. `READY` counts app containers and native sidecars, not init containers. Init container state is under `.status.initContainerStatuses`.
+3. A Pod IP works without a Service: `-o jsonpath='{.status.podIP}'`.
+4. Most Pod fields are immutable, so edit the file and use `kubectl replace --force -f`. Read an init container's output with `kubectl logs <pod> -c <init-container>`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab2
-kubectl -n lab2 apply -f pod.yaml                  # the manifest above
+# create the Pod from the manifest above, saved as pod.yaml
+kubectl -n lab2 apply -f pod.yaml
+# wait until the init container finished and both long-running containers are Ready
 kubectl -n lab2 wait --for=condition=Ready pod/web --timeout=60s
-kubectl -n lab2 get pod web                        # READY 2/2. The sidecar counts, the init container doesn't.
+# check the Pod: READY 2/2. The sidecar counts, the init container doesn't.
+kubectl -n lab2 get pod web
 
-# 3. run the wget from Verify twice, 5+ seconds apart: the timestamp changes
+# fetch time.txt through the Pod IP; run it again 5+ seconds later and the time changes
+kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
+  wget -qO- "http://$(kubectl -n lab2 get pod web -o jsonpath='{.status.podIP}')/time.txt"
 
-# 4. break the init container. Pod specs are mostly immutable, so replace the Pod.
+# break the init container: replace its echo command with exit 1
 sed -i.bak 's#echo .*index.html#exit 1#' pod.yaml
+# Pod specs are mostly immutable, so delete and recreate the Pod
 kubectl -n lab2 replace --force -f pod.yaml
-kubectl -n lab2 get pod web -w                     # Init:Error -> Init:CrashLoopBackOff. nginx never starts.
+# watch the status: Init:Error -> Init:CrashLoopBackOff. nginx never starts.
+kubectl -n lab2 get pod web -w
+# read the failing init container's output
 kubectl -n lab2 logs web -c init-page
 
+# delete everything the lab created
 kubectl delete namespace lab2
 ```
 

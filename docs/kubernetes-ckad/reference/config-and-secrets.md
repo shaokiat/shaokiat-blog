@@ -132,9 +132,11 @@ stringData:
 ## 🧪 Lab
 
 :::tip Lab 7-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **See env and volume diverge.**
+
+**Goal**
 
 1. In namespace `lab7`, create ConfigMap `app-config` with `LOG_LEVEL=info`.
 2. Create a Deployment `cfg` (`busybox:1.36`, command `sleep 3600`) that reads `LOG_LEVEL` as an env var **and** mounts `app-config` at `/etc/config`.
@@ -150,29 +152,48 @@ kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/c
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. "Store settings" in [Command Patterns](../start-here/command-patterns.md#configure-it).
+2. `kubectl set env --from=configmap/...` handles the env var. The volume needs YAML: `kubectl edit` or `kubectl patch`, with the fields from `kubectl explain pod.spec.volumes.configMap`.
+3. Re-create the ConfigMap with `--dry-run=client -o yaml` and pipe it to `kubectl replace -f -`. Wait about a minute for the kubelet to sync.
+4. Env vars are read once, at container start. Which command restarts every Pod?
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab7
+# create the ConfigMap with one key
 kubectl -n lab7 create configmap app-config --from-literal=LOG_LEVEL=info
+# create a Deployment whose container just sleeps
 kubectl -n lab7 create deployment cfg --image=busybox:1.36 -- sleep 3600
+# inject every ConfigMap key as an env var (this adds envFrom)
 kubectl -n lab7 set env deployment/cfg --from=configmap/app-config
-kubectl -n lab7 edit deployment cfg
-#   under the container add:
-#     volumeMounts: [{name: config, mountPath: /etc/config}]
-#   under the Pod spec add:
-#     volumes: [{name: config, configMap: {name: app-config}}]
+# add a volume from the ConfigMap and mount it at /etc/config (or do the same with kubectl edit)
+kubectl -n lab7 patch deployment cfg --type=json -p '[{"op":"add","path":"/spec/template/spec/volumes","value":[{"name":"config","configMap":{"name":"app-config"}}]},{"op":"add","path":"/spec/template/spec/containers/0/volumeMounts","value":[{"name":"config","mountPath":"/etc/config"}]}]'
+# wait for the Pod with the volume to be Ready
 kubectl -n lab7 rollout status deployment/cfg
 
+# overwrite the ConfigMap in place with the new value
 kubectl -n lab7 create configmap app-config --from-literal=LOG_LEVEL=debug \
-  --dry-run=client -o yaml | kubectl -n lab7 replace -f -    # update in place
+  --dry-run=client -o yaml | kubectl -n lab7 replace -f -
+# give the kubelet time to sync the mounted file
 sleep 90
+# compare: env=info file=debug
 kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
 
+# replace every Pod so env vars are read again
 kubectl -n lab7 rollout restart deployment/cfg
+# wait for the new Pod
 kubectl -n lab7 rollout status deployment/cfg
+# compare again: env=debug file=debug
 kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
 
+# delete everything the lab created
 kubectl delete namespace lab7
 ```
 

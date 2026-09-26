@@ -1,7 +1,7 @@
 ---
 title: Glossary
 sidebar_label: Glossary
-sidebar_position: 2
+sidebar_position: 4
 ---
 
 import Link from "@docusaurus/Link";
@@ -25,7 +25,8 @@ One line per term. Follow the link for the full explanation.
 
 | Term | Definition | More |
 |---|---|---|
-| <Link id="namespace" />**Namespace** | A named partition inside a cluster for names, access and quotas. | [What a namespace isolates](#what-a-namespace-isolates) |
+| <Link id="imperative-vs-declarative" />**Imperative vs declarative** | Imperative commands (`run`, `create`, `scale`) change the cluster directly. Declarative `apply -f` makes it match a file. | [Generate, edit, apply](./command-patterns.md#generate-edit-apply) |
+| <Link id="namespace" />**Namespace** | A named partition inside a cluster for names, access and quotas. | [What a namespace isolates](./local-setup.md#what-a-namespace-isolates) |
 | <Link id="namespaced-vs-cluster-scoped" />**Namespaced vs cluster-scoped** | Namespaced kinds (Pod, Service) live in a namespace. Cluster-scoped kinds (Node, PV, ClusterRole) don't. List them with `kubectl api-resources --namespaced=true` or `=false`. | [Architecture](../reference/architecture.md#kubectl-essentials) |
 
 ## Machinery
@@ -40,7 +41,7 @@ One line per term. Follow the link for the full explanation.
 | <Link id="node" />**Node** | A machine (VM, server, or a Docker container in kind) that runs Pods. | [Components](../reference/architecture.md#components) |
 | <Link id="kubelet" />**kubelet** | The agent on every node. Starts the Pods bound to it and reports their status. | [Components](../reference/architecture.md#components) |
 | <Link id="container-runtime" />**Container runtime** | Pulls images and runs containers for the kubelet (containerd, CRI-O). | [Components](../reference/architecture.md#components) |
-| <Link id="controller" />**Controller** | A loop that watches objects and acts to make actual state match desired state. | [Controllers](../mental-model.md#controllers-same-loop-different-promises) |
+| <Link id="controller" />**Controller** | A loop that watches objects and acts to make actual state match desired state. | [Controllers](./mental-model.md#controllers-same-loop-different-promises) |
 
 ## Describing state
 
@@ -50,8 +51,8 @@ One line per term. Follow the link for the full explanation.
 | <Link id="object" />**Object** | One stored instance of a kind, such as Deployment `web` in `lab1`. | [Four top-level fields](../reference/architecture.md#kubectl-essentials) |
 | <Link id="manifest" />**Manifest** | A YAML file describing one or more objects, applied with `kubectl apply -f`. | [Where a change lives](../reference/architecture.md#where-a-change-lives) |
 | <Link id="spec-vs-status" />**spec vs status** | `spec` is what you want, written by you. `status` is what exists, written by controllers. | [Where a change lives](../reference/architecture.md#where-a-change-lives) |
-| <Link id="label" />**Label** | A key-value pair on an object, used for selection (`app: web`). | [Where labels link](../mental-model.md#where-labels-do-the-linking) |
-| <Link id="selector" />**Selector** | A label query that picks objects. The only way a Service or ReplicaSet finds its Pods. | [Where labels link](../mental-model.md#where-labels-do-the-linking) |
+| <Link id="label" />**Label** | A key-value pair on an object, used for selection (`app: web`). | [Where labels link](./mental-model.md#where-labels-do-the-linking) |
+| <Link id="selector" />**Selector** | A label query that picks objects. The only way a Service or ReplicaSet finds its Pods. | [Where labels link](./mental-model.md#where-labels-do-the-linking) |
 | <Link id="annotation" />**Annotation** | A key-value pair for tools and humans. Never used for selection. | [Annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 
 ## Workloads & networking
@@ -62,30 +63,4 @@ One line per term. Follow the link for the full explanation.
 | <Link id="replicaset" />**ReplicaSet** | Keeps N copies of one Pod template running. Owned by a Deployment. | [Deployments](../reference/deployments-and-rollouts.md#rollout-strategy) |
 | <Link id="deployment" />**Deployment** | Manages ReplicaSets to roll out new Pod templates and roll back. | [Deployments](../reference/deployments-and-rollouts.md#choosing-a-workload-resource) |
 | <Link id="service" />**Service** | A stable name and IP in front of the Pods its selector matches. | [Service types](../reference/services-and-ingress.md#service-types) |
-| <Link id="endpointslice" />**EndpointSlice** | The current list of Ready Pod IPs behind a Service. Empty means no traffic. | [Life of an apply](../mental-model.md#life-of-a-kubectl-apply) |
-
-## What a namespace isolates
-
-| Isolated | Not isolated |
-|---|---|
-| Resource names: two `web` Deployments can coexist in different namespaces | Network traffic: open across namespaces by default |
-| RBAC: Role and RoleBinding | Nodes and the kernel |
-| ResourceQuota and LimitRange | Cluster-scoped resources |
-| References: Pods can only use ConfigMaps, Secrets, ServiceAccounts and PVCs from their own namespace | Cluster admins |
-| NetworkPolicy scope | |
-| Lifecycle: deleting the namespace deletes everything in it | |
-
-A namespace is a boundary for names, access and quotas, not a security wall. Combine it with RBAC, NetworkPolicy, quotas and Pod Security admission.
-
-→ See [Multi-Tenant Platform](../scenarios/multi-tenant-platform.md).
-
-## Which namespace does my command use?
-
-1. The `-n` flag
-2. `metadata.namespace` in the YAML
-3. The current context's namespace
-4. `default`
-
-A conflict between 1 and 2 is an error. Check the current default with `kubectl config view --minify | grep namespace`.
-
-DNS follows the same boundary: `web` resolves from the same namespace. From another, use `web.lab1` (full name `web.lab1.svc.cluster.local`).
+| <Link id="endpointslice" />**EndpointSlice** | The current list of Ready Pod IPs behind a Service. Empty means no traffic. | [Life of an apply](./mental-model.md#life-of-a-kubectl-apply) |

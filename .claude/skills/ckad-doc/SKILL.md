@@ -17,7 +17,7 @@ General prose rules (short declarative sentences, "use X when Y", tables over pa
    |---|---|---|---|
    | Reference | `reference/<topic>.md` | `reference/architecture.md` | its `sidebar_position` (Figure 5-1, Lab 5-1) |
    | Scenario | `scenarios/<topic>.md` | `scenarios/ml-model-serving.md` | `S<sidebar_position>` (Figure S1-1) |
-   | Primer | `mental-model.md`, `start-here/*.md` | `mental-model.md`, `start-here/local-setup.md` | `0` (Figure 0-1, Lab 0) |
+   | Start Here primer | `start-here/*.md` (Mental Model → Local Setup → Command Patterns → Glossary) | `start-here/mental-model.md`, `start-here/command-patterns.md` | `0` (Figure 0-1, Lab 0) |
    | Hub | `index.md` | `docs/google-professional-cloud-architect/index.md` | n/a |
 
    Done when: you can list the gold standard's section order and its numbering for the new page.
@@ -55,28 +55,39 @@ General prose rules (short declarative sentences, "use X when Y", tables over pa
 
 ### Labs
 
+Every lab has three **tiers**, defined once in `start-here/local-setup.md#lab-tiers`: 🔴 Challenge (Goal + Verify only), 🟡 Hints, 🟢 Guided.
+
 ```markdown
 :::tip Lab 5-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Imperative task name.**
 
-1. Numbered steps in namespace `lab5`.
+**Goal**
+
+1. Numbered outcomes in namespace `lab5`.
 
 **Verify**
 
 (bash block with expected output as trailing comments)
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
 
-(bash block: every command, expected output as comments, ends with kubectl delete namespace lab5)
+1. One hint per Goal step: the command family, the `-h` or `kubectl explain` to read, or the Command Patterns row. Never the full command.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
+
+(bash block: a `# comment` line above every command saying what it does; expected output as `#   ` lines after it; creates the namespace first, ends with kubectl delete namespace lab5)
 
 </details>
 :::
 ```
 
-Labs must run on a plain kind cluster. Difficulty: ★ recall, ★★ apply, ★★★ diagnose or design. When a lab repeats an earlier one, state what it builds on ("Builds on [Lab 0](...)") and keep only the new part.
+Labs must run on a plain kind cluster. Difficulty: ★ recall, ★★ apply, ★★★ diagnose or design. When a lab repeats an earlier one, state what it builds on ("Builds on [Lab 0](...)") and keep only the new part. Guided commands use the patterns and images in `start-here/command-patterns.md`; a command pattern new to the section gets a row there first.
 
 ### Scenario questions
 

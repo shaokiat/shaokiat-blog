@@ -153,9 +153,11 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 10-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
-**Break the link between a Service and its Pods, then find it.** [Lab 0](../mental-model.md#-lab) does the basic selector break; this lab adds `targetPort` and Ingress.
+**Break the link between a Service and its Pods, then find it.** [Lab 0](../start-here/mental-model.md#-lab) does the basic selector break; this lab adds `targetPort` and Ingress.
+
+**Goal**
 
 1. In namespace `lab10`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, args `netexec --http-port=8080`, 2 replicas).
 2. Expose it as Service `api` on port 80 → 8080. Call it from a temporary Pod.
@@ -171,32 +173,55 @@ kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. agnhost is in the [image kit](../start-here/command-patterns.md#the-image-kit). Note how `--` behaves under `create deployment`.
+2. `kubectl expose -h`: look at `--port` and `--target-port`.
+3. `kubectl describe svc` shows `Selector` and `Endpoints`. Compare with `kubectl get pods --show-labels`.
+4. `kubectl patch --type=json` can replace `/spec/ports/0/targetPort`. Is the error the same? What does `describe svc` show this time?
+5. "Route HTTP by host and path" in [Command Patterns](../start-here/command-patterns.md#expose-it).
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab10
+# run 2 agnhost Pods serving HTTP on 8080 (create deployment: the words after -- replace the entrypoint)
 kubectl -n lab10 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
   --replicas=2 --port=8080 -- /agnhost netexec --http-port=8080
+# create a Service: port 80 on the Service, 8080 on the Pods
 kubectl -n lab10 expose deployment api --port=80 --target-port=8080
+# call it from a throwaway Pod: prints the serving Pod's name
 kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
 
+# break the selector with a typo
 kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"apii"}}}'
+# call it again: Connection refused, although DNS still resolves
 kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
-# Connection refused. DNS resolves, but:
-kubectl -n lab10 describe svc api            # Endpoints: <none>
-kubectl -n lab10 get pods --show-labels      # Pods are app=api; the selector says app=apii
+# see why: Endpoints: <none>
+kubectl -n lab10 describe svc api
+# the Pods are app=api; the selector says app=apii
+kubectl -n lab10 get pods --show-labels
 
+# fix the selector
 kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"api"}}}'
+# send traffic to a port nothing listens on
 kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":9090}]'
+# call it: also "Connection refused", but now describe svc lists endpoints; the Pod itself refuses
 kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
-# Also "Connection refused", but now endpoints exist (describe svc lists them):
-# the refusal comes from the Pod, where nothing listens on 9090.
+# put targetPort back
 kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":8080}]'
 
+# route shop.example.com/api to the Service
 kubectl -n lab10 create ingress shop --rule="shop.example.com/api*=api:80"
-kubectl -n lab10 describe ingress shop       # Backends: api:80 (10.244.x.x:8080,...)
-# Traffic flows only once an Ingress controller is installed (on kind, see kind's ingress guide).
+# check the backends: api:80 (10.244.x.x:8080,...)
+kubectl -n lab10 describe ingress shop
+#   Traffic flows only once an Ingress controller is installed (on kind, see kind's ingress guide).
 
+# delete everything the lab created
 kubectl delete namespace lab10
 ```
 

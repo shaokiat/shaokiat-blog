@@ -10,36 +10,9 @@ sidebar_position: 14
 
 ## Overview
 
-The CKAD is a speed test: roughly two hours of hands-on tasks in live clusters. The winning habit is imperative first: generate YAML with `kubectl create ... --dry-run=client -o yaml`, edit only the fields the generator can't set, then apply. Typing manifests from memory is slow and error-prone. Search `kubernetes.io/docs` for the rest; it's the only site you can open during the exam. This page collects the commands the other pages use, grouped by task, with the shell setup that saves a few seconds on every one of them.
+The CKAD is a speed test: roughly two hours of hands-on tasks in live clusters. The winning habit is imperative first: generate YAML with `kubectl create ... --dry-run=client -o yaml`, edit only the fields the generator can't set, then apply. Typing manifests from memory is slow and error-prone. Search `kubernetes.io/docs` for the rest; it's the only site you can open during the exam. [Command Patterns](../start-here/command-patterns.md) teaches which command fits which task; this page makes you fast at them: shell setup, output formatting, and dense command lists for the exam.
 
 ## Key concepts
-
-### What the generators can create
-
-| Resource | Command | Can't set (edit the YAML) |
-|---|---|---|
-| Pod | `kubectl run web --image=nginx:1.27 --port=80 --labels=app=web` | Probes, volumes, resources, securityContext |
-| Deployment | `kubectl create deployment web --image=nginx:1.27 --replicas=3 --port=80` | Probes, strategy, volumes |
-| Service | `kubectl expose deployment web --port=80 --target-port=8080` | Named ports |
-| Job | `kubectl create job hello --image=busybox:1.36 -- echo hi` | completions, parallelism, backoffLimit |
-| CronJob | `kubectl create cronjob tick --image=busybox:1.36 --schedule="*/5 * * * *" -- date` | concurrencyPolicy, timeZone |
-| ConfigMap | `kubectl create configmap cfg --from-literal=K=V --from-file=app.conf` | n/a |
-| Secret | `kubectl create secret generic db --from-literal=password=x` | n/a |
-| ServiceAccount | `kubectl create serviceaccount ci-bot` | n/a |
-| Role / RoleBinding | `kubectl create role r --verb=get,list --resource=pods` / `kubectl create rolebinding rb --role=r --serviceaccount=ns:ci-bot` | n/a |
-| Ingress | `kubectl create ingress shop --rule="host/path*=svc:80"` | TLS details |
-| ResourceQuota | `kubectl create quota q --hard=pods=10,requests.cpu=2` | Scopes |
-| HPA | `kubectl autoscale deployment web --min=2 --max=10 --cpu=50%` | `behavior` |
-| NetworkPolicy, PVC, LimitRange | No generator | Copy from the docs |
-
-### `--` means different things
-
-| Command | Words after `--` become | Result with an image that has an entrypoint |
-|---|---|---|
-| `kubectl run x --image=img -- a b` | `args` | Entrypoint runs with `a b` as arguments |
-| `kubectl run x --image=img --command -- a b` | `command` | Entrypoint replaced by `a b` |
-| `kubectl create deployment x --image=img -- a b` | `command` | Entrypoint replaced by `a b` |
-| `kubectl create job x --image=img -- a b` | `command` | Entrypoint replaced by `a b` |
 
 ### Output formats
 
@@ -144,9 +117,11 @@ k get secret db -o jsonpath='{.data.password}' | base64 -d
 ## 🧪 Lab
 
 :::tip Lab 14-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Speed drill: eight tasks in ten minutes.**
+
+**Goal**
 
 Work in namespace `lab14`. Only imperative commands and `$do` + a quick edit are allowed.
 
@@ -169,23 +144,46 @@ k -n lab14 get cronjob tick
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1–6. Each one is a row in [Command Patterns → I want to…](../start-here/command-patterns.md#i-want-to). Set the namespace once with `set-context` to save typing `-n`.
+7. `-o custom-columns=` with `.metadata.name` and `.spec.nodeName`.
+8. jsonpath over `.items[*].spec.containers[*].image`, then `tr`, `sort` and `uniq -c`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the namespace and make it the default for every command below
 k create namespace lab14 && k config set-context --current --namespace=lab14
+# 1. a Pod with a label
 k run nginx --image=nginx:1.27 --labels=tier=web
+# 2. a Deployment with 3 replicas
 k create deployment api --image=nginx:1.27 --replicas=3 --port=80
+# 2. a ClusterIP Service in front of it
 k expose deployment api --port=80
+# 3. a ConfigMap with one key
 k create configmap cfg --from-literal=MODE=prod
+# 3. inject it into the Deployment as env vars
 k set env deployment/api --from=configmap/cfg
+# 4. scale to 5
 k scale deployment api --replicas=5
+# 4. ship a new image
 k set image deployment/api nginx=nginx:1.28
+# 4. roll it back
 k rollout undo deployment/api
+# 5. a one-off Job
 k create job once --image=busybox:1.36 -- echo done
+# 6. a CronJob every 5 minutes
 k create cronjob tick --image=busybox:1.36 --schedule="*/5 * * * *" -- date
+# 7. one line per Pod: name and node
 k get pods -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
+# 8. every container image, counted
 k get pods -o jsonpath='{.items[*].spec.containers[*].image}' | tr ' ' '\n' | sort | uniq -c
 
+# switch the default back and delete everything the lab created
 k config set-context --current --namespace=default && k delete namespace lab14
 ```
 
@@ -198,7 +196,7 @@ k config set-context --current --namespace=default && k delete namespace lab14
 - **`kubectl apply` on an object made with `create`** prints a `last-applied-configuration` warning. Harmless, but mixing both styles makes diffs confusing.
 - **Invalid `kubectl edit` saves are kept in `/tmp`.** The error message gives the path. `kubectl apply -f` it after fixing.
 - **`--force --grace-period=0` hides problems.** Fine for exam speed; in production it skips graceful shutdown and can leave the old Pod running on an unreachable node.
-- **`kubectl run -- cmd` sets args, not the command.** See the table above.
+- **`kubectl run -- cmd` sets args, not the command.** → See [What `--` does](../start-here/command-patterns.md#what----does).
 - **Quote selectors, jsonpath and custom-columns.** `!=`, `()`, `{}` and `[*]` mean something to the shell.
 - **Namespace on every command.** After `set-context --namespace`, remember to switch back, or later tasks land in the wrong place.
 

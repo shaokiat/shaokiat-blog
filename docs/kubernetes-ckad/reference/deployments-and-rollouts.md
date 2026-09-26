@@ -137,9 +137,11 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 5-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Roll forward, break it, roll back.**
+
+**Goal**
 
 1. In namespace `lab5`, apply the Deployment above (3 replicas, `maxSurge: 1`, `maxUnavailable: 0`).
 2. Update the image to `nginx:1.28` with a change-cause. Watch the ReplicaSets during the rollout.
@@ -155,28 +157,51 @@ kubectl -n lab5 rollout history deployment/web
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. The generator can't set `strategy`, so save the Deployment above as `web.yaml` and apply it.
+2. "Ship a new image" in [Command Patterns](../start-here/command-patterns.md#change-it). The change-cause is an annotation: `kubectl annotate -h`. Watch with `kubectl get rs -w`.
+3. Count Ready Pods while the new one fails. What does `maxUnavailable: 0` promise?
+4. `kubectl rollout -h` lists `status`, `history` and `undo`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab5
+# create the Deployment from the manifest above, saved as web.yaml
 kubectl -n lab5 apply -f web.yaml
+# wait until all 3 Pods are Ready
 kubectl -n lab5 rollout status deployment/web
 
+# change the container image; this starts a rolling update
 kubectl -n lab5 set image deployment/web nginx=nginx:1.28
+# record why, so rollout history shows it
 kubectl -n lab5 annotate deployment/web kubernetes.io/change-cause="nginx 1.28"
-kubectl -n lab5 get rs -w                          # new RS 0->1->2->3, old RS 3->2->1->0
+# watch the ReplicaSets: new RS 0->1->2->3, old RS 3->2->1->0
+kubectl -n lab5 get rs -w
 
+# roll out an image tag that doesn't exist
 kubectl -n lab5 set image deployment/web nginx=nginx:1.99-typo
-kubectl -n lab5 get pods                           # one new Pod in ImagePullBackOff, 3 old Pods still Ready
-# maxUnavailable: 0 means no old Pod is removed until a new one is Ready. Users see no outage.
-kubectl -n lab5 rollout status deployment/web --timeout=30s   # times out: rollout stuck
+# check the Pods: one new Pod in ImagePullBackOff, 3 old Pods still Ready
+kubectl -n lab5 get pods
+#   maxUnavailable: 0 means no old Pod is removed until a new one is Ready. Users see no outage.
+# wait briefly for the rollout: it times out because it's stuck
+kubectl -n lab5 rollout status deployment/web --timeout=30s
 
+# go back to the previous revision
 kubectl -n lab5 rollout undo deployment/web
+# wait until the rollback finishes
 kubectl -n lab5 rollout status deployment/web
-kubectl -n lab5 rollout history deployment/web     # the 1.28 revision moved to the newest number
-# The broken revision also says "nginx 1.28": change-cause is copied from the Deployment's
-# annotation, so it goes stale unless you update it with every change.
+# list revisions: the 1.28 revision moved to the newest number
+kubectl -n lab5 rollout history deployment/web
+#   The broken revision also says "nginx 1.28": change-cause is copied from the Deployment's
+#   annotation, so it goes stale unless you update it with every change.
 
+# delete everything the lab created
 kubectl delete namespace lab5
 ```
 

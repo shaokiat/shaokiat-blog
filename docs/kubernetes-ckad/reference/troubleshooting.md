@@ -10,7 +10,7 @@ sidebar_position: 13
 
 ## Overview
 
-Debugging Kubernetes is a walk down the [six-step chain](../mental-model.md#life-of-a-kubectl-apply) behind every `kubectl apply`. `kubectl get pods` tells you which step broke; the `STATUS` column is the index into this page. The method is always the same: read the status, run the one command that explains that status, fix the cause, and confirm with the same command. Guessing, or restarting things to see what happens, wastes the most time in the exam and in interviews.
+Debugging Kubernetes is a walk down the [six-step chain](../start-here/mental-model.md#life-of-a-kubectl-apply) behind every `kubectl apply`. `kubectl get pods` tells you which step broke; the `STATUS` column is the index into this page. The method is always the same: read the status, run the one command that explains that status, fix the cause, and confirm with the same command. Guessing, or restarting things to see what happens, wastes the most time in the exam and in interviews.
 
 <div className="mermaid-scroll" style={{maxWidth: "900px", margin: "0 auto"}}>
 
@@ -105,11 +105,13 @@ kubectl run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 
 ## 🧪 Lab
 
 :::tip Lab 13-1 ★★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Three bugs, one manifest.**
 
-Apply this to namespace `lab13`. The goal: `wget -qO- http://web` from a Pod in the namespace returns the nginx welcome page. Fix every problem using only `get`, `describe`, `logs` and `edit`/`set`/`patch`, and write down the status that led you to each fix.
+**Goal**
+
+Save this as `broken.yaml` and apply it to namespace `lab13`. Make `wget -qO- http://web` from a Pod in the namespace return the nginx welcome page. Fix every problem using only `get`, `describe`, `logs` and `edit`/`set`/`patch`, and write down the status that led you to each fix.
 
 ```yaml
 apiVersion: v1
@@ -159,29 +161,48 @@ kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. Start with `kubectl get pods` and look up the STATUS in the [status table](#status--first-command--usual-causes). It tells you the first command to run.
+2. Two of the bugs show up as Pod statuses, one after the other. The third only shows up when you call the Service.
+3. Fix at the owner: `kubectl set image` and `kubectl patch deployment`, not the Pods.
+4. For the Service, compare `describe svc` → `Selector` with `get pods --show-labels`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab13
+# apply the broken manifest
 kubectl -n lab13 apply -f broken.yaml
-kubectl -n lab13 get pods                  # ErrImagePull / ImagePullBackOff
+# read the status: ErrImagePull / ImagePullBackOff
+kubectl -n lab13 get pods
+# read the first Pod's events: Failed to pull image "nginx:1.27-alpinee": not found (tag typo)
 kubectl -n lab13 describe pod -l app=web | grep -A3 Events -m1
-# Failed to pull image "nginx:1.27-alpinee": not found  -> tag typo
+# fix the tag on the Deployment
 kubectl -n lab13 set image deployment/web nginx=nginx:1.27-alpine
 
-kubectl -n lab13 get pods                  # CreateContainerConfigError
+# read the status again: CreateContainerConfigError
+kubectl -n lab13 get pods
+# find the message: configmap "web-config" not found (the ConfigMap is called web-conf)
 kubectl -n lab13 describe pod -l app=web | grep -i configmap
-# configmap "web-config" not found  -> the ConfigMap is called web-conf
+# point the env var at the right ConfigMap
 kubectl -n lab13 patch deployment web --type=json \
   -p '[{"op":"replace","path":"/spec/template/spec/containers/0/env/0/valueFrom/configMapKeyRef/name","value":"web-conf"}]'
+# wait for the fixed Pods
 kubectl -n lab13 rollout status deployment/web
 
+# call the Service: Connection refused
 kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
-# Connection refused
-kubectl -n lab13 describe svc web | grep -E "Selector|Endpoints"   # app=webapp, Endpoints: <none>
+# see why: app=webapp, Endpoints: <none>
+kubectl -n lab13 describe svc web | grep -E "Selector|Endpoints"
+# fix the selector; Verify now succeeds
 kubectl -n lab13 patch svc web -p '{"spec":{"selector":{"app":"web"}}}'
-# Verify now succeeds
 
+# delete everything the lab created
 kubectl delete namespace lab13
 ```
 

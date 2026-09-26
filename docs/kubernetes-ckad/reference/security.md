@@ -226,9 +226,11 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 9-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Least privilege, then a hardened Pod.**
+
+**Goal**
 
 1. In namespace `lab9`, create ServiceAccount `ci-bot` and a Role that allows managing Deployments and reading Pods and their logs. Bind it.
 2. Prove `ci-bot` can create Deployments but can't delete them, and can't read Secrets.
@@ -247,27 +249,57 @@ kubectl -n lab9 get bk
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. `kubectl create serviceaccount`, `kubectl create role -h` (look at `--verb` and `--resource`), `kubectl create rolebinding -h` (look at `--serviceaccount=<ns>:<name>`). Logs are the `pods/log` subresource.
+2. "Check a permission" in [Command Patterns](../start-here/command-patterns.md#check-it). A ServiceAccount's user name is `system:serviceaccount:<ns>:<name>`.
+3. `kubectl label namespace` with `pod-security.kubernetes.io/enforce=restricted`.
+4. Save the Pod above as `hardened.yaml`. Its logs print `id`. Try writing outside `/data` with `kubectl exec`.
+5. Save the CRD above as `backup-crd.yaml`. The object's `apiVersion` is `<group>/<version>` from the CRD.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab9
+# create the identity the CI system will use
 kubectl -n lab9 create serviceaccount ci-bot
+# a Role that manages Deployments, but has no delete verb
 kubectl -n lab9 create role deployer --verb=get,list,watch,create,update,patch --resource=deployments
+# a Role that reads Pods and their logs
 kubectl -n lab9 create role pod-reader --verb=get,list --resource=pods,pods/log
+# bind the first Role to the ServiceAccount
 kubectl -n lab9 create rolebinding ci-bot-deployer --role=deployer --serviceaccount=lab9:ci-bot
+# bind the second Role to the ServiceAccount
 kubectl -n lab9 create rolebinding ci-bot-pod-reader --role=pod-reader --serviceaccount=lab9:ci-bot
-# run the three can-i checks from Verify
 
+# ask the API server as ci-bot: yes
+kubectl -n lab9 auth can-i create deployments --as=system:serviceaccount:lab9:ci-bot
+# no: delete isn't in the Role
+kubectl -n lab9 auth can-i delete deployments --as=system:serviceaccount:lab9:ci-bot
+# no: nothing grants Secrets
+kubectl -n lab9 auth can-i get secrets --as=system:serviceaccount:lab9:ci-bot
+
+# enforce the restricted Pod Security Standard on the namespace
 kubectl label namespace lab9 pod-security.kubernetes.io/enforce=restricted
+# try a default nginx Pod: rejected
 kubectl -n lab9 run bad --image=nginx:1.27
-# Error: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false,
-# unrestricted capabilities, runAsNonRoot != true, seccompProfile ...
+#   Error: violates PodSecurity "restricted:latest": allowPrivilegeEscalation != false,
+#   unrestricted capabilities, runAsNonRoot != true, seccompProfile ...
 
-kubectl -n lab9 apply -f hardened.yaml             # the Pod above
+# create the hardened Pod above, saved as hardened.yaml
+kubectl -n lab9 apply -f hardened.yaml
+# read its output: uid=1000 gid=3000 groups=2000,3000, then "wrote"
 kubectl -n lab9 logs hardened
-kubectl -n lab9 exec hardened -- touch /etc/x      # Read-only file system
+# try to write to the root filesystem: Read-only file system
+kubectl -n lab9 exec hardened -- touch /etc/x
 
-kubectl apply -f backup-crd.yaml                   # the CRD above
+# install the CRD above, saved as backup-crd.yaml
+kubectl apply -f backup-crd.yaml
+# create one Backup object from inline YAML
 kubectl -n lab9 apply -f - <<'EOF'
 apiVersion: ops.example.com/v1
 kind: Backup
@@ -277,9 +309,12 @@ spec:
   schedule: "0 2 * * *"
   retainDays: 7
 EOF
-kubectl -n lab9 get bk                             # stored, but nothing happens: no Operator
+# list it by short name: stored, but nothing happens, because no Operator watches it
+kubectl -n lab9 get bk
 
+# delete everything the lab created
 kubectl delete namespace lab9
+# the CRD is cluster-scoped, so delete it separately
 kubectl delete crd backups.ops.example.com
 ```
 

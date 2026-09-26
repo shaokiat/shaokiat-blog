@@ -5,7 +5,7 @@ sidebar_label: Overview
 
 # Kubernetes (CKAD)
 
-New to Kubernetes? Start with the [Mental Model](./mental-model.md).
+New to Kubernetes? Work through **Start Here** in order: [Mental Model](./start-here/mental-model.md) → [Local Setup](./start-here/local-setup.md) → [Command Patterns](./start-here/command-patterns.md). Every Lab has three tiers (🔴 Challenge, 🟡 Hints, 🟢 Guided), so pick your level.
 
 Notes for Kubernetes interviews, using the [CKAD curriculum](https://github.com/cncf/curriculum) as the syllabus. The exam is performance-based: you solve tasks in a live cluster with `kubectl`, so every reference page pairs concepts with commands and a hands-on lab.
 
@@ -19,7 +19,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 - [Multi-Tenant Platform](./scenarios/multi-tenant-platform.md): namespaces, ResourceQuota, RBAC, NetworkPolicy
 - [Troubleshooting Drills](./scenarios/troubleshooting-drills.md): Pending, CrashLoopBackOff, ImagePullBackOff, OOMKilled, Service with no endpoints
 
-**Fundamentals:** [Mental Model](./mental-model.md) · [Architecture](./reference/architecture.md) · [kubectl Cheatsheet](./reference/kubectl-cheatsheet.md)
+**Fundamentals:** [Mental Model](./start-here/mental-model.md) · [Command Patterns](./start-here/command-patterns.md) · [Architecture](./reference/architecture.md) · [kubectl Cheatsheet](./reference/kubectl-cheatsheet.md)
 
 ---
 

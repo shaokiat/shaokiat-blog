@@ -13,7 +13,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Overview
 
-A cluster has two halves. The control plane decides: the API server stores desired state in etcd, and the scheduler and controllers act on it. Worker nodes execute: each kubelet runs what the API server says belongs on its node. This page covers each component, how they connect, and what breaks when one fails. For the model they implement (desired state, reconciliation, and the chain behind every `kubectl apply`), start with the [Mental Model](../mental-model.md). Figure 1-2 below is the loop that model is built on.
+A cluster has two halves. The control plane decides: the API server stores desired state in etcd, and the scheduler and controllers act on it. Worker nodes execute: each kubelet runs what the API server says belongs on its node. This page covers each component, how they connect, and what breaks when one fails. For the model they implement (desired state, reconciliation, and the chain behind every `kubectl apply`), start with the [Mental Model](../start-here/mental-model.md). Figure 1-2 below is the loop that model is built on.
 
 <ThemedImage
   alt="Cluster architecture: etcd, scheduler and controller-manager talk only to the API server; kubelets on each worker node watch the API server and start Pods through the container runtime"
@@ -138,9 +138,11 @@ status:                      # actual state: controllers write this, never you
 ## 🧪 Lab
 
 :::tip Lab 1-1 ★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
-**Name the components behind each step.** Builds on [Lab 0](../mental-model.md#-lab), which covers self-healing and ownership.
+**Name the components behind each step.** Builds on [Lab 0](../start-here/mental-model.md#-lab), which covers self-healing and ownership.
+
+**Goal**
 
 1. Create namespace `lab1` and a Deployment `web` (image `nginx`, 3 replicas) in it.
 2. Delete one of its Pods, then use events to name the component that created the replacement, the one that placed it, and the one that started it.
@@ -154,27 +156,43 @@ kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
 ```
 
 <details>
-<summary>Solution</summary>
+<summary>🟡 Hints</summary>
+
+1. Same as Lab 0 step 1, in `lab1`.
+2. Events carry a `SOURCE`/reporting component. Sort them by time: `kubectl get events -h` shows `--sort-by`. Look for `SuccessfulCreate`, `Scheduled` and `Started`.
+3. `kubectl scale` works on any object with replicas, including `rs/<name>`. Watch with `kubectl get rs -w`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
 
 ```bash
+# create the lab namespace
 kubectl create namespace lab1
+# create a Deployment with 3 replicas
 kubectl -n lab1 create deployment web --image=nginx --replicas=3
 
-# 2. delete a Pod and watch the replacement
+# stream Pod changes in the background
 kubectl -n lab1 get pods -w &
+# delete one Pod to trigger a replacement
 kubectl -n lab1 delete pod "$(kubectl -n lab1 get pods -o name | head -n 1)"
+# stop the background watch
 kill %1
+# list recent events in time order; the source column names each component
 kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
 #   SuccessfulCreate  replicaset-controller  Created pod: web-...   <- controller-manager
 #   Scheduled         default-scheduler      Assigned ... to node   <- scheduler
 #   Pulled / Started  kubelet                                       <- kubelet
 
-# 3. scale the ReplicaSet behind the Deployment's back
+# scale the ReplicaSet directly, behind the Deployment's back
 kubectl -n lab1 scale rs "$(kubectl -n lab1 get rs -o name | head -n 1)" --replicas=5
+# watch the replica count
 kubectl -n lab1 get rs -w
-# It jumps to 5, then the Deployment controller scales it back to 3.
-# The Deployment owns the ReplicaSet's replica count, just as the ReplicaSet owns its Pods.
+#   It jumps to 5, then the Deployment controller scales it back to 3.
+#   The Deployment owns the ReplicaSet's replica count, just as the ReplicaSet owns its Pods.
 
+# delete everything the lab created
 kubectl delete namespace lab1
 ```
 
