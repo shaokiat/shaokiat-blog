@@ -23,47 +23,47 @@ Interview-style systems that combine several reference pages. Explain each one e
 
 ## Domain 1: Application Design and Build (20%)
 
-- Define, build and modify container images
-- Choose the right workload resource: Deployment, DaemonSet, Job, CronJob → [Deployments & Rollouts](./reference/deployments-and-rollouts.md) · [Jobs & CronJobs](./reference/jobs-and-cronjobs.md)
-- Multi-container Pod patterns: init, sidecar, ambassador, adapter → [Pods & Multi-Container](./reference/pods-and-multi-container.md)
-- Persistent and ephemeral volumes → [Storage](./reference/storage.md)
+- Define, build and modify container images → no dedicated page yet; see [Troubleshooting](./reference/troubleshooting.md#status--first-command--usual-causes) for pull failures
+- Choose the right workload resource: Deployment, DaemonSet, StatefulSet, Job, CronJob → [Deployments & Rollouts](./reference/deployments-and-rollouts.md#choosing-a-workload-resource) · [Jobs & CronJobs](./reference/jobs-and-cronjobs.md#job-fields)
+- Multi-container Pod patterns: init, sidecar, ambassador, adapter → [Pods & Multi-Container](./reference/pods-and-multi-container.md#multi-container-patterns) · [native sidecars](./reference/pods-and-multi-container.md#native-sidecars-vs-plain-extra-containers)
+- Persistent and ephemeral volumes → [Storage](./reference/storage.md#volume-types-by-lifetime) · [PV, PVC and StorageClass](./reference/storage.md#pv-pvc-and-storageclass) · [access modes](./reference/storage.md#access-modes)
 
 ---
 
 ## Domain 2: Application Deployment (20%)
 
-- Rolling updates and rollback → [Deployments & Rollouts](./reference/deployments-and-rollouts.md)
-- Blue/green and canary with Kubernetes primitives → [Deployments & Rollouts](./reference/deployments-and-rollouts.md)
-- Deploy existing packages with **Helm** → [Helm & Kustomize](./reference/helm-and-kustomize.md)
-- Patch manifests per environment with **Kustomize** → [Helm & Kustomize](./reference/helm-and-kustomize.md)
+- Rolling updates and rollback → [Deployments & Rollouts](./reference/deployments-and-rollouts.md#rollout-strategy)
+- Blue/green and canary with Kubernetes primitives → [Release strategies](./reference/deployments-and-rollouts.md#release-strategies-with-core-primitives) · [Zero-Downtime Release](./scenarios/zero-downtime-release.md)
+- Deploy existing packages with **Helm** → [Helm & Kustomize](./reference/helm-and-kustomize.md#helm-terms)
+- Patch manifests per environment with **Kustomize** → [Helm & Kustomize](./reference/helm-and-kustomize.md#kustomize-features)
 
 ---
 
 ## Domain 3: Application Observability and Maintenance (15%)
 
-- API deprecations: group/version, `kubectl api-resources`, `kubectl explain` → [Architecture](./reference/architecture.md)
-- Probes and health checks: startup, readiness, liveness → [Probes & Observability](./reference/probes-and-observability.md)
-- Built-in CLI monitoring: `kubectl top`, events, `get -w` → [Probes & Observability](./reference/probes-and-observability.md)
-- Container logs → [Probes & Observability](./reference/probes-and-observability.md)
-- Debugging → [Troubleshooting](./reference/troubleshooting.md)
+- API deprecations → [API groups and versions](./reference/architecture.md#api-groups-and-versions) · [finding deprecated APIs](./reference/probes-and-observability.md#api-deprecations)
+- Probes and health checks: startup, readiness, liveness → [Probes & Observability](./reference/probes-and-observability.md#the-three-probes)
+- Built-in CLI monitoring: `kubectl top`, events, `get -w` → [Built-in monitoring](./reference/probes-and-observability.md#built-in-monitoring)
+- Container logs → [Probes & Observability](./reference/probes-and-observability.md#kubectl-essentials)
+- Debugging → [Troubleshooting](./reference/troubleshooting.md#status--first-command--usual-causes) · [Troubleshooting Drills](./scenarios/troubleshooting-drills.md)
 
 ---
 
 ## Domain 4: Application Environment, Configuration and Security (25%)
 
-- Extend Kubernetes with **CRDs** and **Operators** → [Security](./reference/security.md)
-- Authentication, authorization (RBAC) and admission control → [Security](./reference/security.md)
-- Requests, limits and ResourceQuotas → [Resources & Scaling](./reference/resources-and-scaling.md)
-- **ConfigMaps** and **Secrets** → [Config & Secrets](./reference/config-and-secrets.md)
-- **ServiceAccounts** and **SecurityContexts** → [Security](./reference/security.md)
+- Extend Kubernetes with **CRDs** and **Operators** → [Security](./reference/security.md#crds-and-operators)
+- Authentication, authorization (RBAC) and admission control → [Request pipeline](./reference/security.md#the-request-pipeline) · [RBAC](./reference/security.md#rbac-objects) · [Pod Security Admission](./reference/security.md#pod-security-admission)
+- Requests, limits and ResourceQuotas → [Requests vs limits](./reference/resources-and-scaling.md#requests-vs-limits) · [LimitRange vs ResourceQuota](./reference/resources-and-scaling.md#limitrange-vs-resourcequota)
+- **ConfigMaps** and **Secrets** → [Config & Secrets](./reference/config-and-secrets.md#configmap-vs-secret) · [injection methods](./reference/config-and-secrets.md#injection-methods)
+- **ServiceAccounts** and **SecurityContexts** → [ServiceAccounts](./reference/security.md#serviceaccounts) · [SecurityContext](./reference/security.md#securitycontext)
 
 ---
 
 ## Domain 5: Services and Networking (20%)
 
-- NetworkPolicies → [Network Policy](./reference/network-policy.md)
-- Provide and troubleshoot access to applications via Services → [Services & Ingress](./reference/services-and-ingress.md)
-- Expose applications with Ingress rules → [Services & Ingress](./reference/services-and-ingress.md)
+- NetworkPolicies → [How selection works](./reference/network-policy.md#how-selection-works) · [peer selectors](./reference/network-policy.md#peer-selectors)
+- Provide and troubleshoot access to applications via Services → [Service types](./reference/services-and-ingress.md#service-types) · [the four ports](./reference/services-and-ingress.md#the-four-ports)
+- Expose applications with Ingress rules → [Ingress vs Gateway API](./reference/services-and-ingress.md#ingress-vs-gateway-api)
 
 ---
 
