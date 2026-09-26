@@ -13,7 +13,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Overview
 
-A Kubernetes cluster is a database of desired state plus a set of controllers that make reality match it. You never start a container directly. You write an object to the API server, it lands in etcd, and a controller notices the gap between what you asked for and what exists, then closes it. The control plane makes decisions; worker nodes run containers. Every later topic (Deployments, Jobs, Services, HPA) is one more controller running this same loop, so debugging always reduces to one question: which controller should have acted, and why didn't it?
+A cluster has two halves. The control plane decides: the API server stores desired state in etcd, and the scheduler and controllers act on it. Worker nodes execute: each kubelet runs what the API server says belongs on its node. This page covers each component, how they connect, and what breaks when one fails. For the model they implement (desired state, reconciliation, and the chain behind every `kubectl apply`), start with the [Mental Model](../mental-model.md). Figure 1-2 below is the loop that model is built on.
 
 <ThemedImage
   alt="Cluster architecture: etcd, scheduler and controller-manager talk only to the API server; kubelets on each worker node watch the API server and start Pods through the container runtime"
@@ -138,10 +138,10 @@ status:                      # actual state: controllers write this, never you
 ## 🧪 Lab
 
 :::tip Lab 1-1 ★
-**Watch the reconcile loop.**
+**Name the components behind each step.** Builds on [Lab 0](../mental-model.md#-lab), which covers self-healing and ownership.
 
 1. Create namespace `lab1` and a Deployment `web` (image `nginx`, 3 replicas) in it.
-2. Delete one of its Pods. Confirm a replacement appears and find which components created and placed it.
+2. Delete one of its Pods, then use events to name the component that created the replacement, the one that placed it, and the one that started it.
 3. Scale the Deployment's ReplicaSet (not the Deployment) to 5. Predict what happens, then check.
 
 **Verify**

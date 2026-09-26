@@ -10,7 +10,7 @@ sidebar_position: 13
 
 ## Overview
 
-Debugging Kubernetes is a walk down the chain from [Architecture](./architecture.md): the object was admitted, a controller created Pods, the scheduler placed them, the kubelet pulled images and started containers, probes passed, and the Service picked them up. `kubectl get pods` tells you which link broke; the `STATUS` column is the index into this page. The method is always the same: read the status, run the one command that explains that status, fix the cause, and confirm with the same command. Guessing, or restarting things to see what happens, wastes the most time in the exam and in interviews.
+Debugging Kubernetes is a walk down the [six-step chain](../mental-model.md#life-of-a-kubectl-apply) behind every `kubectl apply`. `kubectl get pods` tells you which step broke; the `STATUS` column is the index into this page. The method is always the same: read the status, run the one command that explains that status, fix the cause, and confirm with the same command. Guessing, or restarting things to see what happens, wastes the most time in the exam and in interviews.
 
 <div className="mermaid-scroll" style={{maxWidth: "900px", margin: "0 auto"}}>
 

@@ -5,7 +5,9 @@ sidebar_label: Overview
 
 # Kubernetes (CKAD)
 
-Notes for Kubernetes interviews, using the [CKAD curriculum](https://github.com/cncf/curriculum) as the syllabus. The exam is performance-based: you solve tasks in a live cluster with `kubectl`, so every reference page pairs concepts with commands and a hands-on lab. Start with [Architecture](./reference/architecture.md). Every other page is one controller reconciling one kind of desired state.
+New to Kubernetes? Start with the [Mental Model](./mental-model.md).
+
+Notes for Kubernetes interviews, using the [CKAD curriculum](https://github.com/cncf/curriculum) as the syllabus. The exam is performance-based: you solve tasks in a live cluster with `kubectl`, so every reference page pairs concepts with commands and a hands-on lab.
 
 ## Scenarios
 
@@ -17,7 +19,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 - [Multi-Tenant Platform](./scenarios/multi-tenant-platform.md): namespaces, ResourceQuota, RBAC, NetworkPolicy
 - [Troubleshooting Drills](./scenarios/troubleshooting-drills.md): Pending, CrashLoopBackOff, ImagePullBackOff, OOMKilled, Service with no endpoints
 
-**Fundamentals:** [Architecture](./reference/architecture.md) · [kubectl Cheatsheet](./reference/kubectl-cheatsheet.md)
+**Fundamentals:** [Mental Model](./mental-model.md) · [Architecture](./reference/architecture.md) · [kubectl Cheatsheet](./reference/kubectl-cheatsheet.md)
 
 ---
 
