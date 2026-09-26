@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Four multi-container Pod patterns: init container runs before the app; sidecar shares a volume with the app; ambassador proxies outbound calls; adapter translates the app&#x27;s output">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="455" height="250" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">INIT CONTAINER · RUNS TO COMPLETION FIRST</text>
+  <rect x="30" y="46" width="415" height="194" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="44" y="65" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">POD</text>
+  <rect x="50" y="90" width="150" height="64" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="125" y="117" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">init: migrate</text>
+  <text x="125" y="136" text-anchor="middle" font-size="11" fill="#8896a8">exits 0, then gone</text>
+  <rect x="275" y="90" width="150" height="64" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="350" y="117" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">app</text>
+  <text x="350" y="136" text-anchor="middle" font-size="11" fill="#8896a8">starts only after init</text>
+  <polyline points="202,122 273,122" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="237" y="114" text-anchor="middle" font-size="11" fill="#8896a8">exit 0</text>
+  <text x="50" y="190" text-anchor="start" font-size="11" fill="#8896a8">Init fails → Init:CrashLoopBackOff.</text>
+  <text x="50" y="206" text-anchor="start" font-size="11" fill="#8896a8">The app container never starts.</text>
+  <rect x="495" y="10" width="455" height="250" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="511" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">SIDECAR · HELPER FOR THE APP&#x27;S WHOLE LIFE</text>
+  <rect x="515" y="46" width="415" height="194" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="529" y="65" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">POD</text>
+  <rect x="535" y="74" width="140" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="605" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">app</text>
+  <text x="605" y="116" text-anchor="middle" font-size="11" fill="#8896a8">writes log files</text>
+  <rect x="760" y="74" width="150" height="56" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="835" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">log-shipper</text>
+  <text x="835" y="116" text-anchor="middle" font-size="11" fill="#8896a8">tails, ships logs</text>
+  <rect x="645" y="156" width="150" height="50" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="720" y="176" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">emptyDir</text>
+  <text x="720" y="195" text-anchor="middle" font-size="11" fill="#8896a8">shared volume</text>
+  <polyline points="605,132 605,181 643,181" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="595" y="160" text-anchor="end" font-size="11" fill="#8896a8">write</text>
+  <polyline points="797,181 835,181 835,132" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="845" y="160" text-anchor="start" font-size="11" fill="#8896a8">read</text>
+  <text x="535" y="228" text-anchor="start" font-size="11" fill="#8896a8">Native form: initContainer + restartPolicy: Always</text>
+  <rect x="10" y="280" width="455" height="250" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="300" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">AMBASSADOR · PROXIES OUTBOUND CALLS</text>
+  <rect x="30" y="316" width="300" height="194" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="44" y="335" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">POD</text>
+  <rect x="46" y="380" width="110" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="101" y="403" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">app</text>
+  <text x="101" y="422" text-anchor="middle" font-size="11" fill="#8896a8">calls localhost</text>
+  <rect x="200" y="380" width="120" height="56" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="260" y="403" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">ambassador</text>
+  <text x="260" y="422" text-anchor="middle" font-size="11" fill="#8896a8">routes, retries, TLS</text>
+  <rect x="355" y="380" width="100" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="405" y="403" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Redis</text>
+  <text x="405" y="422" text-anchor="middle" font-size="11" fill="#8896a8">sharded cluster</text>
+  <polyline points="158,408 198,408" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="178" y="400" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#2a2f37" stroke-width="4" paint-order="stroke">:6379</text>
+  <polyline points="322,408 353,408" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="46" y="476" text-anchor="start" font-size="11" fill="#8896a8">The proxy knows the topology.</text>
+  <rect x="495" y="280" width="455" height="250" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="511" y="300" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">ADAPTER · TRANSLATES THE APP&#x27;S OUTPUT</text>
+  <rect x="515" y="316" width="300" height="194" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="529" y="335" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">POD</text>
+  <rect x="531" y="380" width="110" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="586" y="403" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">app</text>
+  <text x="586" y="422" text-anchor="middle" font-size="11" fill="#8896a8">custom /status</text>
+  <rect x="685" y="380" width="120" height="56" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="745" y="403" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">exporter</text>
+  <text x="745" y="422" text-anchor="middle" font-size="11" fill="#8896a8">serves /metrics</text>
+  <rect x="840" y="380" width="100" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="890" y="403" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Prometheus</text>
+  <text x="890" y="422" text-anchor="middle" font-size="11" fill="#8896a8">scrapes :9100</text>
+  <polyline points="643,408 683,408" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="663" y="400" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#2a2f37" stroke-width="4" paint-order="stroke">raw</text>
+  <polyline points="838,408 807,408" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="531" y="476" text-anchor="start" font-size="11" fill="#8896a8">Outside world sees a standard format.</text>
+</svg>
