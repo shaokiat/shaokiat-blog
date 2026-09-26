@@ -137,6 +137,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 5-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Roll forward, break it, roll back.**
 
 1. In namespace `lab5`, apply the Deployment above (3 replicas, `maxSurge: 1`, `maxUnavailable: 0`).

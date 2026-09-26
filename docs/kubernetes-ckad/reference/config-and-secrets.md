@@ -132,6 +132,8 @@ stringData:
 ## 🧪 Lab
 
 :::tip Lab 7-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **See env and volume diverge.**
 
 1. In namespace `lab7`, create ConfigMap `app-config` with `LOG_LEVEL=info`.

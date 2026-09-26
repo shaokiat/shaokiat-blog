@@ -153,6 +153,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 10-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Break the link between a Service and its Pods, then find it.** [Lab 0](../mental-model.md#-lab) does the basic selector break; this lab adds `targetPort` and Ingress.
 
 1. In namespace `lab10`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, args `netexec --http-port=8080`, 2 replicas).

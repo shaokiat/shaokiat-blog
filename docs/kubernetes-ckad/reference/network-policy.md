@@ -134,6 +134,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 11-1 ★★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Lock a namespace down, then open exactly one path.**
 
 kind's default CNI (kindnet) enforces NetworkPolicy. On minikube, start with `--cni=calico`.

@@ -226,6 +226,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 9-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Least privilege, then a hardened Pod.**
 
 1. In namespace `lab9`, create ServiceAccount `ci-bot` and a Role that allows managing Deployments and reading Pods and their logs. Bind it.

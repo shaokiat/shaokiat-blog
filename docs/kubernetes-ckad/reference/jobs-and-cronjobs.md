@@ -127,6 +127,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 3-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Watch `concurrencyPolicy: Forbid` skip a run.**
 
 1. In namespace `lab3`, create a CronJob `slow` that runs every minute, sleeps 90 seconds, and uses `concurrencyPolicy: Forbid`.

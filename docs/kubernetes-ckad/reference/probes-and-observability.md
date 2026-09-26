@@ -155,6 +155,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 12-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Watch readiness remove a Pod and liveness restart one.**
 
 1. In namespace `lab12`, create a Pod `probe` (`busybox:1.36`) that creates `/tmp/healthy` and `/tmp/ready`, then sleeps. Give it an exec readiness probe on `/tmp/ready` and an exec liveness probe on `/tmp/healthy`, both every 5 s.

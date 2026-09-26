@@ -138,6 +138,8 @@ status:                      # actual state: controllers write this, never you
 ## 🧪 Lab
 
 :::tip Lab 1-1 ★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Name the components behind each step.** Builds on [Lab 0](../mental-model.md#-lab), which covers self-healing and ownership.
 
 1. Create namespace `lab1` and a Deployment `web` (image `nginx`, 3 replicas) in it.

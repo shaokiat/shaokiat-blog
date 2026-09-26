@@ -114,6 +114,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 4-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Prove that data outlives the Pod.**
 
 1. In namespace `lab4`, create the PVC `data` (1Gi, RWO). Check its status before any Pod uses it.

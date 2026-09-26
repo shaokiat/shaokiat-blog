@@ -144,6 +144,8 @@ k get secret db -o jsonpath='{.data.password}' | base64 -d
 ## 🧪 Lab
 
 :::tip Lab 14-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Speed drill: eight tasks in ten minutes.**
 
 Work in namespace `lab14`. Only imperative commands and `$do` + a quick edit are allowed.

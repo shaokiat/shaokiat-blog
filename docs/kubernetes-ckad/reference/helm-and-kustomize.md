@@ -135,6 +135,8 @@ patches:
 ## 🧪 Lab
 
 :::tip Lab 6-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **One base, two environments.**
 
 1. Create `base/` with a Deployment `web` (`nginx:1.27`, 1 replica) that reads `LOG_LEVEL` from a generated ConfigMap `web-config`.

@@ -157,6 +157,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 8-1 ★★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Quota, defaults, then autoscaling under load.**
 
 Needs metrics-server. On kind: `kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml`, then add `--kubelet-insecure-tls` to its args.

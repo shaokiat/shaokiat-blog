@@ -131,6 +131,8 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 2-1 ★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Build a three-container Pod.**
 
 1. In namespace `lab2`, create the Pod `web` above: an init container writes `index.html`, a native sidecar writes the time to `time.txt` every 5 seconds, and nginx serves both.

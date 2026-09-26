@@ -105,6 +105,8 @@ kubectl run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 
 ## 🧪 Lab
 
 :::tip Lab 13-1 ★★★
+See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup).
+
 **Three bugs, one manifest.**
 
 Apply this to namespace `lab13`. The goal: `wget -qO- http://web` from a Pod in the namespace returns the nginx welcome page. Fix every problem using only `get`, `describe`, `logs` and `edit`/`set`/`patch`, and write down the status that led you to each fix.

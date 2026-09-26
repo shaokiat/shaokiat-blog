@@ -15,9 +15,9 @@ Read this page first. Every other page in this section is a detail of one idea e
 
 ## The big idea
 
-You never tell Kubernetes *what to do*. You tell it *what should exist*, and it works out the steps. A manifest is a statement of desired state ("3 replicas of nginx:1.27"). It's stored, and controllers compare it with actual state forever, acting whenever the two differ. There's no "run" command that finishes. There's only a gap that keeps being closed.
+You never tell Kubernetes *what to do*. You tell it *what should exist*, and it works out the steps. A [manifest](./start-here/glossary.md#manifest) is a statement of desired state ("3 replicas of nginx:1.27"). It's stored, and [controllers](./start-here/glossary.md#controller) compare it with actual state forever, acting whenever the two differ. There's no "run" command that finishes. There's only a gap that keeps being closed.
 
-That's why a deleted Pod comes back, why a failed node's Pods reappear elsewhere, and why an edit to a live object disappears on the next apply. None of these are special features. They're all the same loop.
+That's why a deleted [Pod](./start-here/glossary.md#pod) comes back, why a failed [node](./start-here/glossary.md#node)'s Pods reappear elsewhere, and why an edit to a live [object](./start-here/glossary.md#object) disappears on the next apply. None of these are special features. They're all the same loop.
 
 → See [Figure 1-2: the reconciliation loop](./reference/architecture.md#overview) in Architecture.
 
@@ -25,17 +25,17 @@ That's why a deleted Pod comes back, why a failed node's Pods reappear elsewhere
 
 | Concept | One sentence | What it explains | Detail |
 |---|---|---|---|
-| **The API server is the hub** | Every component reads and writes through it; only it touches etcd. | No component calls another. If the API server is down, nothing new happens, but running apps keep running. | [Components](./reference/architecture.md#components) |
-| **spec vs status** | You write `spec` (desired), controllers write `status` (actual). | Debugging is comparing the two and asking which controller should have closed the gap. | [Where a change lives](./reference/architecture.md#where-a-change-lives) |
+| **The [API server](./start-here/glossary.md#api-server) is the hub** | Every component reads and writes through it; only it touches [etcd](./start-here/glossary.md#etcd). | No component calls another. If the API server is down, nothing new happens, but running apps keep running. | [Components](./reference/architecture.md#components) |
+| **[spec vs status](./start-here/glossary.md#spec-vs-status)** | You write `spec` (desired), controllers write `status` (actual). | Debugging is comparing the two and asking which controller should have closed the gap. | [Where a change lives](./reference/architecture.md#where-a-change-lives) |
 | **Pods are disposable** | The smallest unit, replaced rather than repaired, with a new IP each time. | Why you never edit a Pod, and why nothing should address a Pod IP. | [Pods & Multi-Container](./reference/pods-and-multi-container.md) |
 | **Controllers are one pattern** | Each keeps one invariant true, using the same watch-diff-act loop. | Deployments, Jobs and DaemonSets differ in the promise, not the mechanism. | Table below |
-| **Labels are the only glue** | Objects find each other by label selector, never by name or ownership. | A typo in a label silently disconnects things. | [Services & Ingress](./reference/services-and-ingress.md) |
+| **[Labels](./start-here/glossary.md#label) are the only glue** | Objects find each other by label [selector](./start-here/glossary.md#selector), never by name or ownership. | A typo in a label silently disconnects things. | [Services & Ingress](./reference/services-and-ingress.md) |
 
 ### Controllers: same loop, different promises
 
 | Controller | The invariant it keeps true |
 |---|---|
-| Deployment → ReplicaSet | "N identical, interchangeable Pods of the current template exist." |
+| [Deployment](./start-here/glossary.md#deployment) → [ReplicaSet](./start-here/glossary.md#replicaset) | "N identical, interchangeable Pods of the current template exist." |
 | StatefulSet | "N Pods exist, each with a stable name and its own storage." |
 | DaemonSet | "Exactly one Pod runs on every matching node." |
 | Job / CronJob | "This many Pods have succeeded." / "A Job is created on this schedule." |
@@ -47,7 +47,7 @@ That's why a deleted Pod comes back, why a failed node's Pods reappear elsewhere
 | Selector on | Picks | If the labels don't match |
 |---|---|---|
 | ReplicaSet (from its Deployment) | The Pods it owns and counts | Rejected at apply: `selector does not match template labels`. Stray Pods that *do* match get adopted and counted. |
-| Service | The Pods that receive traffic | Empty EndpointSlice, "connection refused" |
+| [Service](./start-here/glossary.md#service) | The Pods that receive traffic | Empty [EndpointSlice](./start-here/glossary.md#endpointslice), "connection refused" |
 | NetworkPolicy | The Pods a rule protects or allows | The rule silently applies to nothing |
 
 ## Life of a `kubectl apply`
@@ -69,8 +69,8 @@ One `kubectl apply` of a 3-replica Deployment sets off six steps. Each is a diff
 | 1 | kube-apiserver | Your request | Validated Deployment into etcd | Admission |
 | 2 | Deployment controller | New Deployment | A ReplicaSet for this Pod template | Reconcile |
 | 3 | ReplicaSet controller | New ReplicaSet | 3 Pod objects (admission checks quota and Pod Security here) | Reconcile |
-| 4 | kube-scheduler | Pods with no node | A binding: Pod → node | Scheduling |
-| 5 | kubelet on that node | Pods bound to its node | Pulls the image, starts containers, reports `Running`, then `Ready` | Running |
+| 4 | [kube-scheduler](./start-here/glossary.md#scheduler) | Pods with no node | A binding: Pod → node | Scheduling |
+| 5 | [kubelet](./start-here/glossary.md#kubelet) on that node | Pods bound to its node | Pulls the image, starts containers, reports `Running`, then `Ready` | Running |
 | 6 | EndpointSlice controller | Pods turning Ready that match a Service | The Pod's IP into the Service's EndpointSlice | Routing |
 
 ## Which step broke?
@@ -81,7 +81,7 @@ The chain turns every symptom into a question: which step didn't happen? Find th
 |---|---|---|---|
 | Deployment `0/3`, no Pods at all | 3: Pods rejected at admission | ReplicaSet controller's events | [Troubleshooting](./reference/troubleshooting.md#status--first-command--usual-causes) |
 | `Pending` | 4: no node fits | kube-scheduler | [Troubleshooting](./reference/troubleshooting.md#status--first-command--usual-causes) |
-| `ImagePullBackOff` | 5: image can't be pulled | kubelet + container runtime | [Troubleshooting](./reference/troubleshooting.md#status--first-command--usual-causes) |
+| `ImagePullBackOff` | 5: image can't be pulled | kubelet + [container runtime](./start-here/glossary.md#container-runtime) | [Troubleshooting](./reference/troubleshooting.md#status--first-command--usual-causes) |
 | `CrashLoopBackOff` | 5: container starts, then exits | Your application | [Troubleshooting](./reference/troubleshooting.md#exit-codes) |
 | `Running`, but the Service returns nothing | 6: Pod not Ready, or labels don't match | EndpointSlice controller (via readiness and selectors) | [Troubleshooting](./reference/troubleshooting.md#timeout-vs-refused) |
 
@@ -90,11 +90,11 @@ The chain turns every symptom into a question: which step didn't happen? Find th
 ## 🧪 Lab
 
 :::tip Lab 0 ★
+See [Standard lab setup](./start-here/local-setup.md#standard-lab-setup).
+
 **See the chain and the glue for yourself.**
 
-Needs a local cluster: `kind create cluster` (or `minikube start`).
-
-1. In namespace `lab0`, create a Deployment `web` with `nginx:1.27` and 3 replicas.
+1. In [namespace](./start-here/glossary.md#namespace) `lab0`, create a Deployment `web` with `nginx:1.27` and 3 replicas.
 2. Delete one Pod and watch a replacement appear. Which controller created it?
 3. Trace ownership from a Pod up to the Deployment using `kubectl describe`.
 4. Expose the Deployment as a Service on port 80 and list its endpoints.
