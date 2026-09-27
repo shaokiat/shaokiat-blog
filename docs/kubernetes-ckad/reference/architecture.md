@@ -138,7 +138,7 @@ status:                      # actual state: controllers write this, never you
 ## 🧪 Lab
 
 :::tip Lab 1-1 ★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 0](../start-here/mental-model.md#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Name the components behind each step.** Builds on [Lab 0](../start-here/mental-model.md#-lab), which covers self-healing and ownership.
 
@@ -151,16 +151,17 @@ See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Ho
 **Verify**
 
 ```bash
-kubectl -n lab1 get deploy,rs,pods
-kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
+kubectl -n lab1 get deploy,rs,pods                      # web 3/3, one ReplicaSet at 3
+kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp \
+  -o custom-columns=REASON:.reason,SOURCE:.source.component,MESSAGE:.message | tail -n 15
 ```
 
 <details>
 <summary>🟡 Hints</summary>
 
 1. Same as Lab 0 step 1, in `lab1`.
-2. Events carry a `SOURCE`/reporting component. Sort them by time: `kubectl get events -h` shows `--sort-by`. Look for `SuccessfulCreate`, `Scheduled` and `Started`.
-3. `kubectl scale` works on any object with replicas, including `rs/<name>`. Watch with `kubectl get rs -w`.
+2. Each event records the component that reported it in `.source.component`, but the default table hides it. "See who did it" in [Command Patterns](../start-here/command-patterns.md#check-it). Look for `SuccessfulCreate`, `Scheduled` and `Started`.
+3. `kubectl scale` works on any object with replicas, including `rs/<name>`. The revert is too fast to watch, so read the events afterwards.
 
 </details>
 
@@ -173,10 +174,11 @@ kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
    kubectl create namespace lab1
    ```
 
-2. Create a Deployment with 3 replicas.
+2. Create a Deployment with 3 replicas and wait for it.
 
    ```bash
    kubectl -n lab1 create deployment web --image=nginx --replicas=3
+   kubectl -n lab1 rollout status deployment/web
    ```
 
 3. Stream Pod changes in the background.
@@ -188,7 +190,7 @@ kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
 4. Delete one Pod to trigger a replacement.
 
    ```bash
-   kubectl -n lab1 delete pod "$(kubectl -n lab1 get pods -o name | head -n 1)"
+   kubectl -n lab1 delete "$(kubectl -n lab1 get pods -o name | head -n 1)"
    ```
 
 5. Stop the background watch.
@@ -197,39 +199,70 @@ kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
    kill %1
    ```
 
-6. List recent events in time order; the source column names each component.
+6. List recent events in time order, with the component that reported each one. The default `get events` table has no source column, so ask for it.
 
    ```bash
-   kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp | tail -n 15
+   kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp \
+     -o custom-columns=REASON:.reason,SOURCE:.source.component,MESSAGE:.message | tail -n 8
    ```
 
    ```text
-   SuccessfulCreate  replicaset-controller  Created pod: web-...   <- controller-manager
-   Scheduled         default-scheduler      Assigned ... to node   <- scheduler
-   Pulled / Started  kubelet                                       <- kubelet
+   SuccessfulCreate    replicaset-controller   Created pod: web-5fc9f4bf66-k7qlh
+   Scheduled           default-scheduler       Successfully assigned lab1/web-5fc9f4bf66-ct585 to ckad-control-plane
+   Pulling             kubelet                 Pulling image "nginx"
+   SuccessfulCreate    replicaset-controller   Created pod: web-5fc9f4bf66-ct585
+   Killing             kubelet                 Stopping container nginx
+   Pulled              kubelet                 Successfully pulled image "nginx" in 1.525s ...
+   Started             kubelet                 Container started
+   Created             kubelet                 Container created
    ```
+
+   `replicaset-controller` runs inside kube-controller-manager and created the replacement. `default-scheduler` placed it. The `kubelet` pulled and started it.
 
 7. Scale the ReplicaSet directly, behind the Deployment's back.
 
    ```bash
-   kubectl -n lab1 scale rs "$(kubectl -n lab1 get rs -o name | head -n 1)" --replicas=5
+   kubectl -n lab1 scale "$(kubectl -n lab1 get rs -o name | head -n 1)" --replicas=5
    ```
 
-8. Watch the replica count.
+8. Check the count, then the events that explain it.
 
    ```bash
-   kubectl -n lab1 get rs -w
+   kubectl -n lab1 get rs
+   kubectl -n lab1 get events --sort-by=.metadata.creationTimestamp \
+     -o custom-columns=REASON:.reason,SOURCE:.source.component,MESSAGE:.message | tail -n 6
    ```
 
-   It jumps to 5, then the Deployment controller scales it back to 3. The Deployment owns the ReplicaSet's replica count, just as the ReplicaSet owns its Pods.
+   ```text
+   NAME             DESIRED   CURRENT   READY   AGE
+   web-5fc9f4bf66   3         3         3       13s
 
-9. Delete everything the lab created.
+   SuccessfulCreate    replicaset-controller   Created pod: web-5fc9f4bf66-r6fr2
+   SuccessfulCreate    replicaset-controller   Created pod: web-5fc9f4bf66-v2wvp
+   SuccessfulDelete    replicaset-controller   Deleted pod: web-5fc9f4bf66-v2wvp
+   SuccessfulDelete    replicaset-controller   Deleted pod: web-5fc9f4bf66-r6fr2
+   Scheduled           default-scheduler       Successfully assigned lab1/web-5fc9f4bf66-r6fr2 to ckad-control-plane
+   ScalingReplicaSet   deployment-controller   Scaled down replica set web-5fc9f4bf66 from 5 to 3
+   ```
+
+   Still 3. The ReplicaSet created 2 Pods to reach 5. Within a second `deployment-controller` scaled it back from 5 to 3, and the 2 new Pods were deleted. The Deployment owns the ReplicaSet's replica count, just as the ReplicaSet owns its Pods.
+
+9. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
    kubectl delete namespace lab1
    ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "3 Pods Ready"               "$(kubectl -n lab1 get deploy web -o jsonpath='{.status.readyReplicas}')" "3"
+t "one ReplicaSet, back at 3"  "$(kubectl -n lab1 get rs -o jsonpath='{range .items[*]}{.spec.replicas}{end}')" "3"
+t "Deployment scaled it back"  "$(kubectl -n lab1 get events --field-selector reason=ScalingReplicaSet -o jsonpath='{.items[*].message}' | grep -c 'from 5 to 3')" "1"
+```
 :::
 
 ## Gotchas

@@ -4,6 +4,7 @@ sidebar_label: Services & Ingress
 sidebar_position: 10
 ---
 
+import Link from "@docusaurus/Link";
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
@@ -153,7 +154,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 10-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 0](../start-here/mental-model.md#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Break the link between a Service and its Pods, then find it.** [Lab 0](../start-here/mental-model.md#-lab) does the basic selector break; this lab adds `targetPort` and Ingress.
 
@@ -271,15 +272,144 @@ kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
     kubectl -n lab10 describe ingress shop
     ```
 
-    Traffic flows only once an Ingress controller is installed (on kind, see kind's ingress guide).
+    `ADDRESS` stays empty and nothing routes until an Ingress controller runs. [Lab 10-2](#lab-10-2) installs one and sends real traffic.
 
-15. Delete everything the lab created.
+15. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab10
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+kubectl -n lab10 run chk --image=busybox:1.36 --restart=Never -- sleep 600 2>/dev/null; kubectl -n lab10 wait --for=condition=Ready pod/chk >/dev/null
+t "selector fixed"      "$(kubectl -n lab10 get svc api -o jsonpath='{.spec.selector.app}')" "api"
+t "targetPort 8080"     "$(kubectl -n lab10 get svc api -o jsonpath='{.spec.ports[0].targetPort}')" "8080"
+t "2 endpoints"         "$(kubectl -n lab10 get endpointslices -l kubernetes.io/service-name=api -o jsonpath='{range .items[*].endpoints[*]}x{end}')" "xx"
+t "Service answers"     "$(kubectl -n lab10 exec chk -- wget -qO- -T 3 http://api/hostname | cut -c1-4)" "api-"
+t "Ingress routes /api" "$(kubectl -n lab10 get ingress shop -o jsonpath='{.spec.rules[0].http.paths[0].backend.service.name}')" "api"
+```
+:::
+
+<Link id="lab-10-2" />
+
+:::tip Lab 10-2 ★★
+**Requires:** [Cluster add-ons](../start-here/local-setup.md#cluster-add-ons) (port mappings + ingress-nginx) · [Lab 10-1](#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+
+**Route two Services through one Ingress, from your laptop.**
+
+**Goal**
+
+1. In namespace `lab10b`, create Deployment `api` (agnhost `netexec` on 8080, 2 replicas) with Service `api` on 80 → 8080, and Deployment `web` (`nginx:1.27`) with Service `web` on 80.
+2. Create one Ingress `shop`, class `nginx`, host `shop.localhost`: `/api` goes to `api`, everything else to `web`.
+3. From your laptop, curl `/`, `/api` and `/apiv1`. Which backend answered each, and how can you tell?
+4. Curl a host the Ingress doesn't know. Who answers now?
+
+**Verify**
+
+```bash
+curl -s http://shop.localhost/ | grep -o '<title>.*</title>'      # <title>Welcome to nginx!</title>
+curl -s http://shop.localhost/api                                # NOW: 2026-... (agnhost)
+curl -s -o /dev/null -w '%{http_code}\n' http://other.localhost/  # 404
+```
+
+<details>
+<summary>🟡 Hints</summary>
+
+1. Same commands as Lab 10-1 steps 2–3, twice.
+2. "Route HTTP by host and path" in [Command Patterns](../start-here/command-patterns.md#expose-it). `--rule` can repeat; `--class` picks the controller.
+3. agnhost answers unknown paths with `NOW: <time>`. nginx answers with HTML. `pathType: Prefix` matches whole path segments.
+4. A 404 has a footer. Compare it with the one from `/apiv1`, and read `kubectl logs deploy/web`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
+
+1. Create the namespace and both backends.
+
+   ```bash
+   kubectl create namespace lab10b
+   kubectl -n lab10b create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
+     --replicas=2 --port=8080 -- /agnhost netexec --http-port=8080
+   kubectl -n lab10b expose deployment api --port=80 --target-port=8080
+   kubectl -n lab10b create deployment web --image=nginx:1.27
+   kubectl -n lab10b expose deployment web --port=80
+   ```
+
+2. Create the Ingress. The more specific path wins, whatever the rule order.
+
+   ```bash
+   kubectl -n lab10b create ingress shop --class=nginx \
+     --rule="shop.localhost/api*=api:80" --rule="shop.localhost/*=web:80"
+   kubectl -n lab10b describe ingress shop | sed -n '/Rules/,/Annotations/p'
+   ```
+
+   ```text
+   Rules:
+     Host            Path  Backends
+     ----            ----  --------
+     shop.localhost
+                     /api   api:80 (10.244.0.172:8080,10.244.0.171:8080)
+                     /      web:80 (10.244.0.173:80)
+   ```
+
+   The generator's `api*` becomes `path: /api` with `pathType: Prefix`.
+
+3. Curl each path from your laptop.
+
+   ```bash
+   curl -s http://shop.localhost/ | grep -o '<title>.*</title>'
+   curl -s http://shop.localhost/api
+   curl -s http://shop.localhost/apiv1 | tail -3
+   ```
+
+   ```text
+   <title>Welcome to nginx!</title>
+   NOW: 2026-09-27 09:56:00.194899043 +0000 UTC m=+5.235875961
+   <hr><center>nginx/1.27.5</center>
+   </body>
+   </html>
+   ```
+
+   `/api` reached agnhost. `/apiv1` is not under the `/api` prefix, because Prefix matches whole segments, so it went to `web`, whose nginx has no such file. The versioned footer and `kubectl -n lab10b logs deploy/web` both show the `web` Pod served that 404.
+
+4. Curl a host with no rule.
+
+   ```bash
+   curl -s http://other.localhost/ | tail -3
+   ```
+
+   ```text
+   <hr><center>nginx</center>
+   </body>
+   </html>
+   ```
+
+   A different 404: no version in the footer. The controller answered itself, because no rule matched the host. No Pod was involved.
+
+5. Run the ✅ Check below, then delete everything the lab created.
+
+   ```bash
+   kubectl delete namespace lab10b
+   ```
+
+</details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "/ reaches web"          "$(curl -s http://shop.localhost/ | grep -o '<title>.*</title>')" "<title>Welcome to nginx!</title>"
+t "/api reaches api"       "$(curl -s http://shop.localhost/api | cut -c1-4)" "NOW:"
+t "/apiv1 goes to web"     "$(curl -s http://shop.localhost/apiv1 | grep -o 'nginx/1.27')" "nginx/1.27"
+t "unknown host is a 404"  "$(curl -s -o /dev/null -w '%{http_code}' http://other.localhost/)" "404"
+t "Ingress has 2 backends" "$(kubectl -n lab10b get ingress shop -o jsonpath='{.spec.rules[0].http.paths[*].backend.service.name}')" "api web"
+```
 :::
 
 ## Gotchas

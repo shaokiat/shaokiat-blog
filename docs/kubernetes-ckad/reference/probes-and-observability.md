@@ -155,7 +155,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 12-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Services](./services-and-ingress.md#service-types) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Watch readiness remove a Pod and liveness restart one.**
 
@@ -244,13 +244,23 @@ kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E
 
    ~15s later: events show "Liveness probe failed" then "Killing". RESTARTS only ticks up ~30s after that: sh runs as PID 1 and ignores SIGTERM, so the kubelet waits out terminationGracePeriodSeconds (30s) before SIGKILL. Real apps must handle SIGTERM. The restarted container recreates both files and becomes Ready again.
 
-7. Delete everything the lab created.
+7. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
    kubectl delete namespace lab12
    ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "liveness restarted it"   "$([ "$(kubectl -n lab12 get pod probe -o jsonpath='{.status.containerStatuses[0].restartCount}')" -ge 1 ] && echo yes)" "yes"
+t "Ready again"             "$(kubectl -n lab12 get pod probe -o jsonpath='{.status.containerStatuses[0].ready}')" "true"
+t "readiness probe failed"  "$(kubectl -n lab12 get events --field-selector reason=Unhealthy -o jsonpath='{.items[*].message}' | grep -c 'Readiness probe failed')" "1"
+t "liveness probe failed"   "$(kubectl -n lab12 get events --field-selector reason=Unhealthy -o jsonpath='{.items[*].message}' | grep -c 'Liveness probe failed')" "1"
+```
 :::
 
 ## Gotchas

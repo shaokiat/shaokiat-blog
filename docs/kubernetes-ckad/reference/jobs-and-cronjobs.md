@@ -127,7 +127,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 3-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Generate, edit, apply](../start-here/command-patterns.md#generate-edit-apply) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Watch `concurrencyPolicy: Forbid` skip a run.**
 
@@ -185,7 +185,14 @@ kubectl -n lab3 get jobs
    kubectl -n lab3 get jobs -w
    ```
 
-   A 90s run spans two schedule ticks. Forbid skips every tick that finds a run active, so you see roughly one Job every 2 minutes.
+   ```text
+   NAME            STATUS     COMPLETIONS   DURATION   AGE
+   slow-29841788   Complete   1/1           93s        3m20s
+   slow-29841789   Complete   1/1           93s        107s
+   slow-29841791   Running    0/1           14s        14s
+   ```
+
+   Three Jobs in over four minutes, never two at once. Forbid doesn't start a tick that finds a run active, but with no `startingDeadlineSeconds` the missed tick isn't lost either: the controller starts it late, as soon as the previous run finishes. So runs go back to back (`...89` started when `...88` ended), and ticks that pile up collapse into one (`...90` never ran). Set `startingDeadlineSeconds` if a late run is worse than no run.
 
 6. Start a Job from the CronJob's template right now.
 
@@ -201,13 +208,23 @@ kubectl -n lab3 get jobs
    kubectl -n lab3 patch cronjob slow -p '{"spec":{"suspend":true}}'
    ```
 
-8. Delete everything the lab created.
+8. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
    kubectl delete namespace lab3
    ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "concurrencyPolicy Forbid" "$(kubectl -n lab3 get cronjob slow -o jsonpath='{.spec.concurrencyPolicy}')" "Forbid"
+t "suspended"                "$(kubectl -n lab3 get cronjob slow -o jsonpath='{.spec.suspend}')" "true"
+t "manual run created"       "$(kubectl -n lab3 get job slow-manual -o jsonpath='{.metadata.name}')" "slow-manual"
+t "never 2 scheduled at once" "$(kubectl -n lab3 get jobs -o jsonpath='{range .items[*]}{.metadata.name} {.status.active}{"\n"}{end}' | grep -v manual | grep -c ' 1$' | awk '{print ($1<=1)?"yes":"no"}')" "yes"
+```
 :::
 
 ## Gotchas

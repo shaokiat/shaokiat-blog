@@ -4,6 +4,8 @@ sidebar_label: Helm & Kustomize
 sidebar_position: 6
 ---
 
+import Link from "@docusaurus/Link";
+
 # Helm & Kustomize
 
 > Docs: [Helm](https://helm.sh/docs/) · [Helm cheat sheet](https://helm.sh/docs/intro/cheatsheet/) · [Kustomize in kubectl](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/)
@@ -135,7 +137,7 @@ patches:
 ## 🧪 Lab
 
 :::tip Lab 6-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [envFrom](./config-and-secrets.md#injection-methods) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **One base, two environments.**
 
@@ -143,15 +145,13 @@ See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Ho
 
 1. Create `base/` with a Deployment `web` (`nginx:1.27`, 1 replica) that reads `LOG_LEVEL` from a generated ConfigMap `web-config`.
 2. Create `overlays/prod/` that sets namespace `lab6`, prefix `prod-`, 3 replicas, tag `1.28` and `LOG_LEVEL=info`.
-3. Render the overlay, then apply it. Change `LOG_LEVEL` and re-apply. What happens to the Pods, and why?
-4. *(If Helm is installed)* Install `podinfo/podinfo` as release `web` in `lab6-helm` with 2 replicas, upgrade it with `ui.message=hello`, then roll back to revision 1.
+3. Render the overlay, then apply it. Change `LOG_LEVEL` to `warn` and re-apply. What happens to the Pods, and why?
 
 **Verify**
 
 ```bash
 kubectl -n lab6 get deploy prod-web -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}{"\n"}'  # 3 nginx:1.28
-kubectl -n lab6 get configmap                                  # prod-web-config-<hash>
-helm history web -n lab6-helm                                  # 3 revisions, the last "Rollback to 1"
+kubectl -n lab6 get configmap                                  # prod-web-config-<hash>, one per LOG_LEVEL applied
 ```
 
 <details>
@@ -160,7 +160,6 @@ helm history web -n lab6-helm                                  # 3 revisions, th
 1. Generate the Deployment with `--dry-run=client -o yaml`, then add `envFrom` pointing at `web-config`. The ConfigMap comes from `configMapGenerator`, not from a file.
 2. The fields you need are in the Kustomize features table above: `namespace`, `namePrefix`, `replicas`, `images`, and a generator with `behavior: merge`.
 3. `kubectl kustomize <dir>` renders; `kubectl apply -k <dir>` applies. Compare the ConfigMap name before and after.
-4. `helm repo add`, then `helm install -h`, `helm upgrade --reuse-values`, `helm rollback`.
 
 </details>
 
@@ -235,37 +234,154 @@ helm history web -n lab6-helm                                  # 3 revisions, th
 
     The ConfigMap name (hash) changed, so the Pod template changed, so a rollout happened.
 
-11. Install the chart as release "web" with 2 replicas (needs: helm repo add podinfo https://stefanprodan.github.io/podinfo).
+11. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    helm install web podinfo/podinfo -n lab6-helm --create-namespace --set replicaCount=2
-    ```
-
-12. Upgrade, keeping the earlier values and adding a message.
-
-    ```bash
-    helm upgrade web podinfo/podinfo -n lab6-helm --reuse-values --set ui.message=hello
-    ```
-
-13. Roll back to revision 1.
-
-    ```bash
-    helm rollback web 1 -n lab6-helm
-    ```
-
-14. List the release's revisions.
-
-    ```bash
-    helm history web -n lab6-helm
-    ```
-
-15. Delete everything the lab created.
-
-    ```bash
-    kubectl delete namespace lab6 lab6-helm
+    cd .. && kubectl delete namespace lab6
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "3 replicas on 1.28"     "$(kubectl -n lab6 get deploy prod-web -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}')" "3 nginx:1.28"
+t "Pods see LOG_LEVEL=warn" "$(kubectl -n lab6 exec deploy/prod-web -- printenv LOG_LEVEL)" "warn"
+t "config change rolled"   "$(kubectl -n lab6 get rs --no-headers | wc -l | tr -d ' ')" "2"
+t "two hashed ConfigMaps"  "$(kubectl -n lab6 get configmap -o name | grep -c 'prod-web-config-')" "2"
+```
+:::
+
+<Link id="lab-6-2" />
+
+:::tip Lab 6-2 ★★
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · the [helm CLI](https://helm.sh/docs/intro/install/) (v3 or v4) and internet access · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+
+**Install a chart, break its values, roll back.**
+
+**Goal**
+
+1. Add the `podinfo` repo. Install chart `podinfo/podinfo` version `6.15.0` as release `web` in namespace `lab6-helm`, with 2 replicas.
+2. Upgrade the release to set `ui.message=hello`, keeping 2 replicas.
+3. Upgrade again, passing only `--set ui.message=oops`. How many replicas are there now, and why?
+4. Roll back to the revision that had 2 replicas and `hello`.
+
+**Verify**
+
+```bash
+helm history web -n lab6-helm                               # 4 revisions, the last "Rollback to 2"
+kubectl -n lab6-helm get deploy web-podinfo                 # 2/2
+helm get values web -n lab6-helm                            # replicaCount: 2, message: hello
+```
+
+<details>
+<summary>🟡 Hints</summary>
+
+1. `helm repo add -h`, then `helm install -h`: look at `--version`, `--create-namespace` and `--set`. `helm show values` names the replica key.
+2. `helm upgrade -h`: which flag keeps the values from the last revision?
+3. Compare `helm get values` before and after. Values you don't pass again are not kept by default.
+4. `helm history` numbers the revisions; `helm rollback <release> <revision>`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
+
+1. Add the chart repository and find the replica key.
+
+   ```bash
+   helm repo add podinfo https://stefanprodan.github.io/podinfo
+   helm repo update
+   helm show values podinfo/podinfo --version 6.15.0 | grep -E '^replicaCount|  message'
+   ```
+
+   ```text
+   replicaCount: 1
+     message: ""
+   ```
+
+2. Install a pinned chart version with 2 replicas.
+
+   ```bash
+   helm install web podinfo/podinfo --version 6.15.0 -n lab6-helm --create-namespace --set replicaCount=2
+   kubectl -n lab6-helm rollout status deployment/web-podinfo
+   ```
+
+   ```text
+   NAME: web
+   NAMESPACE: lab6-helm
+   STATUS: deployed
+   REVISION: 1
+   DESCRIPTION: Install complete
+   ```
+
+3. Upgrade, keeping the earlier values and adding a message.
+
+   ```bash
+   helm upgrade web podinfo/podinfo --version 6.15.0 -n lab6-helm --reuse-values --set ui.message=hello
+   helm get values web -n lab6-helm
+   ```
+
+   ```text
+   USER-SUPPLIED VALUES:
+   replicaCount: 2
+   ui:
+     message: hello
+   ```
+
+4. Upgrade the careless way: a new `--set` and nothing else.
+
+   ```bash
+   helm upgrade web podinfo/podinfo --version 6.15.0 -n lab6-helm --set ui.message=oops
+   kubectl -n lab6-helm get deploy web-podinfo -o jsonpath='{.spec.replicas}{"\n"}'
+   helm get values web -n lab6-helm
+   ```
+
+   ```text
+   1
+   USER-SUPPLIED VALUES:
+   ui:
+     message: oops
+   ```
+
+   Without `--reuse-values` (or `-f` with the full values file), Helm starts from the chart defaults. `replicaCount: 2` was dropped, so the Deployment scaled to 1.
+
+5. Roll back to revision 2 and read the history.
+
+   ```bash
+   helm rollback web 2 -n lab6-helm
+   kubectl -n lab6-helm rollout status deployment/web-podinfo
+   helm history web -n lab6-helm
+   ```
+
+   ```text
+   REVISION  UPDATED                   STATUS      CHART           APP VERSION  DESCRIPTION
+   1         Sun Sep 27 09:54:27 2026  superseded  podinfo-6.15.0  6.15.0       Install complete
+   2         Sun Sep 27 09:54:39 2026  superseded  podinfo-6.15.0  6.15.0       Upgrade complete
+   3         Sun Sep 27 09:54:40 2026  superseded  podinfo-6.15.0  6.15.0       Upgrade complete
+   4         Sun Sep 27 09:54:41 2026  deployed    podinfo-6.15.0  6.15.0       Rollback to 2
+   ```
+
+   A rollback is a new revision (4) with revision 2's values and templates. History only moves forward.
+
+6. Run the ✅ Check below, then delete everything the lab created.
+
+   ```bash
+   kubectl delete namespace lab6-helm
+   ```
+
+</details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "4 revisions"           "$(helm history web -n lab6-helm -o json | grep -o '"revision":' | wc -l | tr -d ' ')" "4"
+t "last is Rollback to 2" "$(helm history web -n lab6-helm --max 1 -o json | grep -o 'Rollback to 2')" "Rollback to 2"
+t "2 replicas again"      "$(kubectl -n lab6-helm get deploy web-podinfo -o jsonpath='{.status.readyReplicas}')" "2"
+t "message is hello"      "$(kubectl -n lab6-helm get deploy web-podinfo -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="PODINFO_UI_MESSAGE")].value}')" "hello"
+```
 :::
 
 ## Gotchas

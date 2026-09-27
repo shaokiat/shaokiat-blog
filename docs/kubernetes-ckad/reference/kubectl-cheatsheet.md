@@ -117,7 +117,7 @@ k get secret db -o jsonpath='{.data.password}' | base64 -d
 ## 🧪 Lab
 
 :::tip Lab 14-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [the `k` alias](../start-here/local-setup.md#kubeconfig-in-5-lines) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Speed drill: eight tasks in ten minutes.**
 
@@ -213,6 +213,7 @@ k -n lab14 get cronjob tick
 
     ```bash
     k create job once --image=busybox:1.36 -- echo done
+    k wait --for=condition=complete job/once --timeout=60s
     ```
 
 11. A CronJob every 5 minutes.
@@ -233,13 +234,25 @@ k -n lab14 get cronjob tick
     k get pods -o jsonpath='{.items[*].spec.containers[*].image}' | tr ' ' '\n' | sort | uniq -c
     ```
 
-14. Switch the default back and delete everything the lab created.
+14. Run the ✅ Check below, then switch the default back and delete everything the lab created.
 
     ```bash
     k config set-context --current --namespace=default && k delete namespace lab14
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "nginx labelled"     "$(kubectl -n lab14 get pod nginx -o jsonpath='{.metadata.labels.tier}')" "web"
+t "api: 5 on 1.27"     "$(kubectl -n lab14 get deploy api -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}')" "5 nginx:1.27"
+t "api reads cfg"      "$(kubectl -n lab14 get deploy api -o jsonpath='{.spec.template.spec.containers[0].env[0].valueFrom.configMapKeyRef.name}')" "cfg"
+t "Service api on 80"  "$(kubectl -n lab14 get svc api -o jsonpath='{.spec.ports[0].port}')" "80"
+t "Job once succeeded" "$(kubectl -n lab14 get job once -o jsonpath='{.status.succeeded}')" "1"
+t "CronJob tick"       "$(kubectl -n lab14 get cronjob tick -o jsonpath='{.spec.schedule}')" "*/5 * * * *"
+```
 :::
 
 ## Gotchas

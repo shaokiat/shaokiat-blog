@@ -35,8 +35,8 @@ Interview-style systems that combine several reference pages. Explain each one e
 ## Domain 2: Application Deployment (20%)
 
 - Rolling updates and rollback → [Deployments & Rollouts](./reference/deployments-and-rollouts.md#rollout-strategy)
-- Blue/green and canary with Kubernetes primitives → [Release strategies](./reference/deployments-and-rollouts.md#release-strategies-with-core-primitives) · [Zero-Downtime Release](./scenarios/zero-downtime-release.md)
-- Deploy existing packages with **Helm** → [Helm & Kustomize](./reference/helm-and-kustomize.md#helm-terms)
+- Blue/green and canary with Kubernetes primitives → [Release strategies](./reference/deployments-and-rollouts.md#release-strategies-with-core-primitives) · [Lab 5-2](./reference/deployments-and-rollouts.md#lab-5-2) · [Zero-Downtime Release](./scenarios/zero-downtime-release.md)
+- Deploy existing packages with **Helm** → [Helm & Kustomize](./reference/helm-and-kustomize.md#helm-terms) · [Lab 6-2](./reference/helm-and-kustomize.md#lab-6-2)
 - Patch manifests per environment with **Kustomize** → [Helm & Kustomize](./reference/helm-and-kustomize.md#kustomize-features)
 
 ---
@@ -55,7 +55,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 
 - Extend Kubernetes with **CRDs** and **Operators** → [Security](./reference/security.md#crds-and-operators)
 - Authentication, authorization (RBAC) and admission control → [Request pipeline](./reference/security.md#the-request-pipeline) · [RBAC](./reference/security.md#rbac-objects) · [Pod Security Admission](./reference/security.md#pod-security-admission)
-- Requests, limits and ResourceQuotas → [Requests vs limits](./reference/resources-and-scaling.md#requests-vs-limits) · [LimitRange vs ResourceQuota](./reference/resources-and-scaling.md#limitrange-vs-resourcequota)
+- Requests, limits and ResourceQuotas → [Requests vs limits](./reference/resources-and-scaling.md#requests-vs-limits) · [LimitRange vs ResourceQuota](./reference/resources-and-scaling.md#limitrange-vs-resourcequota) · [Scheduling & Shutdown](./reference/scheduling.md#placing-pods)
 - **ConfigMaps** and **Secrets** → [Config & Secrets](./reference/config-and-secrets.md#configmap-vs-secret) · [injection methods](./reference/config-and-secrets.md#injection-methods)
 - **ServiceAccounts** and **SecurityContexts** → [ServiceAccounts](./reference/security.md#serviceaccounts) · [SecurityContext](./reference/security.md#securitycontext)
 
@@ -65,7 +65,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 
 - NetworkPolicies → [How selection works](./reference/network-policy.md#how-selection-works) · [peer selectors](./reference/network-policy.md#peer-selectors)
 - Provide and troubleshoot access to applications via Services → [Service types](./reference/services-and-ingress.md#service-types) · [the four ports](./reference/services-and-ingress.md#the-four-ports)
-- Expose applications with Ingress rules → [Ingress vs Gateway API](./reference/services-and-ingress.md#ingress-vs-gateway-api)
+- Expose applications with Ingress rules → [Ingress vs Gateway API](./reference/services-and-ingress.md#ingress-vs-gateway-api) · [Lab 10-2](./reference/services-and-ingress.md#lab-10-2)
 
 ---
 

@@ -131,7 +131,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 2-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Build a three-container Pod.**
 
@@ -207,6 +207,8 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
    kubectl -n lab2 replace --force -f pod.yaml
    ```
 
+   It takes about 30 seconds. The `clock` sidecar's shell ignores SIGTERM, so the kubelet waits out the grace period before SIGKILL (→ [termination sequence](./scheduling.md#the-termination-sequence)).
+
 8. Watch the status: Init:Error → Init:CrashLoopBackOff. nginx never starts.
 
    ```bash
@@ -219,13 +221,22 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
    kubectl -n lab2 logs web -c init-page
    ```
 
-10. Delete everything the lab created.
+10. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab2
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "clock is a native sidecar" "$(kubectl -n lab2 get pod web -o jsonpath='{.spec.initContainers[1].restartPolicy}')" "Always"
+t "init-page exits 1"         "$(kubectl -n lab2 get pod web -o jsonpath='{.status.initContainerStatuses[0].lastState.terminated.exitCode}')" "1"
+t "nginx never started"       "$(kubectl -n lab2 get pod web -o jsonpath='{.status.containerStatuses[0].state.waiting.reason}')" "PodInitializing"
+```
 :::
 
 ## Gotchas

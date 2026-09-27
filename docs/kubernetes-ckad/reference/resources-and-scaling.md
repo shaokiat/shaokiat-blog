@@ -159,11 +159,9 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 8-1 ★★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) + metrics-server from [Cluster add-ons](../start-here/local-setup.md#cluster-add-ons) · [Services](./services-and-ingress.md#service-types) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Quota, defaults, then autoscaling under load.**
-
-**Requires:** metrics-server → [Cluster add-ons](../start-here/local-setup.md#cluster-add-ons).
 
 **Goal**
 
@@ -244,13 +242,25 @@ kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <u
 
    After stopping the load, scale-in waits for the 5-minute stabilization window.
 
-9. Delete everything the lab created.
+9. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
    kubectl delete namespace lab8
    ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "LimitRange injected a request" "$(kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].resources.requests.cpu}')" "100m"
+t "QoS Burstable"                 "$(kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}')" "Burstable"
+t "quota counts the Pods"         "$([ -n "$(kubectl -n lab8 get quota team-quota -o jsonpath='{.status.used.pods}')" ] && echo yes)" "yes"
+t "HPA targets 50%"               "$(kubectl -n lab8 get hpa web -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}')" "50"
+t "HPA sees CPU"                  "$(kubectl -n lab8 get hpa web -o jsonpath='{.status.currentMetrics[0].resource.current.averageUtilization}' | grep -c '^[0-9]')" "1"
+t "HPA scaled out under load"     "$(kubectl -n lab8 get events --field-selector reason=SuccessfulRescale -o name | head -n 1 | grep -c .)" "1"
+```
 :::
 
 ## Gotchas

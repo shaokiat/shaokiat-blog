@@ -77,7 +77,7 @@ Read and wire:
 
 ```bash
 kubectl get secret db-creds -o jsonpath='{.data.password}' | base64 -d; echo
-kubectl set env deployment/web --from=configmap/app-config              # adds envFrom
+kubectl set env deployment/web --from=configmap/app-config              # one env entry per key (configMapKeyRef)
 kubectl set env deployment/web --list                                   # what the container gets
 kubectl exec deploy/web -- env | grep LOG_LEVEL
 ```
@@ -132,7 +132,7 @@ stringData:
 ## 🧪 Lab
 
 :::tip Lab 7-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **See env and volume diverge.**
 
@@ -182,7 +182,7 @@ kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/c
    kubectl -n lab7 create deployment cfg --image=busybox:1.36 -- sleep 3600
    ```
 
-4. Inject every ConfigMap key as an env var (this adds envFrom).
+4. Inject every ConfigMap key as an env var. `set env --from` writes one `env` entry per key, each a `configMapKeyRef`, not an `envFrom`.
 
    ```bash
    kubectl -n lab7 set env deployment/cfg --from=configmap/app-config
@@ -237,13 +237,20 @@ kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/c
     kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
     ```
 
-13. Delete everything the lab created.
+13. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab7
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "env and file both debug" "$(kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"')" "env=debug file=debug"
+```
 :::
 
 ## Gotchas

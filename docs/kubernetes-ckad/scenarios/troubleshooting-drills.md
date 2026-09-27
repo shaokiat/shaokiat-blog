@@ -27,7 +27,7 @@ For each drill, before you open the answer:
 | Fix it at the owner | Deployment, not Pod, wherever there is one |
 | Confirm with the same command | The status you expected, not "it seems fine" |
 
-Setup: `kind create cluster`, then one namespace per drill: `kubectl create ns drill1 && kubectl config set-context --current --namespace=drill1`.
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) (plain kind). Use one namespace per drill and make it the default, because the commands below omit `-n`: `kubectl create ns drill1 && kubectl config set-context --current --namespace=drill1`. Each drill ends with a ✅ Check that passes once your fix works.
 
 ## Architecture
 
@@ -117,6 +117,13 @@ Longer term, add a LimitRange with default requests to the namespace.
 
 </details>
 
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "app1 2/2 Ready" "$(kubectl get deploy app1 -o jsonpath='{.status.readyReplicas}')" "2"
+```
+
 **Reproduce in one line:** `kubectl create quota compute --hard=requests.cpu=2,requests.memory=4Gi && kubectl create deployment app1 --image=nginx:1.27 --replicas=2`
 
 ### Drill 2 ★: Pending forever
@@ -159,16 +166,23 @@ kubectl describe node | grep -A6 "Allocated resources"
 <summary>Root cause and fix</summary>
 
 ```text
-0/2 nodes are available: 1 Insufficient cpu, 1 node(s) had untolerated taint(s).
+0/1 nodes are available: 1 Insufficient cpu. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
 ```
 
-The scheduler checks every node. The worker lacks 64 free CPUs (by requests), and the control-plane node is tainted against workloads. No node qualifies.
+The scheduler checks every node and gives one reason per node. The only node lacks 64 free CPUs, counted by requests, not usage. On a cluster with a separate control plane the same Pod reads `0/2 nodes are available: 1 Insufficient cpu, 1 node(s) had untolerated taint(s)`: the control-plane node is tainted against workloads (→ [Taints and tolerations](../reference/scheduling.md#taints-and-tolerations)).
 
 ```bash
 kubectl set resources deployment app2 --requests=cpu=100m
 ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "app2 Ready"     "$(kubectl get deploy app2 -o jsonpath='{.status.readyReplicas}')" "1"
+```
 
 **Reproduce in one line:** `kubectl create deployment app2 --image=nginx:1.27 && kubectl set resources deployment app2 --requests=cpu=64`
 
@@ -213,6 +227,13 @@ kubectl set image pod/app3 nginx=nginx:1.27      # image is one of the few mutab
 ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "app3 Ready"     "$(kubectl get pod app3 -o jsonpath='{.status.containerStatuses[0].ready}')" "true"
+```
 
 **Reproduce in one line:** `kubectl run app3 --image=nginx:1.72`
 
@@ -270,6 +291,13 @@ kubectl get pod app4 -o yaml | sed 's/key: passwd/key: password/' | kubectl repl
 
 </details>
 
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "app4 Ready"     "$(kubectl get pod app4 -o jsonpath='{.status.containerStatuses[0].ready}')" "true"
+```
+
 **Reproduce in one line:** `kubectl create secret generic db --from-literal=password=s3cr3t`, then apply the Pod above.
 
 ### Drill 5 ★★: CrashLoopBackOff
@@ -320,6 +348,13 @@ kubectl run app5 --image=busybox:1.36 --env=DB_URL=postgres://db:5432/app --comm
 In a real app the env var would come from a ConfigMap (→ [Config & Secrets](../reference/config-and-secrets.md)).
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "app5 Ready, no new restarts" "$(kubectl get pod app5 -o jsonpath='{.status.containerStatuses[0].ready} {.status.containerStatuses[0].restartCount}')" "true 0"
+```
 
 **Reproduce in one line:** `kubectl run app5 --image=busybox:1.36 --command -- sh -c 'echo "fatal: DB_URL is not set" >&2; exit 1'`
 
@@ -372,6 +407,13 @@ kubectl logs app6                                # loading, ready
 In a real incident, check whether memory plateaus (limit too low) or keeps growing (leak) before raising the limit.
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "app6 finished loading" "$(kubectl logs app6 | tail -n 1)" "ready"
+```
 
 **Reproduce in one line:** apply the Pod above. `kubectl run` can't set limits without `--overrides`.
 
@@ -441,6 +483,14 @@ kubectl patch deployment app7 --type=json \
 
 </details>
 
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "2 Ready endpoints" "$(kubectl get endpointslices -l kubernetes.io/service-name=app7 -o jsonpath='{range .items[*].endpoints[*]}{.conditions.ready} {end}')" "true true "
+t "app7 answers"      "$(kubectl exec c -- wget -qO- -T 3 http://app7 | grep -o '<title>.*</title>')" "<title>Welcome to nginx!</title>"
+```
+
 **Reproduce in one line:** apply the manifest above. There is no imperative flag for probes.
 
 ### Drill 8 ★★★: Endpoints exist, connection refused
@@ -506,6 +556,13 @@ kubectl patch svc app8 --type=json -p '[{"op":"replace","path":"/spec/ports/0/ta
 Variation: if the request *times out* instead, suspect a NetworkPolicy (→ [Network Policy](../reference/network-policy.md)).
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "app8 answers"      "$(kubectl exec c -- wget -qO- -T 3 http://app8 | grep -o '<title>.*</title>')" "<title>Welcome to nginx!</title>"
+```
 
 **Reproduce in one line:** `kubectl create deployment app8 --image=nginx:1.27 --replicas=2 && kubectl expose deployment app8 --port=80 --target-port=8080`
 

@@ -226,7 +226,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 9-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Least privilege, then a hardened Pod.**
 
@@ -377,7 +377,7 @@ kubectl -n lab9 get bk
     kubectl -n lab9 get bk
     ```
 
-18. Delete everything the lab created.
+18. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab9
@@ -390,6 +390,21 @@ kubectl -n lab9 get bk
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+sa=system:serviceaccount:lab9:ci-bot
+t "ci-bot can create deployments" "$(kubectl -n lab9 auth can-i create deployments --as=$sa)" "yes"
+t "ci-bot cannot delete them"     "$(kubectl -n lab9 auth can-i delete deployments --as=$sa)" "no"
+t "ci-bot can read Pod logs"      "$(kubectl -n lab9 auth can-i get pods/log --as=$sa)" "yes"
+t "ci-bot cannot read Secrets"    "$(kubectl -n lab9 auth can-i get secrets --as=$sa)" "no"
+t "restricted is enforced"        "$(kubectl get ns lab9 -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" "restricted"
+t "hardened runs as 1000"         "$(kubectl -n lab9 exec hardened -- id -u)" "1000"
+t "root filesystem read-only"     "$(kubectl -n lab9 exec hardened -- touch /etc/x 2>&1 | grep -c 'Read-only')" "1"
+t "Backup stored"                 "$(kubectl -n lab9 get bk nightly-db -o jsonpath='{.spec.retainDays}')" "7"
+```
 :::
 
 ## Gotchas

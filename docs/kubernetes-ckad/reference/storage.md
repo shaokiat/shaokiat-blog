@@ -114,7 +114,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 4-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Prove that data outlives the Pod.**
 
@@ -198,9 +198,10 @@ kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')
      "volumeMounts":[{"name":"data","mountPath":"/data"}]}]}}'
    ```
 
-9. Read what the reader printed: the line the writer appended.
+9. Wait for the reader to finish, then read what it printed: the line the writer appended.
 
    ```bash
+   kubectl -n lab4 wait --for=jsonpath='{.status.phase}'=Succeeded pod/reader --timeout=60s
    kubectl -n lab4 logs reader
    ```
 
@@ -211,13 +212,22 @@ kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')
       -o jsonpath='{.spec.persistentVolumeReclaimPolicy}{"\n"}'
     ```
 
-11. Delete everything the lab created.
+11. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab4
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "PVC Bound"               "$(kubectl -n lab4 get pvc data -o jsonpath='{.status.phase}')" "Bound"
+t "reader saw writer's line" "$(kubectl -n lab4 logs reader | grep -c UTC)" "1"
+t "reclaim policy Delete"   "$(kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')" -o jsonpath='{.spec.persistentVolumeReclaimPolicy}')" "Delete"
+```
 :::
 
 ## Gotchas

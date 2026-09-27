@@ -105,7 +105,7 @@ kubectl run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 
 ## 🧪 Lab
 
 :::tip Lab 13-1 ★★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Config & Secrets](./config-and-secrets.md#injection-methods) · [Services & Ingress](./services-and-ingress.md#the-four-ports) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Three bugs, one manifest.**
 
@@ -246,13 +246,22 @@ kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
     kubectl -n lab13 patch svc web -p '{"spec":{"selector":{"app":"web"}}}'
     ```
 
-13. Delete everything the lab created.
+13. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab13
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+kubectl -n lab13 run chk --image=busybox:1.36 --restart=Never -- sleep 600 2>/dev/null; kubectl -n lab13 wait --for=condition=Ready pod/chk >/dev/null
+t "2 Pods Ready"  "$(kubectl -n lab13 get deploy web -o jsonpath='{.status.readyReplicas}')" "2"
+t "web answers"   "$(kubectl -n lab13 exec chk -- wget -qO- -T 3 http://web | grep -o '<title>.*</title>')" "<title>Welcome to nginx!</title>"
+```
 :::
 
 → More drills in the same format: [Troubleshooting Drills](../scenarios/troubleshooting-drills.md).

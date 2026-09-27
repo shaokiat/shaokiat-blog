@@ -125,7 +125,7 @@ The chain turns every symptom into a question: which step didn't happen? Find th
 ## 🧪 Lab
 
 :::tip Lab 0 ★
-See [Standard lab setup](./local-setup.md#standard-lab-setup) · [How the tiers work](./local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](./local-setup.md#standard-lab-setup) · [Command Patterns](./command-patterns.md) (skim; the first pass only pastes commands) · [How the tiers work](./local-setup.md#lab-tiers).
 
 **See the chain and the glue for yourself.**
 
@@ -263,13 +263,24 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 
     The Pods are fine and the Service exists. Only the label link is gone.
 
-14. Delete everything the lab created.
+14. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab0
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "3 Pods Ready"             "$(kubectl -n lab0 get deploy web -o jsonpath='{.status.readyReplicas}')" "3"
+t "Pod owned by ReplicaSet"  "$(kubectl -n lab0 get pods -l app=web -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}')" "ReplicaSet"
+t "RS owned by Deployment"   "$(kubectl -n lab0 get rs -l app=web -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}')" "Deployment"
+t "selector now app=wrong"   "$(kubectl -n lab0 get svc web -o jsonpath='{.spec.selector.app}')" "wrong"
+t "Service has no endpoints" "$(kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web -o jsonpath='{range .items[*].endpoints[*]}x{end}')" ""
+```
 :::
 
 Next: [Lab 1-1](../reference/architecture.md#-lab) names the components behind each step, and [Lab 10-1](../reference/services-and-ingress.md#-lab) adds `targetPort` and Ingress failures.

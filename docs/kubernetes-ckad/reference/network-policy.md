@@ -134,7 +134,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 11-1 ★★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 10-1](./services-and-ingress.md#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Lock a namespace down, then open exactly one path.**
 
@@ -143,22 +143,22 @@ kind's default CNI (kindnet) enforces NetworkPolicy. On minikube, start with `--
 **Goal**
 
 1. In namespace `lab11`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, command `/agnhost netexec --http-port=8080`) and a Service `api` on port 80 → 8080.
-2. Confirm a Pod labelled `app=frontend` and an unlabelled Pod can both reach `http://api/hostname`.
+2. Start client Pods `fe` (labelled `app=frontend`) and `other` (no labels). Confirm both can reach `http://api/hostname`.
 3. Apply `default-deny`. Test again. What error do you get, and why?
 4. Apply `allow-dns`, `allow-frontend` and `frontend-egress-to-api`. Only the frontend should get through.
 
 **Verify**
 
 ```bash
-kubectl -n lab11 run fe --rm -it --image=busybox:1.36 --restart=Never -l app=frontend -- wget -qO- -T 3 http://api/hostname   # api-...
-kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname          # timeout
+kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname      # api-...
+kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname   # wget: download timed out
 ```
 
 <details>
 <summary>🟡 Hints</summary>
 
 1. Same as Lab 10-1 steps 1–2.
-2. `kubectl run -h`: `-l` sets labels on the Pod you run.
+2. Two long-lived client Pods, `fe` labelled `app=frontend` and `other` unlabelled: `kubectl run -h` shows `-l`. Test with `kubectl exec`.
 3. There's no NetworkPolicy generator. Save the skeletons above as files. With egress denied, what does a Pod need before it can even find `api`?
 4. `kubectl apply -f` accepts several `-f` flags. A connection needs an egress allow on the client **and** an ingress allow on the server.
 
@@ -186,16 +186,19 @@ kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget
    kubectl -n lab11 expose deployment api --port=80 --target-port=8080
    ```
 
-4. Call it as a frontend-labelled Pod: works.
+4. Start two client Pods: `fe` carries the frontend label, `other` carries none.
 
    ```bash
-   kubectl -n lab11 run fe --rm -it --image=busybox:1.36 --restart=Never -l app=frontend -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab11 run fe --image=busybox:1.36 --restart=Never -l app=frontend -- sleep 3600
+   kubectl -n lab11 run other --image=busybox:1.36 --restart=Never -- sleep 3600
+   kubectl -n lab11 wait --for=condition=Ready pod/fe pod/other
    ```
 
-5. Call it as an unlabelled Pod: also works, because nothing is denied yet.
+5. Call the API from both: both work, because nothing is denied yet.
 
    ```bash
-   kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname
    ```
 
 6. Deny all ingress and egress for every Pod (the default-deny skeleton above, saved as `default-deny.yaml`).
@@ -207,7 +210,7 @@ kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget
 7. Try the frontend again.
 
    ```bash
-   kubectl -n lab11 run fe --rm -it --image=busybox:1.36 --restart=Never -l app=frontend -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname
    ```
 
    ```text
@@ -225,22 +228,30 @@ kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget
 9. Frontend: succeeds.
 
    ```bash
-   kubectl -n lab11 run fe --rm -it --image=busybox:1.36 --restart=Never -l app=frontend -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname
    ```
 
 10. Unlabelled Pod: times out, because only `app=frontend` is allowed in.
 
     ```bash
-    kubectl -n lab11 run other --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+    kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname
     ```
 
-11. Delete everything the lab created.
+11. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab11
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "frontend allowed" "$(kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname | cut -c1-4)" "api-"
+t "other blocked"    "$(kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname 2>&1 | grep -o 'timed out')" "timed out"
+```
 :::
 
 ## Gotchas

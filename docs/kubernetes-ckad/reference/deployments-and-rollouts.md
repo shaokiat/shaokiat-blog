@@ -4,6 +4,7 @@ sidebar_label: Deployments & Rollouts
 sidebar_position: 5
 ---
 
+import Link from "@docusaurus/Link";
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
@@ -137,7 +138,7 @@ spec:
 ## 🧪 Lab
 
 :::tip Lab 5-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [readiness probes](./probes-and-observability.md#the-three-probes) (the manifest uses one) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Roll forward, break it, roll back.**
 
@@ -245,13 +246,153 @@ kubectl -n lab5 rollout history deployment/web
 
     The broken revision also says "nginx 1.28": change-cause is copied from the Deployment's annotation, so it goes stale unless you update it with every change.
 
-13. Delete everything the lab created.
+13. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
     kubectl delete namespace lab5
     ```
 
 </details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "back on nginx:1.28"   "$(kubectl -n lab5 get deploy web -o jsonpath='{.spec.template.spec.containers[0].image}')" "nginx:1.28"
+t "3 Pods Ready"         "$(kubectl -n lab5 get deploy web -o jsonpath='{.status.readyReplicas}')" "3"
+t "3 revisions"          "$(kubectl -n lab5 rollout history deployment/web | grep -cE '^[0-9]+ ')" "3"
+t "typo ReplicaSet at 0" "$(kubectl -n lab5 get rs -o jsonpath='{range .items[?(@.spec.template.spec.containers[0].image=="nginx:1.99-typo")]}{.spec.replicas}{end}')" "0"
+```
+:::
+
+<Link id="lab-5-2" />
+
+:::tip Lab 5-2 ★★
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 5-1](#-lab) · [Release strategies](#release-strategies-with-core-primitives) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+
+**Blue/green with one patch, then a canary by replica ratio.**
+
+**Goal**
+
+1. In namespace `lab5b`, create Deployments `web-blue` (`nginx:1.27`) and `web-green` (`nginx:1.28`), 3 replicas each, labelled `app: web` plus `version: blue` or `version: green`. Add a client Pod `c`.
+2. Create Service `web` on port 80 that sends all traffic to blue. Prove which version answers.
+3. Cut over to green with one command, prove it, and note how you would roll back.
+4. Turn it into a canary: the Service selects both versions, green runs 1 replica, blue 3. Sample 40 requests and count the versions.
+
+**Verify**
+
+```bash
+kubectl -n lab5b exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:   # nginx/1.27.5 or nginx/1.28.3
+kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'                       # {"app":"web"} after step 4
+```
+
+<details>
+<summary>🟡 Hints</summary>
+
+1. The generator can't set two labels, so write the blue Deployment as YAML and derive green from it. Give both a readiness probe.
+2. `kubectl create service clusterip -h` sets the selector to `app=<name>`; `kubectl patch` adds `version`. The `Server` response header names the nginx version: `wget -S` prints headers.
+3. The switch is the Service's `spec.selector`. Rollback is the same command with the old value.
+4. Remove `version` from the selector (`--type=json` with a `remove` op) and `kubectl scale`. Loop `wget` in the client Pod and count with `sort | uniq -c`.
+
+</details>
+
+<details>
+<summary>🟢 Guided</summary>
+
+1. Create the namespace and a client Pod.
+
+   ```bash
+   kubectl create namespace lab5b
+   kubectl -n lab5b run c --image=busybox:1.36 --restart=Never -- sleep 3600
+   ```
+
+2. Write the blue Deployment, derive green from it, and apply both.
+
+   ```bash
+   cat > blue.yaml <<'EOF'
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: web-blue
+   spec:
+     replicas: 3
+     selector:
+       matchLabels: {app: web, version: blue}
+     template:
+       metadata:
+         labels: {app: web, version: blue}
+       spec:
+         containers:
+         - name: nginx
+           image: nginx:1.27
+           readinessProbe:
+             httpGet: {path: /, port: 80}
+   EOF
+   sed 's/blue/green/g; s/1\.27/1.28/' blue.yaml > green.yaml
+   kubectl -n lab5b apply -f blue.yaml -f green.yaml
+   kubectl -n lab5b rollout status deployment/web-green
+   ```
+
+3. Create the Service, pinned to blue.
+
+   ```bash
+   kubectl -n lab5b create service clusterip web --tcp=80:80
+   kubectl -n lab5b patch service web -p '{"spec":{"selector":{"app":"web","version":"blue"}}}'
+   kubectl -n lab5b exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:
+   ```
+
+   ```text
+     Server: nginx/1.27.5
+   ```
+
+   If the first call prints nothing, run it again: kube-proxy takes a second to program a brand-new Service.
+
+4. Cut over. Green was already Ready, so no Pod starts; only the endpoints change.
+
+   ```bash
+   kubectl -n lab5b patch service web -p '{"spec":{"selector":{"app":"web","version":"green"}}}'
+   kubectl -n lab5b exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:
+   ```
+
+   ```text
+     Server: nginx/1.28.3
+   ```
+
+   Rollback is the same patch with `blue`: instant, because blue is still running at full size.
+
+5. Make it a canary: select both versions, and shrink green to 1 of 4 Pods.
+
+   ```bash
+   kubectl -n lab5b scale deployment web-green --replicas=1
+   sleep 5                                          # let the 2 extra green Pods terminate
+   kubectl -n lab5b patch service web --type=json -p '[{"op":"remove","path":"/spec/selector/version"}]'
+   kubectl -n lab5b exec c -- sh -c 'for i in $(seq 40); do wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:; done' | sort | uniq -c
+   ```
+
+   ```text
+     31   Server: nginx/1.27.5
+      9   Server: nginx/1.28.3
+   ```
+
+   About 1 in 4, as the replica ratio predicts. Each `wget` opens a new connection; clients that keep connections open skew the split (→ [Zero-Downtime Release](../scenarios/zero-downtime-release.md#follow-up-questions)).
+
+6. Run the ✅ Check below, then delete everything the lab created.
+
+   ```bash
+   kubectl delete namespace lab5b
+   ```
+
+</details>
+
+**✅ Check**
+
+```bash
+t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
+t "selector is app=web only" "$(kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}')" '{"app":"web"}'
+t "3 blue, 1 green Ready"    "$(kubectl -n lab5b get deploy web-blue web-green -o jsonpath='{.items[*].status.readyReplicas}')" "3 1"
+t "4 endpoints"              "$(kubectl -n lab5b get endpointslices -l kubernetes.io/service-name=web -o jsonpath='{range .items[*].endpoints[*]}x{end}')" "xxxx"
+t "both versions answer"     "$(kubectl -n lab5b exec c -- sh -c 'for i in $(seq 40); do wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -io "nginx/1\.2[78]"; done' | sort -u | tr '\n' ' ')" "nginx/1.27 nginx/1.28 "
+```
 :::
 
 ## Gotchas
