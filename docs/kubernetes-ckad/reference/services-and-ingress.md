@@ -341,7 +341,7 @@ kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 - **Clarify:** 502s at startup or at shutdown of Pods? Through the Ingress, or also Service-to-Service?
 - **Observe:** errors line up with old Pods terminating. The proxy logs show connections reset by upstream.
 - **Hypothesise:** on deletion, the kubelet sends SIGTERM while endpoint removal is still propagating to kube-proxy and the Ingress controller. For a moment, traffic still arrives at a Pod that has stopped accepting it.
-- **Fix:** a `preStop` hook that sleeps 5–10 s, so the Pod keeps serving until everyone has removed it, plus graceful shutdown in the app and a `terminationGracePeriodSeconds` longer than both.
+- **Fix:** a `preStop` hook that sleeps 5–10 s, so the Pod keeps serving until everyone has removed it, plus graceful shutdown in the app and a `terminationGracePeriodSeconds` longer than both (→ [termination sequence](./scheduling.md#the-termination-sequence)).
 - **Prevent:** add connection draining to the release checklist and test it with load running during a deploy. → See [Zero-Downtime Release](../scenarios/zero-downtime-release.md).
 
 </details>

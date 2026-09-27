@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scenario: ML Model Serving
 
-> Builds on: [Pods & Multi-Container](../reference/pods-and-multi-container.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Resources & Scaling](../reference/resources-and-scaling.md) · [Deployments & Rollouts](../reference/deployments-and-rollouts.md)
+> Builds on: [Pods & Multi-Container](../reference/pods-and-multi-container.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Resources & Scaling](../reference/resources-and-scaling.md) · [Deployments & Rollouts](../reference/deployments-and-rollouts.md) · [Scheduling & Shutdown](../reference/scheduling.md)
 
 ## Situation
 
@@ -46,7 +46,7 @@ A team serves a 6 GB recommendation model over HTTP. A new Pod has to download t
 | Startup, readiness and liveness probes | Tolerate a slow boot, gate traffic, restart only real hangs | [Probes & Observability](../reference/probes-and-observability.md) |
 | Requests and limits | Make scheduling predictable and give the HPA a baseline | [Resources & Scaling](../reference/resources-and-scaling.md) |
 | HorizontalPodAutoscaler | Adds replicas before the peak saturates the existing ones | [Resources & Scaling](../reference/resources-and-scaling.md#horizontalpodautoscaler) |
-| PodDisruptionBudget | Keeps at least one replica through node drains | [Architecture](../reference/architecture.md) |
+| PodDisruptionBudget | Keeps at least one replica through node drains | [Scheduling & Shutdown](../reference/scheduling.md#poddisruptionbudget) |
 | Service + Ingress | Stable entry point that only includes Ready Pods | [Services & Ingress](../reference/services-and-ingress.md) |
 
 ## Walkthrough
@@ -105,7 +105,7 @@ spec:
           failureThreshold: 3
         lifecycle:
           preStop:
-            sleep: {seconds: 10}                          # let endpoints drain before SIGTERM
+            sleep: {seconds: 10}                          # let endpoints drain before SIGTERM (→ Figure 16-1)
         volumeMounts: [{name: models, mountPath: /models, readOnly: true}]
       volumes:
       - name: models
@@ -137,7 +137,7 @@ spec:
       policies: [{type: Pods, value: 1, periodSeconds: 120}]
 ```
 
-**6. Protect against drains.** A PodDisruptionBudget stops `kubectl drain` and cluster upgrades from evicting more than one replica at a time.
+**6. Protect against drains.** On GPU nodes, add the pool's toleration and an `nvidia.com/gpu` limit (→ [GPU workloads](../reference/scheduling.md#gpu-workloads)). A PodDisruptionBudget stops `kubectl drain` and cluster upgrades from evicting more than one replica at a time.
 
 ```yaml
 apiVersion: policy/v1

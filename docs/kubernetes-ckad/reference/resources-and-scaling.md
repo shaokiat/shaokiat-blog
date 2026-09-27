@@ -14,6 +14,8 @@ Every container can declare **requests** (what it is guaranteed, and what the sc
 
 ## Key concepts
 
+Requests decide whether a Pod *fits* a node. Labels, taints and GPUs decide whether it's *allowed* there: → [Scheduling & Shutdown](./scheduling.md#placing-pods).
+
 ### Requests vs limits
 
 | | Requests | Limits |

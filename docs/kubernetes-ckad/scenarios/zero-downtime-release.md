@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scenario: Zero-Downtime Release
 
-> Builds on: [Deployments & Rollouts](../reference/deployments-and-rollouts.md) · [Services & Ingress](../reference/services-and-ingress.md) · [Probes & Observability](../reference/probes-and-observability.md)
+> Builds on: [Deployments & Rollouts](../reference/deployments-and-rollouts.md) · [Services & Ingress](../reference/services-and-ingress.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Scheduling & Shutdown](../reference/scheduling.md)
 
 ## Situation
 
@@ -42,16 +42,16 @@ A checkout API runs 6 replicas behind an Ingress. Every deploy produces a short 
 | Resource | Role here | Reference |
 |---|---|---|
 | Deployment rolling update | The default path for every release | [Deployments & Rollouts](../reference/deployments-and-rollouts.md#rollout-strategy) |
-| Readiness probe + `preStop` | No traffic to Pods that aren't ready or are shutting down | [Probes & Observability](../reference/probes-and-observability.md) |
+| Readiness probe + `preStop` | No traffic to Pods that aren't ready or are shutting down | [Probes & Observability](../reference/probes-and-observability.md) · [Termination sequence](../reference/scheduling.md#the-termination-sequence) |
 | Service label selector | The switch for blue/green; the pool for canary | [Services & Ingress](../reference/services-and-ingress.md) |
-| PodDisruptionBudget | Keeps capacity during node maintenance, not just deploys | [Architecture](../reference/architecture.md) |
+| PodDisruptionBudget | Keeps capacity during node maintenance, not just deploys | [Scheduling & Shutdown](../reference/scheduling.md#poddisruptionbudget) |
 | Two Deployments | Blue/green and canary both need both versions running at once | [Deployments & Rollouts](../reference/deployments-and-rollouts.md#release-strategies-with-core-primitives) |
 
 ## Walkthrough
 
 ### 1. Fix the rolling update first
 
-The 502s come from shutdown, not startup. When a Pod is deleted, the kubelet sends SIGTERM while kube-proxy and the Ingress controller are still removing the Pod from their endpoints. For a second or two, requests still arrive at a process that has stopped accepting them.
+The 502s come from shutdown, not startup (→ [Figure 16-1](../reference/scheduling.md#overview)). When a Pod is deleted, the kubelet sends SIGTERM while kube-proxy and the Ingress controller are still removing the Pod from their endpoints. For a second or two, requests still arrive at a process that has stopped accepting them.
 
 | Setting | Value | What it fixes |
 |---|---|---|

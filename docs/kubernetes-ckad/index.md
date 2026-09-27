@@ -25,7 +25,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 
 ## Domain 1: Application Design and Build (20%)
 
-- Define, build and modify container images → no dedicated page yet; see [Troubleshooting](./reference/troubleshooting.md#status--first-command--usual-causes) for pull failures
+- Define, build and modify container images → [Container Images](./reference/container-images.md#what-goes-in-the-dockerfile) · [imagePullPolicy](./reference/container-images.md#imagepullpolicy) · [Lab 15-1](./reference/container-images.md#-lab)
 - Choose the right workload resource: Deployment, DaemonSet, StatefulSet, Job, CronJob → [Deployments & Rollouts](./reference/deployments-and-rollouts.md#choosing-a-workload-resource) · [Jobs & CronJobs](./reference/jobs-and-cronjobs.md#job-fields)
 - Multi-container Pod patterns: init, sidecar, ambassador, adapter → [Pods & Multi-Container](./reference/pods-and-multi-container.md#multi-container-patterns) · [native sidecars](./reference/pods-and-multi-container.md#native-sidecars-vs-plain-extra-containers)
 - Persistent and ephemeral volumes → [Storage](./reference/storage.md#volume-types-by-lifetime) · [PV, PVC and StorageClass](./reference/storage.md#pv-pvc-and-storageclass) · [access modes](./reference/storage.md#access-modes)

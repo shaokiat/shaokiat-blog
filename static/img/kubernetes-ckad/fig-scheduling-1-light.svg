@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 340" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Timeline of deleting a Pod: at time zero the Pod is removed from Service endpoints while the kubelet runs a 5 second preStop sleep; for about two seconds traffic still arrives because proxies have not updated; after preStop the kubelet sends SIGTERM, the app drains and exits; if it were still running at the end of the 30 second grace period it would get SIGKILL">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="960" height="330" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">DELETING ONE POD · TIME →  (preStop 5s · grace period 30s)</text>
+  <text x="30" y="78" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">Service endpoints</text>
+  <text x="30" y="94" text-anchor="start" font-size="11" fill="#4a5568">kube-proxy, Ingress update</text>
+  <text x="30" y="148" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">preStop hook</text>
+  <text x="30" y="164" text-anchor="start" font-size="11" fill="#4a5568">kubelet runs it first</text>
+  <text x="30" y="218" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">App process</text>
+  <text x="30" y="234" text-anchor="start" font-size="11" fill="#4a5568">PID 1 in the container</text>
+  <text x="30" y="288" text-anchor="start" font-size="13" fill="#1e3a4f" font-weight="700">Grace period</text>
+  <text x="30" y="304" text-anchor="start" font-size="11" fill="#4a5568">terminationGracePeriodSeconds</text>
+  <rect x="237" y="66" width="63" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="268.5" y="84" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">serving</text>
+  <rect x="300" y="66" width="42" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/><text x="321" y="84" text-anchor="middle" font-size="10.5" font-weight="600" fill="#713f12">race</text>
+  <rect x="342" y="66" width="588" height="28" rx="6" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.2"/><text x="636" y="84" text-anchor="middle" font-size="10.5" font-weight="600" fill="#52606d">removed: no new traffic</text>
+  <rect x="300" y="136" width="105" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/><text x="352.5" y="154" text-anchor="middle" font-size="10.5" font-weight="600" fill="#713f12">sleep 5</text>
+  <rect x="405" y="136" width="525" height="28" rx="6" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <rect x="237" y="206" width="168" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="321" y="224" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">serving requests</text>
+  <rect x="405" y="206" width="147" height="28" rx="6" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.2"/><text x="478.5" y="224" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1f5c3d">drain, exit 0</text>
+  <rect x="552" y="206" width="378" height="28" rx="6" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/><text x="741" y="224" text-anchor="middle" font-size="10.5" font-weight="600" fill="#4a5568">gone</text>
+  <rect x="300" y="276" width="630" height="28" rx="6" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.2"/><text x="615" y="294" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1e3a4f">30s budget covers preStop + drain</text>
+  <line x1="300" y1="52" x2="300" y2="310" stroke="#3a6f9a" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="300" y="48" text-anchor="middle" font-size="11" fill="#1e3a4f" font-weight="600">delete</text>
+  <line x1="405" y1="52" x2="405" y2="310" stroke="#d97706" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="405" y="48" text-anchor="middle" font-size="11" fill="#713f12" font-weight="600">SIGTERM</text>
+  <line x1="930" y1="52" x2="930" y2="310" stroke="#d97706" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="930" y="48" text-anchor="end" font-size="11" fill="#713f12" font-weight="600">SIGKILL if still running</text>
+  <text x="321" y="108" text-anchor="middle" font-size="10.5" fill="#713f12">traffic still arrives</text>
+</svg>
