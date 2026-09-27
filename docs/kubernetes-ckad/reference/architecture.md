@@ -63,7 +63,12 @@ Every object has `spec` (what you want, written by you) and `status` (what exist
 
 ### API groups and versions
 
-`apiVersion` is `group/version`. Versions move alpha → beta → GA, and old versions are removed. A manifest using a removed version fails with `no matches for kind "X" in version "Y"`.
+`apiVersion` is `group/version`. A manifest using a removed version fails with `no matches for kind "X" in version "Y"`; `kubectl explain <kind>` prints the current one.
+
+<details>
+<summary>Deeper dive</summary>
+
+Versions move alpha → beta → GA, and old versions are removed after a published deprecation period (→ [API deprecations](./probes-and-observability.md#api-deprecations)).
 
 | apiVersion | Kinds you will use |
 |---|---|
@@ -75,6 +80,8 @@ Every object has `spec` (what you want, written by you) and `status` (what exist
 | `autoscaling/v2` | HorizontalPodAutoscaler |
 
 → See the [deprecated API migration guide](https://kubernetes.io/docs/reference/using-api/deprecation-guide/).
+
+</details>
 
 ## kubectl essentials
 

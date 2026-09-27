@@ -88,7 +88,14 @@ Label a namespace to enforce one of three [Pod Security Standards](https://kuber
 | `baseline` | Host namespaces, privileged containers, hostPath | Default for most namespaces |
 | `restricted` | Also root users, privilege escalation, capabilities beyond `NET_BIND_SERVICE` | Application namespaces |
 
-Modes: `enforce` rejects the Pod, `warn` returns a warning, `audit` logs it.
+One label turns it on: `kubectl label namespace team-a pod-security.kubernetes.io/enforce=restricted`.
+
+<details>
+<summary>Deeper dive</summary>
+
+Each level can be applied in three modes, one label per mode: `enforce` rejects the Pod, `warn` returns a warning to the client, `audit` records it in the audit log. Roll out with `warn` and `audit` first to find violations, then switch to `enforce`. Pin the standard's version with `pod-security.kubernetes.io/enforce-version`, or `latest` moves with each upgrade.
+
+</details>
 
 ### CRDs and Operators
 
@@ -98,7 +105,18 @@ Modes: `enforce` rejects the Pod, `warn` returns a warning, `audit` logs it.
 | **Custom resource** | An instance of that kind | `Backup nightly-db` |
 | **Operator** | A controller that watches the kind and reconciles it | Creates CronJobs and PVCs for each Backup |
 
-A CRD without a controller only stores data. The Operator is what makes it do something.
+A CRD without a controller only stores data. The Operator is what makes it do something. The minimal CRD in [kubectl essentials](#kubectl-essentials) adds `kind: Backup`; a custom resource is then ordinary YAML:
+
+```yaml
+# fragment: needs the Backup CRD installed
+apiVersion: ops.example.com/v1
+kind: Backup
+metadata:
+  name: nightly-db
+spec:
+  schedule: "0 2 * * *"
+  retainDays: 7
+```
 
 ## kubectl essentials
 
@@ -130,13 +148,18 @@ kubectl label namespace team-a pod-security.kubernetes.io/enforce=restricted
 kubectl exec <pod> -- id                                  # which UID/GID the process has
 ```
 
-Extensions:
+<details>
+<summary>Deeper dive</summary>
+
+Inspect extensions:
 
 ```bash
 kubectl get crd
 kubectl api-resources --api-group=ops.example.com
 kubectl explain backup.spec                               # works for CRDs with a schema
 ```
+
+</details>
 
 A Role and its binding:
 

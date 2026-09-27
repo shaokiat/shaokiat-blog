@@ -38,6 +38,11 @@ Raw YAML stops scaling once the same app runs in three environments or you insta
 
 ### Kustomize features
 
+A base of plain YAML, plus one overlay per environment that patches it. The [base and prod overlay](#kubectl-essentials) below use every field Lab 6-1 needs.
+
+<details>
+<summary>Deeper dive</summary>
+
 | Field in `kustomization.yaml` | Does |
 |---|---|
 | `resources` | Files or directories to include (the base) |
@@ -46,6 +51,8 @@ Raw YAML stops scaling once the same app runs in three environments or you insta
 | `replicas` | Override replica counts by name |
 | `patches` | Strategic-merge or JSON patches for anything else |
 | `configMapGenerator` / `secretGenerator` | Build ConfigMaps with a content hash in the name, so a change triggers a rollout |
+
+</details>
 
 ## kubectl essentials
 
@@ -158,7 +165,7 @@ kubectl -n lab6 get configmap                                  # prod-web-config
 <summary>🟡 Hints</summary>
 
 1. Generate the Deployment with `--dry-run=client -o yaml`, then add `envFrom` pointing at `web-config`. The ConfigMap comes from `configMapGenerator`, not from a file.
-2. The fields you need are in the Kustomize features table above: `namespace`, `namePrefix`, `replicas`, `images`, and a generator with `behavior: merge`.
+2. The fields you need are in the overlay example above (and the Deeper dive under Kustomize features): `namespace`, `namePrefix`, `replicas`, `images`, and a generator with `behavior: merge`.
 3. `kubectl kustomize <dir>` renders; `kubectl apply -k <dir>` applies. Compare the ConfigMap name before and after.
 
 </details>

@@ -64,6 +64,8 @@ Pods are replaced all the time and every replacement gets a new IP, so nothing s
 
 ### Ingress vs Gateway API
 
+Gateway API exists because Ingress only standardised host and path routing. Everything else (traffic weights, header matching, timeouts, TLS details) became controller-specific annotations, so an Ingress written for one controller didn't work on another.
+
 | | Ingress | Gateway API |
 |---|---|---|
 | API | `networking.k8s.io/v1`, stable, in the CKAD curriculum | `gateway.networking.k8s.io/v1`, the successor |
@@ -71,7 +73,7 @@ Pods are replaced all the time and every replacement gets a new IP, so nothing s
 | Traffic splitting, header matching | Controller-specific annotations | Built in (weights, headers) |
 | Needs a controller | Yes | Yes |
 
-The community `ingress-nginx` controller was retired in 2026. Ingress objects keep working with other controllers, and new platforms increasingly choose Gateway API.
+→ Why the labs still use ingress-nginx: [the retirement note](../start-here/local-setup.md#cluster-add-ons).
 
 ## kubectl essentials
 

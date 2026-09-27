@@ -76,7 +76,16 @@ For anything historical you need a real stack: log aggregation and Prometheus. T
 
 ### API deprecations
 
-APIs graduate alpha → beta → GA, and deprecated versions are removed after a published period (→ [Architecture](./architecture.md#api-groups-and-versions)). Removal breaks `kubectl apply`, Helm charts and CI pipelines on the next upgrade.
+Deprecated API versions are removed after a published period. The objects stored in the cluster survive the upgrade; the manifests and Helm charts in Git break on the next `kubectl apply`. Three commands find them before that:
+
+```bash
+kubectl explain cronjob | head -3                                   # the version the server serves now
+kubectl apply --dry-run=server -f manifests/                        # fails on removed versions, warns on deprecated ones
+kubectl get --raw /metrics | grep apiserver_requested_deprecated_apis   # who still calls them
+```
+
+<details>
+<summary>Deeper dive</summary>
 
 | Signal | Where |
 |---|---|
@@ -84,6 +93,10 @@ APIs graduate alpha → beta → GA, and deprecated versions are removed after a
 | `kubectl explain <kind>` header | Shows the version the server prefers |
 | `apiserver_requested_deprecated_apis` metric | Which deprecated APIs clients still call |
 | `kubectl convert` plugin | Rewrites manifests to a newer version |
+
+→ The versions you will use: [API groups and versions](./architecture.md#api-groups-and-versions).
+
+</details>
 
 ## kubectl essentials
 
