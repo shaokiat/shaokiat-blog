@@ -141,7 +141,7 @@ spec:
 
 **Goal**
 
-1. In namespace `lab2`, create the Pod `web` above: an init container writes `index.html`, a native sidecar writes the time to `time.txt` every 5 seconds, and nginx serves both.
+1. In namespace `lab2-1`, create the Pod `web` above: an init container writes `index.html`, a native sidecar writes the time to `time.txt` every 5 seconds, and nginx serves both.
 2. Confirm the init container finished and the sidecar is still running.
 3. Fetch `time.txt` twice from another Pod and confirm it changes.
 4. Change the init container's command to `exit 1`, recreate the Pod, and read its status.
@@ -149,10 +149,10 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab2 get pod web                        # READY 2/2: sidecar + app
-kubectl -n lab2 get pod web -o jsonpath='{.status.initContainerStatuses[0].state.terminated.reason}'   # Completed
-kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
-  wget -qO- "http://$(kubectl -n lab2 get pod web -o jsonpath='{.status.podIP}')/time.txt"
+kubectl -n lab2-1 get pod web                        # READY 2/2: sidecar + app
+kubectl -n lab2-1 get pod web -o jsonpath='{.status.initContainerStatuses[0].state.terminated.reason}'   # Completed
+kubectl -n lab2-1 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
+  wget -qO- "http://$(kubectl -n lab2-1 get pod web -o jsonpath='{.status.podIP}')/time.txt"
 ```
 
 <details>
@@ -171,32 +171,32 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab2
+   kubectl create namespace lab2-1
    ```
 
 2. Create the Pod from the manifest above, saved as `pod.yaml`.
 
    ```bash
-   kubectl -n lab2 apply -f pod.yaml
+   kubectl -n lab2-1 apply -f pod.yaml
    ```
 
 3. Wait until the init container finished and both long-running containers are Ready.
 
    ```bash
-   kubectl -n lab2 wait --for=condition=Ready pod/web --timeout=60s
+   kubectl -n lab2-1 wait --for=condition=Ready pod/web --timeout=60s
    ```
 
 4. Check the Pod: READY 2/2. The sidecar counts, the init container doesn't.
 
    ```bash
-   kubectl -n lab2 get pod web
+   kubectl -n lab2-1 get pod web
    ```
 
 5. Fetch `time.txt` through the Pod IP; run it again 5+ seconds later and the time changes.
 
    ```bash
-   kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
-     wget -qO- "http://$(kubectl -n lab2 get pod web -o jsonpath='{.status.podIP}')/time.txt"
+   kubectl -n lab2-1 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
+     wget -qO- "http://$(kubectl -n lab2-1 get pod web -o jsonpath='{.status.podIP}')/time.txt"
    ```
 
 6. Break the init container: replace its echo command with exit 1.
@@ -208,7 +208,7 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
 7. Pod specs are mostly immutable, so delete and recreate the Pod.
 
    ```bash
-   kubectl -n lab2 replace --force -f pod.yaml
+   kubectl -n lab2-1 replace --force -f pod.yaml
    ```
 
    It takes about 30 seconds. The `clock` sidecar's shell ignores SIGTERM, so the kubelet waits out the grace period before SIGKILL (→ [termination sequence](./scheduling.md#the-termination-sequence)).
@@ -216,19 +216,19 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
 8. Watch the status: Init:Error → Init:CrashLoopBackOff. nginx never starts.
 
    ```bash
-   kubectl -n lab2 get pod web -w
+   kubectl -n lab2-1 get pod web -w
    ```
 
 9. Read the failing init container's output.
 
    ```bash
-   kubectl -n lab2 logs web -c init-page
+   kubectl -n lab2-1 logs web -c init-page
    ```
 
 10. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab2
+    kubectl delete namespace lab2-1
     ```
 
 </details>
@@ -237,9 +237,9 @@ kubectl -n lab2 run tmp --rm -it --image=busybox:1.36 --restart=Never -- \
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "clock is a native sidecar" "$(kubectl -n lab2 get pod web -o jsonpath='{.spec.initContainers[1].restartPolicy}')" "Always"
-t "init-page exits 1"         "$(kubectl -n lab2 get pod web -o jsonpath='{.status.initContainerStatuses[0].lastState.terminated.exitCode}')" "1"
-t "nginx never started"       "$(kubectl -n lab2 get pod web -o jsonpath='{.status.containerStatuses[0].state.waiting.reason}')" "PodInitializing"
+t "clock is a native sidecar" "$(kubectl -n lab2-1 get pod web -o jsonpath='{.spec.initContainers[1].restartPolicy}')" "Always"
+t "init-page exits 1"         "$(kubectl -n lab2-1 get pod web -o jsonpath='{.status.initContainerStatuses[0].lastState.terminated.exitCode}')" "1"
+t "nginx never started"       "$(kubectl -n lab2-1 get pod web -o jsonpath='{.status.containerStatuses[0].state.waiting.reason}')" "PodInitializing"
 ```
 :::
 

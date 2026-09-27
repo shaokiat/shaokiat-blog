@@ -48,7 +48,7 @@ One line per term. Follow the link for the full explanation.
 | Term | Definition | More |
 |---|---|---|
 | <Link id="resource" />**Resource / kind** | A type the API serves (`kind: Deployment`). "Resource" is its plural API name (`deployments`). | [API groups](../reference/architecture.md#api-groups-and-versions) |
-| <Link id="object" />**Object** | One stored instance of a kind, such as Deployment `web` in `lab1`. | [Four top-level fields](../reference/architecture.md#kubectl-essentials) |
+| <Link id="object" />**Object** | One stored instance of a kind, such as Deployment `web` in `lab1-2`. | [Four top-level fields](../reference/architecture.md#kubectl-essentials) |
 | <Link id="manifest" />**Manifest** | A YAML file describing one or more objects, applied with `kubectl apply -f`. | [Where a change lives](../reference/architecture.md#where-a-change-lives) |
 | <Link id="spec-vs-status" />**spec vs status** | `spec` is what you want, written by you. `status` is what exists, written by controllers. | [Where a change lives](../reference/architecture.md#where-a-change-lives) |
 | <Link id="label" />**Label** | A key-value pair on an object, used for selection (`app: web`). | [Where labels link](./mental-model.md#where-labels-do-the-linking) |

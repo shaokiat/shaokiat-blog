@@ -162,14 +162,14 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 8-1 ★★★
+:::tip Lab 3-2 ★★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) + metrics-server from [Cluster add-ons](../start-here/local-setup.md#cluster-add-ons) · [Services](./services-and-ingress.md#service-types) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Quota, defaults, then autoscaling under load.**
 
 **Goal**
 
-1. In namespace `lab8`, create the LimitRange and ResourceQuota above.
+1. In namespace `lab3-2`, create the LimitRange and ResourceQuota above.
 2. Create Deployment `web` (`registry.k8s.io/hpa-example`, port 80) without any resources. Check which QoS class and requests its Pod got.
 3. Expose it on port 80, then create an HPA targeting 50% CPU, 1–5 replicas.
 4. Generate load and watch the HPA scale out. Stop the load and note how long scale-in takes.
@@ -177,9 +177,9 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].resources}{"\n"}'  # injected defaults
-kubectl -n lab8 describe quota team-quota
-kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <unknown>
+kubectl -n lab3-2 get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].resources}{"\n"}'  # injected defaults
+kubectl -n lab3-2 describe quota team-quota
+kubectl -n lab3-2 get hpa web                     # TARGETS shows a real %, not <unknown>
 ```
 
 <details>
@@ -198,50 +198,50 @@ kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <u
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab8
+   kubectl create namespace lab3-2
    ```
 
 2. Create the LimitRange and ResourceQuota above, saved together as `limits.yaml`.
 
    ```bash
-   kubectl -n lab8 apply -f limits.yaml
+   kubectl -n lab3-2 apply -f limits.yaml
    ```
 
 3. Create the CPU-heavy app with no resources set.
 
    ```bash
-   kubectl -n lab8 create deployment web --image=registry.k8s.io/hpa-example --port=80
+   kubectl -n lab3-2 create deployment web --image=registry.k8s.io/hpa-example --port=80
    ```
 
 4. Read the Pod's QoS class: Burstable, because the LimitRange injected requests.
 
    ```bash
-   kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}{"\n"}'
+   kubectl -n lab3-2 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}{"\n"}'
    ```
 
 5. Put a Service in front of it.
 
    ```bash
-   kubectl -n lab8 expose deployment web --port=80
+   kubectl -n lab3-2 expose deployment web --port=80
    ```
 
 6. Autoscale on 50% of the CPU request, between 1 and 5 replicas.
 
    ```bash
-   kubectl -n lab8 autoscale deployment web --min=1 --max=5 --cpu-percent=50
+   kubectl -n lab3-2 autoscale deployment web --min=1 --max=5 --cpu-percent=50
    ```
 
 7. Generate load from a second terminal; Ctrl-C to stop.
 
    ```bash
-   kubectl -n lab8 run load --rm -it --image=busybox:1.36 --restart=Never -- \
+   kubectl -n lab3-2 run load --rm -it --image=busybox:1.36 --restart=Never -- \
      sh -c 'while true; do wget -q -O- http://web; done'
    ```
 
 8. Watch utilisation climb above 50% and replicas grow within about a minute.
 
    ```bash
-   kubectl -n lab8 get hpa web -w
+   kubectl -n lab3-2 get hpa web -w
    ```
 
    After stopping the load, scale-in waits for the 5-minute stabilization window.
@@ -249,7 +249,7 @@ kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <u
 9. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
-   kubectl delete namespace lab8
+   kubectl delete namespace lab3-2
    ```
 
 </details>
@@ -258,12 +258,12 @@ kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <u
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "LimitRange injected a request" "$(kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].resources.requests.cpu}')" "100m"
-t "QoS Burstable"                 "$(kubectl -n lab8 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}')" "Burstable"
-t "quota counts the Pods"         "$([ -n "$(kubectl -n lab8 get quota team-quota -o jsonpath='{.status.used.pods}')" ] && echo yes)" "yes"
-t "HPA targets 50%"               "$(kubectl -n lab8 get hpa web -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}')" "50"
-t "HPA sees CPU"                  "$(kubectl -n lab8 get hpa web -o jsonpath='{.status.currentMetrics[0].resource.current.averageUtilization}' | grep -c '^[0-9]')" "1"
-t "HPA scaled out under load"     "$(kubectl -n lab8 get events --field-selector reason=SuccessfulRescale -o name | head -n 1 | grep -c .)" "1"
+t "LimitRange injected a request" "$(kubectl -n lab3-2 get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].resources.requests.cpu}')" "100m"
+t "QoS Burstable"                 "$(kubectl -n lab3-2 get pod -l app=web -o jsonpath='{.items[0].status.qosClass}')" "Burstable"
+t "quota counts the Pods"         "$([ -n "$(kubectl -n lab3-2 get quota team-quota -o jsonpath='{.status.used.pods}')" ] && echo yes)" "yes"
+t "HPA targets 50%"               "$(kubectl -n lab3-2 get hpa web -o jsonpath='{.spec.metrics[0].resource.target.averageUtilization}')" "50"
+t "HPA sees CPU"                  "$(kubectl -n lab3-2 get hpa web -o jsonpath='{.status.currentMetrics[0].resource.current.averageUtilization}' | grep -c '^[0-9]')" "1"
+t "HPA scaled out under load"     "$(kubectl -n lab3-2 get events --field-selector reason=SuccessfulRescale -o name | head -n 1 | grep -c .)" "1"
 ```
 :::
 

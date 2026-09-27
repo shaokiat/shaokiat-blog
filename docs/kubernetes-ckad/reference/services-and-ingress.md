@@ -159,14 +159,14 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 10-1 ★★
-**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 0](../start-here/mental-model.md#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+:::tip Lab 2-4 ★★
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 1-1](../start-here/mental-model.md#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
-**Break the link between a Service and its Pods, then find it.** [Lab 0](../start-here/mental-model.md#-lab) does the basic selector break; this lab adds `targetPort` and Ingress.
+**Break the link between a Service and its Pods, then find it.** [Lab 1-1](../start-here/mental-model.md#-lab) does the basic selector break; this lab adds `targetPort` and Ingress.
 
 **Goal**
 
-1. In namespace `lab10`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, args `netexec --http-port=8080`, 2 replicas).
+1. In namespace `lab2-4`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, args `netexec --http-port=8080`, 2 replicas).
 2. Expose it as Service `api` on port 80 → 8080. Call it from a temporary Pod.
 3. Patch the Service selector to `app: apii`. Call it again and find the cause using only `kubectl get`/`describe`.
 4. Fix the selector, then change `targetPort` to 9090 and describe how the symptom differs.
@@ -175,8 +175,8 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab10 get endpointslices -l kubernetes.io/service-name=api   # 2 endpoints after the fix
-kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+kubectl -n lab2-4 get endpointslices -l kubernetes.io/service-name=api   # 2 endpoints after the fix
+kubectl -n lab2-4 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
 ```
 
 <details>
@@ -196,94 +196,94 @@ kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab10
+   kubectl create namespace lab2-4
    ```
 
 2. Run 2 agnhost Pods serving HTTP on 8080 (create deployment: the words after -- replace the entrypoint).
 
    ```bash
-   kubectl -n lab10 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
+   kubectl -n lab2-4 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
      --replicas=2 --port=8080 -- /agnhost netexec --http-port=8080
    ```
 
 3. Create a Service: port 80 on the Service, 8080 on the Pods.
 
    ```bash
-   kubectl -n lab10 expose deployment api --port=80 --target-port=8080
+   kubectl -n lab2-4 expose deployment api --port=80 --target-port=8080
    ```
 
 4. Call it from a throwaway Pod: prints the serving Pod's name.
 
    ```bash
-   kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab2-4 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
    ```
 
 5. Break the selector with a typo.
 
    ```bash
-   kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"apii"}}}'
+   kubectl -n lab2-4 patch svc api -p '{"spec":{"selector":{"app":"apii"}}}'
    ```
 
 6. Call it again: Connection refused, although DNS still resolves.
 
    ```bash
-   kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab2-4 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
    ```
 
 7. See why: Endpoints: `<none>`.
 
    ```bash
-   kubectl -n lab10 describe svc api
+   kubectl -n lab2-4 describe svc api
    ```
 
 8. The Pods are `app=api`; the selector says `app=apii`.
 
    ```bash
-   kubectl -n lab10 get pods --show-labels
+   kubectl -n lab2-4 get pods --show-labels
    ```
 
 9. Fix the selector.
 
    ```bash
-   kubectl -n lab10 patch svc api -p '{"spec":{"selector":{"app":"api"}}}'
+   kubectl -n lab2-4 patch svc api -p '{"spec":{"selector":{"app":"api"}}}'
    ```
 
 10. Send traffic to a port nothing listens on.
 
     ```bash
-    kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":9090}]'
+    kubectl -n lab2-4 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":9090}]'
     ```
 
 11. Call it: also "Connection refused", but now describe svc lists endpoints; the Pod itself refuses.
 
     ```bash
-    kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
+    kubectl -n lab2-4 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://api/hostname
     ```
 
 12. Put targetPort back.
 
     ```bash
-    kubectl -n lab10 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":8080}]'
+    kubectl -n lab2-4 patch svc api --type=json -p '[{"op":"replace","path":"/spec/ports/0/targetPort","value":8080}]'
     ```
 
 13. Route shop.example.com/api to the Service.
 
     ```bash
-    kubectl -n lab10 create ingress shop --rule="shop.example.com/api*=api:80"
+    kubectl -n lab2-4 create ingress shop --rule="shop.example.com/api*=api:80"
     ```
 
 14. Check the backends: api:80 (10.244.x.x:8080,...).
 
     ```bash
-    kubectl -n lab10 describe ingress shop
+    kubectl -n lab2-4 describe ingress shop
     ```
 
-    `ADDRESS` stays empty and nothing routes until an Ingress controller runs. [Lab 10-2](#lab-10-2) installs one and sends real traffic.
+    `ADDRESS` stays empty and nothing routes until an Ingress controller runs. [Lab 2-5](#lab-2-5) installs one and sends real traffic.
 
 15. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab10
+    kubectl delete namespace lab2-4
     ```
 
 </details>
@@ -292,25 +292,25 @@ kubectl -n lab10 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-kubectl -n lab10 run chk --image=busybox:1.36 --restart=Never -- sleep 600 2>/dev/null; kubectl -n lab10 wait --for=condition=Ready pod/chk >/dev/null
-t "selector fixed"      "$(kubectl -n lab10 get svc api -o jsonpath='{.spec.selector.app}')" "api"
-t "targetPort 8080"     "$(kubectl -n lab10 get svc api -o jsonpath='{.spec.ports[0].targetPort}')" "8080"
-t "2 endpoints"         "$(kubectl -n lab10 get endpointslices -l kubernetes.io/service-name=api -o jsonpath='{range .items[*].endpoints[*]}x{end}')" "xx"
-t "Service answers"     "$(kubectl -n lab10 exec chk -- wget -qO- -T 3 http://api/hostname | cut -c1-4)" "api-"
-t "Ingress routes /api" "$(kubectl -n lab10 get ingress shop -o jsonpath='{.spec.rules[0].http.paths[0].backend.service.name}')" "api"
+kubectl -n lab2-4 run chk --image=busybox:1.36 --restart=Never -- sleep 600 2>/dev/null; kubectl -n lab2-4 wait --for=condition=Ready pod/chk >/dev/null
+t "selector fixed"      "$(kubectl -n lab2-4 get svc api -o jsonpath='{.spec.selector.app}')" "api"
+t "targetPort 8080"     "$(kubectl -n lab2-4 get svc api -o jsonpath='{.spec.ports[0].targetPort}')" "8080"
+t "2 endpoints"         "$(kubectl -n lab2-4 get endpointslices -l kubernetes.io/service-name=api -o jsonpath='{range .items[*].endpoints[*]}x{end}')" "xx"
+t "Service answers"     "$(kubectl -n lab2-4 exec chk -- wget -qO- -T 3 http://api/hostname | cut -c1-4)" "api-"
+t "Ingress routes /api" "$(kubectl -n lab2-4 get ingress shop -o jsonpath='{.spec.rules[0].http.paths[0].backend.service.name}')" "api"
 ```
 :::
 
-<Link id="lab-10-2" />
+<Link id="lab-2-5" />
 
-:::tip Lab 10-2 ★★
-**Requires:** [Cluster add-ons](../start-here/local-setup.md#cluster-add-ons) (port mappings + ingress-nginx) · [Lab 10-1](#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+:::tip Lab 2-5 ★★
+**Requires:** [Cluster add-ons](../start-here/local-setup.md#cluster-add-ons) (port mappings + ingress-nginx) · [Lab 2-4](#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Route two Services through one Ingress, from your laptop.**
 
 **Goal**
 
-1. In namespace `lab10b`, create Deployment `api` (agnhost `netexec` on 8080, 2 replicas) with Service `api` on 80 → 8080, and Deployment `web` (`nginx:1.27`) with Service `web` on 80.
+1. In namespace `lab2-5`, create Deployment `api` (agnhost `netexec` on 8080, 2 replicas) with Service `api` on 80 → 8080, and Deployment `web` (`nginx:1.27`) with Service `web` on 80.
 2. Create one Ingress `shop`, class `nginx`, host `shop.localhost`: `/api` goes to `api`, everything else to `web`.
 3. From your laptop, curl `/`, `/api` and `/apiv1`. Which backend answered each, and how can you tell?
 4. Curl a host the Ingress doesn't know. Who answers now?
@@ -326,7 +326,7 @@ curl -s -o /dev/null -w '%{http_code}\n' http://other.localhost/  # 404
 <details>
 <summary>🟡 Hints</summary>
 
-1. Same commands as Lab 10-1 steps 2–3, twice.
+1. Same commands as Lab 2-4 steps 2–3, twice.
 2. "Route HTTP by host and path" in [Command Patterns](../start-here/command-patterns.md#expose-it). `--rule` can repeat; `--class` picks the controller.
 3. agnhost answers unknown paths with `NOW: <time>`. nginx answers with HTML. `pathType: Prefix` matches whole path segments.
 4. A 404 has a footer. Compare it with the one from `/apiv1`, and read `kubectl logs deploy/web`.
@@ -339,20 +339,20 @@ curl -s -o /dev/null -w '%{http_code}\n' http://other.localhost/  # 404
 1. Create the namespace and both backends.
 
    ```bash
-   kubectl create namespace lab10b
-   kubectl -n lab10b create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
+   kubectl create namespace lab2-5
+   kubectl -n lab2-5 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
      --replicas=2 --port=8080 -- /agnhost netexec --http-port=8080
-   kubectl -n lab10b expose deployment api --port=80 --target-port=8080
-   kubectl -n lab10b create deployment web --image=nginx:1.27
-   kubectl -n lab10b expose deployment web --port=80
+   kubectl -n lab2-5 expose deployment api --port=80 --target-port=8080
+   kubectl -n lab2-5 create deployment web --image=nginx:1.27
+   kubectl -n lab2-5 expose deployment web --port=80
    ```
 
 2. Create the Ingress. The more specific path wins, whatever the rule order.
 
    ```bash
-   kubectl -n lab10b create ingress shop --class=nginx \
+   kubectl -n lab2-5 create ingress shop --class=nginx \
      --rule="shop.localhost/api*=api:80" --rule="shop.localhost/*=web:80"
-   kubectl -n lab10b describe ingress shop | sed -n '/Rules/,/Annotations/p'
+   kubectl -n lab2-5 describe ingress shop | sed -n '/Rules/,/Annotations/p'
    ```
 
    ```text
@@ -382,7 +382,7 @@ curl -s -o /dev/null -w '%{http_code}\n' http://other.localhost/  # 404
    </html>
    ```
 
-   `/api` reached agnhost. `/apiv1` is not under the `/api` prefix, because Prefix matches whole segments, so it went to `web`, whose nginx has no such file. The versioned footer and `kubectl -n lab10b logs deploy/web` both show the `web` Pod served that 404.
+   `/api` reached agnhost. `/apiv1` is not under the `/api` prefix, because Prefix matches whole segments, so it went to `web`, whose nginx has no such file. The versioned footer and `kubectl -n lab2-5 logs deploy/web` both show the `web` Pod served that 404.
 
 4. Curl a host with no rule.
 
@@ -401,7 +401,7 @@ curl -s -o /dev/null -w '%{http_code}\n' http://other.localhost/  # 404
 5. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
-   kubectl delete namespace lab10b
+   kubectl delete namespace lab2-5
    ```
 
 </details>
@@ -414,7 +414,7 @@ t "/ reaches web"          "$(curl -s http://shop.localhost/ | grep -o '<title>.
 t "/api reaches api"       "$(curl -s http://shop.localhost/api | cut -c1-4)" "NOW:"
 t "/apiv1 goes to web"     "$(curl -s http://shop.localhost/apiv1 | grep -o 'nginx/1.27')" "nginx/1.27"
 t "unknown host is a 404"  "$(curl -s -o /dev/null -w '%{http_code}' http://other.localhost/)" "404"
-t "Ingress has 2 backends" "$(kubectl -n lab10b get ingress shop -o jsonpath='{.spec.rules[0].http.paths[*].backend.service.name}')" "api web"
+t "Ingress has 2 backends" "$(kubectl -n lab2-5 get ingress shop -o jsonpath='{.spec.rules[0].http.paths[*].backend.service.name}')" "api web"
 ```
 :::
 

@@ -611,7 +611,7 @@ The client Pod `c` used in drills 7 and 8: `kubectl run c --image=busybox:1.36 -
 
 - **Clarify:** what should be working? Which Service or URL is the success criterion?
 - **Observe:** `kubectl get all,events --sort-by=.lastTimestamp` for an overview, then `kubectl get events --field-selector type=Warning`. Warnings usually point straight at the broken stage.
-- **Hypothesise:** group the failures by stage. Several can be broken at once, as in [Lab 13-1](../reference/troubleshooting.md#-lab).
+- **Hypothesise:** group the failures by stage. Several can be broken at once, as in [Lab 4-1](../reference/troubleshooting.md#-lab).
 - **Fix:** fix in lifecycle order, admission first, because later stages can't be diagnosed until earlier ones pass.
 - **Prevent:** narrate each step. In an interview the method counts as much as the fix.
 

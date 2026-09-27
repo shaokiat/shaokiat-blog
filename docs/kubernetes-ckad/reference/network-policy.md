@@ -137,8 +137,8 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 11-1 ★★★
-**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 10-1](./services-and-ingress.md#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+:::tip Lab 6-1 ★★★
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 2-4](./services-and-ingress.md#-lab) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Lock a namespace down, then open exactly one path.**
 
@@ -146,7 +146,7 @@ kind's default CNI (kindnet) enforces NetworkPolicy. On minikube, start with `--
 
 **Goal**
 
-1. In namespace `lab11`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, command `/agnhost netexec --http-port=8080`) and a Service `api` on port 80 → 8080.
+1. In namespace `lab6-1`, create Deployment `api` (`registry.k8s.io/e2e-test-images/agnhost:2.53`, command `/agnhost netexec --http-port=8080`) and a Service `api` on port 80 → 8080.
 2. Start client Pods `fe` (labelled `app=frontend`) and `other` (no labels). Confirm both can reach `http://api/hostname`.
 3. Apply `default-deny`. Test again. What error do you get, and why?
 4. Apply `allow-dns`, `allow-frontend` and `frontend-egress-to-api`. Only the frontend should get through.
@@ -154,14 +154,14 @@ kind's default CNI (kindnet) enforces NetworkPolicy. On minikube, start with `--
 **Verify**
 
 ```bash
-kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname      # api-...
-kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname   # wget: download timed out
+kubectl -n lab6-1 exec fe -- wget -qO- -T 3 http://api/hostname      # api-...
+kubectl -n lab6-1 exec other -- wget -qO- -T 3 http://api/hostname   # wget: download timed out
 ```
 
 <details>
 <summary>🟡 Hints</summary>
 
-1. Same as Lab 10-1 steps 1–2.
+1. Same as Lab 2-4 steps 1–2.
 2. Two long-lived client Pods, `fe` labelled `app=frontend` and `other` unlabelled: `kubectl run -h` shows `-l`. Test with `kubectl exec`.
 3. There's no NetworkPolicy generator. Save the skeletons above as files. With egress denied, what does a Pod need before it can even find `api`?
 4. `kubectl apply -f` accepts several `-f` flags. A connection needs an egress allow on the client **and** an ingress allow on the server.
@@ -174,47 +174,47 @@ kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname   # wget: down
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab11
+   kubectl create namespace lab6-1
    ```
 
 2. Run agnhost serving HTTP on 8080.
 
    ```bash
-   kubectl -n lab11 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
+   kubectl -n lab6-1 create deployment api --image=registry.k8s.io/e2e-test-images/agnhost:2.53 \
      --port=8080 -- /agnhost netexec --http-port=8080
    ```
 
 3. Put a Service in front: 80 → 8080.
 
    ```bash
-   kubectl -n lab11 expose deployment api --port=80 --target-port=8080
+   kubectl -n lab6-1 expose deployment api --port=80 --target-port=8080
    ```
 
 4. Start two client Pods: `fe` carries the frontend label, `other` carries none.
 
    ```bash
-   kubectl -n lab11 run fe --image=busybox:1.36 --restart=Never -l app=frontend -- sleep 3600
-   kubectl -n lab11 run other --image=busybox:1.36 --restart=Never -- sleep 3600
-   kubectl -n lab11 wait --for=condition=Ready pod/fe pod/other
+   kubectl -n lab6-1 run fe --image=busybox:1.36 --restart=Never -l app=frontend -- sleep 3600
+   kubectl -n lab6-1 run other --image=busybox:1.36 --restart=Never -- sleep 3600
+   kubectl -n lab6-1 wait --for=condition=Ready pod/fe pod/other
    ```
 
 5. Call the API from both: both work, because nothing is denied yet.
 
    ```bash
-   kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname
-   kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab6-1 exec fe -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab6-1 exec other -- wget -qO- -T 3 http://api/hostname
    ```
 
 6. Deny all ingress and egress for every Pod (the default-deny skeleton above, saved as `default-deny.yaml`).
 
    ```bash
-   kubectl -n lab11 apply -f default-deny.yaml
+   kubectl -n lab6-1 apply -f default-deny.yaml
    ```
 
 7. Try the frontend again.
 
    ```bash
-   kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab6-1 exec fe -- wget -qO- -T 3 http://api/hostname
    ```
 
    ```text
@@ -226,25 +226,25 @@ kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname   # wget: down
 8. Allow DNS, and the frontend → api path in both directions (`allow-frontend.yaml` holds both of those policies).
 
    ```bash
-   kubectl -n lab11 apply -f allow-dns.yaml -f allow-frontend.yaml
+   kubectl -n lab6-1 apply -f allow-dns.yaml -f allow-frontend.yaml
    ```
 
 9. Frontend: succeeds.
 
    ```bash
-   kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname
+   kubectl -n lab6-1 exec fe -- wget -qO- -T 3 http://api/hostname
    ```
 
 10. Unlabelled Pod: times out, because only `app=frontend` is allowed in.
 
     ```bash
-    kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname
+    kubectl -n lab6-1 exec other -- wget -qO- -T 3 http://api/hostname
     ```
 
 11. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab11
+    kubectl delete namespace lab6-1
     ```
 
 </details>
@@ -253,8 +253,8 @@ kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname   # wget: down
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "frontend allowed" "$(kubectl -n lab11 exec fe -- wget -qO- -T 3 http://api/hostname | cut -c1-4)" "api-"
-t "other blocked"    "$(kubectl -n lab11 exec other -- wget -qO- -T 3 http://api/hostname 2>&1 | grep -o 'timed out')" "timed out"
+t "frontend allowed" "$(kubectl -n lab6-1 exec fe -- wget -qO- -T 3 http://api/hostname | cut -c1-4)" "api-"
+t "other blocked"    "$(kubectl -n lab6-1 exec other -- wget -qO- -T 3 http://api/hostname 2>&1 | grep -o 'timed out')" "timed out"
 ```
 :::
 

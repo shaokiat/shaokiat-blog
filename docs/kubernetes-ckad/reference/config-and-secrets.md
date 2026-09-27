@@ -135,14 +135,14 @@ stringData:
 
 ## 🧪 Lab
 
-:::tip Lab 7-1 ★★
+:::tip Lab 3-1 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **See env and volume diverge.**
 
 **Goal**
 
-1. In namespace `lab7`, create ConfigMap `app-config` with `LOG_LEVEL=info`.
+1. In namespace `lab3-1`, create ConfigMap `app-config` with `LOG_LEVEL=info`.
 2. Create a Deployment `cfg` (`busybox:1.36`, command `sleep 3600`) that reads `LOG_LEVEL` as an env var **and** mounts `app-config` at `/etc/config`.
 3. Change `LOG_LEVEL` to `debug`. Within two minutes, compare the env var and the file.
 4. Make the running Pods see `debug` in the env var too.
@@ -150,7 +150,7 @@ stringData:
 **Verify**
 
 ```bash
-kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
+kubectl -n lab3-1 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
 # after step 3: env=info  file=debug
 # after step 4: env=debug file=debug
 ```
@@ -171,44 +171,44 @@ kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/c
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab7
+   kubectl create namespace lab3-1
    ```
 
 2. Create the ConfigMap with one key.
 
    ```bash
-   kubectl -n lab7 create configmap app-config --from-literal=LOG_LEVEL=info
+   kubectl -n lab3-1 create configmap app-config --from-literal=LOG_LEVEL=info
    ```
 
 3. Create a Deployment whose container just sleeps.
 
    ```bash
-   kubectl -n lab7 create deployment cfg --image=busybox:1.36 -- sleep 3600
+   kubectl -n lab3-1 create deployment cfg --image=busybox:1.36 -- sleep 3600
    ```
 
 4. Inject every ConfigMap key as an env var. `set env --from` writes one `env` entry per key, each a `configMapKeyRef`, not an `envFrom`.
 
    ```bash
-   kubectl -n lab7 set env deployment/cfg --from=configmap/app-config
+   kubectl -n lab3-1 set env deployment/cfg --from=configmap/app-config
    ```
 
 5. Add a volume from the ConfigMap and mount it at /etc/config (or do the same with kubectl edit).
 
    ```bash
-   kubectl -n lab7 patch deployment cfg --type=json -p '[{"op":"add","path":"/spec/template/spec/volumes","value":[{"name":"config","configMap":{"name":"app-config"}}]},{"op":"add","path":"/spec/template/spec/containers/0/volumeMounts","value":[{"name":"config","mountPath":"/etc/config"}]}]'
+   kubectl -n lab3-1 patch deployment cfg --type=json -p '[{"op":"add","path":"/spec/template/spec/volumes","value":[{"name":"config","configMap":{"name":"app-config"}}]},{"op":"add","path":"/spec/template/spec/containers/0/volumeMounts","value":[{"name":"config","mountPath":"/etc/config"}]}]'
    ```
 
 6. Wait for the Pod with the volume to be Ready.
 
    ```bash
-   kubectl -n lab7 rollout status deployment/cfg
+   kubectl -n lab3-1 rollout status deployment/cfg
    ```
 
 7. Overwrite the ConfigMap in place with the new value.
 
    ```bash
-   kubectl -n lab7 create configmap app-config --from-literal=LOG_LEVEL=debug \
-     --dry-run=client -o yaml | kubectl -n lab7 replace -f -
+   kubectl -n lab3-1 create configmap app-config --from-literal=LOG_LEVEL=debug \
+     --dry-run=client -o yaml | kubectl -n lab3-1 replace -f -
    ```
 
 8. Give the kubelet time to sync the mounted file.
@@ -220,31 +220,31 @@ kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/c
 9. Compare: `env=info` `file=debug`.
 
    ```bash
-   kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
+   kubectl -n lab3-1 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
    ```
 
 10. Replace every Pod so env vars are read again.
 
     ```bash
-    kubectl -n lab7 rollout restart deployment/cfg
+    kubectl -n lab3-1 rollout restart deployment/cfg
     ```
 
 11. Wait for the new Pod.
 
     ```bash
-    kubectl -n lab7 rollout status deployment/cfg
+    kubectl -n lab3-1 rollout status deployment/cfg
     ```
 
 12. Compare again: `env=debug` `file=debug`.
 
     ```bash
-    kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
+    kubectl -n lab3-1 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"'
     ```
 
 13. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab7
+    kubectl delete namespace lab3-1
     ```
 
 </details>
@@ -253,7 +253,7 @@ kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/c
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "env and file both debug" "$(kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"')" "env=debug file=debug"
+t "env and file both debug" "$(kubectl -n lab3-1 exec deploy/cfg -- sh -c 'echo "env=$LOG_LEVEL file=$(cat /etc/config/LOG_LEVEL)"')" "env=debug file=debug"
 ```
 :::
 

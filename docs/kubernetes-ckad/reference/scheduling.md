@@ -186,14 +186,14 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 16-1 ★★
+:::tip Lab 3-3 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) (plain kind, one node) · [How the tiers work](../start-here/local-setup.md#lab-tiers). The lab taints and labels your only node; the last step removes both.
 
 **Reserve a node, get a workload onto it, then try to drain it.**
 
 **Goal**
 
-1. Taint your node `dedicated=gpu:NoSchedule`. In namespace `lab16`, create Deployment `web` (`nginx:1.27`, 2 replicas) and read why its Pods don't start.
+1. Taint your node `dedicated=gpu:NoSchedule`. In namespace `lab3-3`, create Deployment `web` (`nginx:1.27`, 2 replicas) and read why its Pods don't start.
 2. Let `web` onto the tainted node without removing the taint.
 3. Require nodes labelled `disktype=ssd`. Watch what happens to the rollout, then make it succeed.
 4. Protect `web` with a PodDisruptionBudget of `minAvailable: 2`, then try to drain only `web`'s Pods from the node. Uncordon afterwards.
@@ -202,8 +202,8 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab16 get pods -o wide                        # 2 Running
-kubectl -n lab16 get pdb web                             # ALLOWED DISRUPTIONS 0
+kubectl -n lab3-3 get pods -o wide                        # 2 Running
+kubectl -n lab3-3 get pdb web                             # ALLOWED DISRUPTIONS 0
 kubectl get nodes                                        # Ready, not SchedulingDisabled
 ```
 
@@ -224,7 +224,7 @@ kubectl get nodes                                        # Ready, not Scheduling
 1. Create the namespace and keep the node name in a variable.
 
    ```bash
-   kubectl create namespace lab16
+   kubectl create namespace lab3-3
    NODE=$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')
    ```
 
@@ -232,8 +232,8 @@ kubectl get nodes                                        # Ready, not Scheduling
 
    ```bash
    kubectl taint nodes "$NODE" dedicated=gpu:NoSchedule
-   kubectl -n lab16 create deployment web --image=nginx:1.27 --replicas=2
-   kubectl -n lab16 describe pod -l app=web | grep FailedScheduling | head -1
+   kubectl -n lab3-3 create deployment web --image=nginx:1.27 --replicas=2
+   kubectl -n lab3-3 describe pod -l app=web | grep FailedScheduling | head -1
    ```
 
    ```text
@@ -244,15 +244,15 @@ kubectl get nodes                                        # Ready, not Scheduling
 3. Add a toleration that matches the taint's key, value and effect.
 
    ```bash
-   kubectl -n lab16 patch deployment web --type=json -p '[{"op":"add","path":"/spec/template/spec/tolerations","value":[{"key":"dedicated","operator":"Equal","value":"gpu","effect":"NoSchedule"}]}]'
-   kubectl -n lab16 rollout status deployment/web
+   kubectl -n lab3-3 patch deployment web --type=json -p '[{"op":"add","path":"/spec/template/spec/tolerations","value":[{"key":"dedicated","operator":"Equal","value":"gpu","effect":"NoSchedule"}]}]'
+   kubectl -n lab3-3 rollout status deployment/web
    ```
 
 4. Require an `ssd` node. No node has that label yet.
 
    ```bash
-   kubectl -n lab16 patch deployment web -p '{"spec":{"template":{"spec":{"nodeSelector":{"disktype":"ssd"}}}}}'
-   kubectl -n lab16 get pods
+   kubectl -n lab3-3 patch deployment web -p '{"spec":{"template":{"spec":{"nodeSelector":{"disktype":"ssd"}}}}}'
+   kubectl -n lab3-3 get pods
    ```
 
    ```text
@@ -268,18 +268,18 @@ kubectl get nodes                                        # Ready, not Scheduling
 
    ```bash
    kubectl label node "$NODE" disktype=ssd
-   kubectl -n lab16 rollout status deployment/web
+   kubectl -n lab3-3 rollout status deployment/web
    ```
 
 6. Create the budget and try to drain `web` off the node.
 
    ```bash
-   kubectl -n lab16 create pdb web --selector=app=web --min-available=2
+   kubectl -n lab3-3 create pdb web --selector=app=web --min-available=2
    kubectl drain "$NODE" --pod-selector=app=web --timeout=15s 2>&1 | grep -m1 "disruption budget"
    ```
 
    ```text
-   error when evicting pods/"web-776f7c6b64-fv2mk" -n "lab16" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.
+   error when evicting pods/"web-776f7c6b64-fv2mk" -n "lab3-3" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.
    ```
 
    With 2 replicas and `minAvailable: 2`, `ALLOWED DISRUPTIONS` is 0. On a real cluster the drain waits until the Deployment has a spare replica elsewhere.
@@ -293,13 +293,13 @@ kubectl get nodes                                        # Ready, not Scheduling
 8. Add a 5-second `preStop` sleep, then time a delete.
 
    ```bash
-   kubectl -n lab16 patch deployment web -p '{"spec":{"template":{"spec":{"containers":[{"name":"nginx","lifecycle":{"preStop":{"sleep":{"seconds":5}}}}]}}}}'
-   kubectl -n lab16 rollout status deployment/web
-   time kubectl -n lab16 delete "$(kubectl -n lab16 get pods -l app=web -o name | head -n 1)"
+   kubectl -n lab3-3 patch deployment web -p '{"spec":{"template":{"spec":{"containers":[{"name":"nginx","lifecycle":{"preStop":{"sleep":{"seconds":5}}}}]}}}}'
+   kubectl -n lab3-3 rollout status deployment/web
+   time kubectl -n lab3-3 delete "$(kubectl -n lab3-3 get pods -l app=web -o name | head -n 1)"
    ```
 
    ```text
-   pod "web-5cf474b777-hcqmb" deleted from lab16 namespace
+   pod "web-5cf474b777-hcqmb" deleted from lab3-3 namespace
    ```
 
    `time` reports about 6 seconds: five of `preStop`, then SIGTERM, which nginx handles quickly. Without the hook the same delete takes about 2 seconds.
@@ -309,7 +309,7 @@ kubectl get nodes                                        # Ready, not Scheduling
    ```bash
    kubectl taint nodes "$NODE" dedicated=gpu:NoSchedule-
    kubectl label node "$NODE" disktype-
-   kubectl delete namespace lab16
+   kubectl delete namespace lab3-3
    ```
 
 </details>
@@ -319,12 +319,12 @@ kubectl get nodes                                        # Ready, not Scheduling
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
 NODE=$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')
-t "2 Pods Ready"          "$(kubectl -n lab16 get deploy web -o jsonpath='{.status.readyReplicas}')" "2"
-t "toleration set"        "$(kubectl -n lab16 get deploy web -o jsonpath='{.spec.template.spec.tolerations[0].value}')" "gpu"
-t "nodeSelector set"      "$(kubectl -n lab16 get deploy web -o jsonpath='{.spec.template.spec.nodeSelector.disktype}')" "ssd"
-t "PDB allows 0"          "$(kubectl -n lab16 get pdb web -o jsonpath='{.status.disruptionsAllowed}')" "0"
+t "2 Pods Ready"          "$(kubectl -n lab3-3 get deploy web -o jsonpath='{.status.readyReplicas}')" "2"
+t "toleration set"        "$(kubectl -n lab3-3 get deploy web -o jsonpath='{.spec.template.spec.tolerations[0].value}')" "gpu"
+t "nodeSelector set"      "$(kubectl -n lab3-3 get deploy web -o jsonpath='{.spec.template.spec.nodeSelector.disktype}')" "ssd"
+t "PDB allows 0"          "$(kubectl -n lab3-3 get pdb web -o jsonpath='{.status.disruptionsAllowed}')" "0"
 t "node schedulable"      "$(kubectl get node "$NODE" -o jsonpath='{.spec.unschedulable}')" ""
-t "preStop is 5s"         "$(kubectl -n lab16 get deploy web -o jsonpath='{.spec.template.spec.containers[0].lifecycle.preStop.sleep.seconds}')" "5"
+t "preStop is 5s"         "$(kubectl -n lab3-3 get deploy web -o jsonpath='{.spec.template.spec.containers[0].lifecycle.preStop.sleep.seconds}')" "5"
 ```
 :::
 

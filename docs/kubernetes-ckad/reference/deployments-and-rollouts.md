@@ -141,14 +141,14 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 5-1 ★★
+:::tip Lab 2-2 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [readiness probes](./probes-and-observability.md#the-three-probes) (the manifest uses one) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Roll forward, break it, roll back.**
 
 **Goal**
 
-1. In namespace `lab5`, apply the Deployment above (3 replicas, `maxSurge: 1`, `maxUnavailable: 0`).
+1. In namespace `lab2-2`, apply the Deployment above (3 replicas, `maxSurge: 1`, `maxUnavailable: 0`).
 2. Update the image to `nginx:1.28` with a change-cause. Watch the ReplicaSets during the rollout.
 3. Update to `nginx:1.99-typo`. Observe what happens to availability.
 4. Roll back to the working version and confirm the revision history.
@@ -156,9 +156,9 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab5 get deploy web -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'   # nginx:1.28
-kubectl -n lab5 get deploy web                     # 3/3 READY
-kubectl -n lab5 rollout history deployment/web
+kubectl -n lab2-2 get deploy web -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'   # nginx:1.28
+kubectl -n lab2-2 get deploy web                     # 3/3 READY
+kubectl -n lab2-2 rollout history deployment/web
 ```
 
 <details>
@@ -177,49 +177,49 @@ kubectl -n lab5 rollout history deployment/web
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab5
+   kubectl create namespace lab2-2
    ```
 
 2. Create the Deployment from the manifest above, saved as `web.yaml`.
 
    ```bash
-   kubectl -n lab5 apply -f web.yaml
+   kubectl -n lab2-2 apply -f web.yaml
    ```
 
 3. Wait until all 3 Pods are Ready.
 
    ```bash
-   kubectl -n lab5 rollout status deployment/web
+   kubectl -n lab2-2 rollout status deployment/web
    ```
 
 4. Change the container image; this starts a rolling update.
 
    ```bash
-   kubectl -n lab5 set image deployment/web nginx=nginx:1.28
+   kubectl -n lab2-2 set image deployment/web nginx=nginx:1.28
    ```
 
 5. Record why, so rollout history shows it.
 
    ```bash
-   kubectl -n lab5 annotate deployment/web kubernetes.io/change-cause="nginx 1.28"
+   kubectl -n lab2-2 annotate deployment/web kubernetes.io/change-cause="nginx 1.28"
    ```
 
 6. Watch the ReplicaSets: new RS 0→1→2→3, old RS 3→2→1→0.
 
    ```bash
-   kubectl -n lab5 get rs -w
+   kubectl -n lab2-2 get rs -w
    ```
 
 7. Roll out an image tag that doesn't exist.
 
    ```bash
-   kubectl -n lab5 set image deployment/web nginx=nginx:1.99-typo
+   kubectl -n lab2-2 set image deployment/web nginx=nginx:1.99-typo
    ```
 
 8. Check the Pods: one new Pod in ImagePullBackOff, 3 old Pods still Ready.
 
    ```bash
-   kubectl -n lab5 get pods
+   kubectl -n lab2-2 get pods
    ```
 
    maxUnavailable: 0 means no old Pod is removed until a new one is Ready. Users see no outage.
@@ -227,25 +227,25 @@ kubectl -n lab5 rollout history deployment/web
 9. Wait briefly for the rollout: it times out because it's stuck.
 
    ```bash
-   kubectl -n lab5 rollout status deployment/web --timeout=30s
+   kubectl -n lab2-2 rollout status deployment/web --timeout=30s
    ```
 
 10. Go back to the previous revision.
 
     ```bash
-    kubectl -n lab5 rollout undo deployment/web
+    kubectl -n lab2-2 rollout undo deployment/web
     ```
 
 11. Wait until the rollback finishes.
 
     ```bash
-    kubectl -n lab5 rollout status deployment/web
+    kubectl -n lab2-2 rollout status deployment/web
     ```
 
 12. List revisions: the 1.28 revision moved to the newest number.
 
     ```bash
-    kubectl -n lab5 rollout history deployment/web
+    kubectl -n lab2-2 rollout history deployment/web
     ```
 
     The broken revision also says "nginx 1.28": change-cause is copied from the Deployment's annotation, so it goes stale unless you update it with every change.
@@ -253,7 +253,7 @@ kubectl -n lab5 rollout history deployment/web
 13. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab5
+    kubectl delete namespace lab2-2
     ```
 
 </details>
@@ -262,23 +262,23 @@ kubectl -n lab5 rollout history deployment/web
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "back on nginx:1.28"   "$(kubectl -n lab5 get deploy web -o jsonpath='{.spec.template.spec.containers[0].image}')" "nginx:1.28"
-t "3 Pods Ready"         "$(kubectl -n lab5 get deploy web -o jsonpath='{.status.readyReplicas}')" "3"
-t "3 revisions"          "$(kubectl -n lab5 rollout history deployment/web | grep -cE '^[0-9]+ ')" "3"
-t "typo ReplicaSet at 0" "$(kubectl -n lab5 get rs -o jsonpath='{range .items[?(@.spec.template.spec.containers[0].image=="nginx:1.99-typo")]}{.spec.replicas}{end}')" "0"
+t "back on nginx:1.28"   "$(kubectl -n lab2-2 get deploy web -o jsonpath='{.spec.template.spec.containers[0].image}')" "nginx:1.28"
+t "3 Pods Ready"         "$(kubectl -n lab2-2 get deploy web -o jsonpath='{.status.readyReplicas}')" "3"
+t "3 revisions"          "$(kubectl -n lab2-2 rollout history deployment/web | grep -cE '^[0-9]+ ')" "3"
+t "typo ReplicaSet at 0" "$(kubectl -n lab2-2 get rs -o jsonpath='{range .items[?(@.spec.template.spec.containers[0].image=="nginx:1.99-typo")]}{.spec.replicas}{end}')" "0"
 ```
 :::
 
-<Link id="lab-5-2" />
+<Link id="lab-2-3" />
 
-:::tip Lab 5-2 ★★
-**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 5-1](#-lab) · [Release strategies](#release-strategies-with-core-primitives) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+:::tip Lab 2-3 ★★
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Lab 2-2](#-lab) · [Release strategies](#release-strategies-with-core-primitives) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Blue/green with one patch, then a canary by replica ratio.**
 
 **Goal**
 
-1. In namespace `lab5b`, create Deployments `web-blue` (`nginx:1.27`) and `web-green` (`nginx:1.28`), 3 replicas each, labelled `app: web` plus `version: blue` or `version: green`. Add a client Pod `c`.
+1. In namespace `lab2-3`, create Deployments `web-blue` (`nginx:1.27`) and `web-green` (`nginx:1.28`), 3 replicas each, labelled `app: web` plus `version: blue` or `version: green`. Add a client Pod `c`.
 2. Create Service `web` on port 80 that sends all traffic to blue. Prove which version answers.
 3. Cut over to green with one command, prove it, and note how you would roll back.
 4. Turn it into a canary: the Service selects both versions, green runs 1 replica, blue 3. Sample 40 requests and count the versions.
@@ -286,8 +286,8 @@ t "typo ReplicaSet at 0" "$(kubectl -n lab5 get rs -o jsonpath='{range .items[?(
 **Verify**
 
 ```bash
-kubectl -n lab5b exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:   # nginx/1.27.5 or nginx/1.28.3
-kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'                       # {"app":"web"} after step 4
+kubectl -n lab2-3 exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:   # nginx/1.27.5 or nginx/1.28.3
+kubectl -n lab2-3 get svc web -o jsonpath='{.spec.selector}{"\n"}'                       # {"app":"web"} after step 4
 ```
 
 <details>
@@ -306,8 +306,8 @@ kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'               
 1. Create the namespace and a client Pod.
 
    ```bash
-   kubectl create namespace lab5b
-   kubectl -n lab5b run c --image=busybox:1.36 --restart=Never -- sleep 3600
+   kubectl create namespace lab2-3
+   kubectl -n lab2-3 run c --image=busybox:1.36 --restart=Never -- sleep 3600
    ```
 
 2. Write the blue Deployment, derive green from it, and apply both.
@@ -333,16 +333,16 @@ kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'               
              httpGet: {path: /, port: 80}
    EOF
    sed 's/blue/green/g; s/1\.27/1.28/' blue.yaml > green.yaml
-   kubectl -n lab5b apply -f blue.yaml -f green.yaml
-   kubectl -n lab5b rollout status deployment/web-green
+   kubectl -n lab2-3 apply -f blue.yaml -f green.yaml
+   kubectl -n lab2-3 rollout status deployment/web-green
    ```
 
 3. Create the Service, pinned to blue.
 
    ```bash
-   kubectl -n lab5b create service clusterip web --tcp=80:80
-   kubectl -n lab5b patch service web -p '{"spec":{"selector":{"app":"web","version":"blue"}}}'
-   kubectl -n lab5b exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:
+   kubectl -n lab2-3 create service clusterip web --tcp=80:80
+   kubectl -n lab2-3 patch service web -p '{"spec":{"selector":{"app":"web","version":"blue"}}}'
+   kubectl -n lab2-3 exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:
    ```
 
    ```text
@@ -354,8 +354,8 @@ kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'               
 4. Cut over. Green was already Ready, so no Pod starts; only the endpoints change.
 
    ```bash
-   kubectl -n lab5b patch service web -p '{"spec":{"selector":{"app":"web","version":"green"}}}'
-   kubectl -n lab5b exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:
+   kubectl -n lab2-3 patch service web -p '{"spec":{"selector":{"app":"web","version":"green"}}}'
+   kubectl -n lab2-3 exec c -- wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:
    ```
 
    ```text
@@ -367,10 +367,10 @@ kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'               
 5. Make it a canary: select both versions, and shrink green to 1 of 4 Pods.
 
    ```bash
-   kubectl -n lab5b scale deployment web-green --replicas=1
+   kubectl -n lab2-3 scale deployment web-green --replicas=1
    sleep 5                                          # let the 2 extra green Pods terminate
-   kubectl -n lab5b patch service web --type=json -p '[{"op":"remove","path":"/spec/selector/version"}]'
-   kubectl -n lab5b exec c -- sh -c 'for i in $(seq 40); do wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:; done' | sort | uniq -c
+   kubectl -n lab2-3 patch service web --type=json -p '[{"op":"remove","path":"/spec/selector/version"}]'
+   kubectl -n lab2-3 exec c -- sh -c 'for i in $(seq 40); do wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -i server:; done' | sort | uniq -c
    ```
 
    ```text
@@ -383,7 +383,7 @@ kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'               
 6. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
-   kubectl delete namespace lab5b
+   kubectl delete namespace lab2-3
    ```
 
 </details>
@@ -392,10 +392,10 @@ kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}{"\n"}'               
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "selector is app=web only" "$(kubectl -n lab5b get svc web -o jsonpath='{.spec.selector}')" '{"app":"web"}'
-t "3 blue, 1 green Ready"    "$(kubectl -n lab5b get deploy web-blue web-green -o jsonpath='{.items[*].status.readyReplicas}')" "3 1"
-t "4 endpoints"              "$(kubectl -n lab5b get endpointslices -l kubernetes.io/service-name=web -o jsonpath='{range .items[*].endpoints[*]}x{end}')" "xxxx"
-t "both versions answer"     "$(kubectl -n lab5b exec c -- sh -c 'for i in $(seq 40); do wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -io "nginx/1\.2[78]"; done' | sort -u | tr '\n' ' ')" "nginx/1.27 nginx/1.28 "
+t "selector is app=web only" "$(kubectl -n lab2-3 get svc web -o jsonpath='{.spec.selector}')" '{"app":"web"}'
+t "3 blue, 1 green Ready"    "$(kubectl -n lab2-3 get deploy web-blue web-green -o jsonpath='{.items[*].status.readyReplicas}')" "3 1"
+t "4 endpoints"              "$(kubectl -n lab2-3 get endpointslices -l kubernetes.io/service-name=web -o jsonpath='{range .items[*].endpoints[*]}x{end}')" "xxxx"
+t "both versions answer"     "$(kubectl -n lab2-3 exec c -- sh -c 'for i in $(seq 40); do wget -S -qO /dev/null -T 3 http://web 2>&1 | grep -io "nginx/1\.2[78]"; done' | sort -u | tr '\n' ' ')" "nginx/1.27 nginx/1.28 "
 ```
 :::
 
