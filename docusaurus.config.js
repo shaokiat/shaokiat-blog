@@ -32,6 +32,57 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl: "https://github.com/shaokiat/shaokiat-blog/tree/main/",
           exclude: ["**/web-dev/**", "**/web3/**", "**/predictive-maintenance*"],
+          // Kubernetes section: group pages by Learning Path phase instead of by folder.
+          // File paths (and URLs) stay the same; only the sidebar grouping changes.
+          async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
+            const items = await defaultSidebarItemsGenerator(args);
+            const k8s = items.find(
+              (i) => i.type === "category" && i.link?.id === "kubernetes-ckad/index"
+            );
+            if (k8s) {
+              const ids = (xs) => xs.flatMap((i) => (i.type === "doc" ? [i.id] : i.items ? ids(i.items) : []));
+              const before = ids(k8s.items);
+              const phase = (label, ids) => ({
+                type: "category",
+                label,
+                collapsible: true,
+                collapsed: true,
+                items: ids.map((id) => ({ type: "doc", id: `kubernetes-ckad/${id}` })),
+              });
+              k8s.items = [
+                { ...phase("1 · Foundations", [
+                  "start-here/mental-model", "start-here/local-setup", "start-here/command-patterns",
+                  "start-here/learning-path", "reference/architecture",
+                ]), collapsed: false },
+                phase("2 · Run an app", [
+                  "reference/pods-and-multi-container", "reference/deployments-and-rollouts",
+                  "reference/services-and-ingress", "reference/container-images",
+                ]),
+                phase("3 · Configure it", [
+                  "reference/config-and-secrets", "reference/resources-and-scaling",
+                  "reference/scheduling", "reference/probes-and-observability",
+                ]),
+                phase("4 · Debug it", [
+                  "reference/troubleshooting", "scenarios/troubleshooting-drills",
+                  "scenarios/capstone-deploy-an-app",
+                ]),
+                phase("5 · Other workloads", ["reference/jobs-and-cronjobs", "reference/storage"]),
+                phase("6 · Isolation & security", [
+                  "reference/network-policy", "reference/security", "scenarios/multi-tenant-platform",
+                ]),
+                phase("7 · Packaging", ["reference/helm-and-kustomize"]),
+                phase("8 · Interview mode", [
+                  "scenarios/ml-model-serving", "scenarios/nightly-retraining-pipeline",
+                  "scenarios/zero-downtime-release", "scenarios/mock-interview",
+                ]),
+                phase("Lookup", ["start-here/glossary", "reference/kubectl-cheatsheet"]),
+              ];
+              const placed = ids(k8s.items);
+              const missing = before.filter((id) => !placed.includes(id));
+              if (missing.length) throw new Error(`Add to a Kubernetes phase in docusaurus.config.js: ${missing}`);
+            }
+            return items;
+          },
         },
         blog: {
           showReadingTime: true,

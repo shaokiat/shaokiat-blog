@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 350" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="An image built from a Dockerfile is a stack of read-only layers plus run config. It reaches the node either through a registry pull, which the kubelet triggers according to imagePullPolicy, or by kind load, which copies it straight into containerd. The kubelet then starts the container with the image&#x27;s ENTRYPOINT and CMD">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="960" height="330" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">FROM DOCKERFILE TO RUNNING CONTAINER</text>
+  <rect x="30" y="70" width="150" height="70" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="105" y="93" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">Dockerfile</text>
+  <text x="105" y="112" text-anchor="middle" font-size="11" fill="#8896a8">FROM · COPY · USER</text>
+  <text x="105" y="126" text-anchor="middle" font-size="11" fill="#8896a8">ENTRYPOINT · CMD</text>
+  <polyline points="182,105 228,105" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="205" y="97" text-anchor="middle" font-size="11" fill="#8896a8">build</text>
+  <rect x="230" y="44" width="210" height="196" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="244" y="63" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">IMAGE myapp:0.1</text>
+  <rect x="246" y="70" width="178" height="32" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="335" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">config: USER 10001</text>
+  <rect x="246" y="110" width="178" height="32" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="335" y="131" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">layer: app.py</text>
+  <rect x="246" y="150" width="178" height="32" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="335" y="171" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">layer: /venv</text>
+  <rect x="246" y="190" width="178" height="32" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="335" y="211" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">layer: python:3.13-slim</text>
+  <text x="335" y="232" text-anchor="middle" font-size="10.5" fill="#8896a8">read-only layers + run config</text>
+  <rect x="520" y="60" width="170" height="60" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="605" y="85" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Registry</text>
+  <text x="605" y="104" text-anchor="middle" font-size="11" fill="#8896a8">docker.io · ghcr.io</text>
+  <polyline points="442,90 518,90" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="480" y="82" text-anchor="middle" font-size="11" fill="#8896a8">push</text>
+  <polyline points="442,200 706,200" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="574" y="192" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#202329" stroke-width="4" paint-order="stroke">kind load docker-image</text>
+  <text x="574" y="216" text-anchor="middle" font-size="10.5" fill="#8896a8">copies straight into the node</text>
+  <rect x="708" y="44" width="246" height="280" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="722" y="63" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">NODE</text>
+  <rect x="726" y="70" width="210" height="56" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="831" y="93" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">kubelet</text>
+  <text x="831" y="112" text-anchor="middle" font-size="11" fill="#8896a8">reads imagePullPolicy</text>
+  <rect x="726" y="170" width="210" height="56" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="831" y="193" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">containerd</text>
+  <text x="831" y="212" text-anchor="middle" font-size="11" fill="#8896a8">the node&#x27;s image store</text>
+  <rect x="756" y="256" width="150" height="52" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="764" y="271" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">RUNS</text>
+  <text x="831" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">container</text>
+  <text x="831" y="302" text-anchor="middle" font-size="10.5" fill="#8896a8">ENTRYPOINT + CMD</text>
+  <polyline points="831,128 831,168" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="840" y="152" text-anchor="start" font-size="11" fill="#8896a8">pull if needed</text>
+  <polyline points="831,228 831,254" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="840" y="245" text-anchor="start" font-size="11" fill="#8896a8">start</text>
+  <text x="614" y="150" text-anchor="start" font-size="11" fill="#8896a8" stroke="#202329" stroke-width="4" paint-order="stroke">pulled by containerd</text>
+  <polyline points="605,122 605,176 724,190" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="30" y="300" text-anchor="start" font-size="11" fill="#e0cfa8">Always: pull on every start.</text>
+  <text x="30" y="318" text-anchor="start" font-size="11" fill="#e0cfa8">IfNotPresent: use the node&#x27;s copy. Never: node copy or fail.</text>
+</svg>

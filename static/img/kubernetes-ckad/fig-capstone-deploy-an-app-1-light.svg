@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Capstone architecture: curl on the laptop reaches ingress-nginx on port 80, which routes host myapp.localhost through Ingress myapp to Service myapp and on to Ready myapp Pods. An HPA scales the Deployment between 2 and 5 replicas; each Pod reads GREETING from a ConfigMap and API_KEY from a Secret">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="960" height="400" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">KIND CLUSTER ckad</text>
+  <rect x="30" y="60" width="140" height="60" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="100" y="85" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">Laptop</text>
+  <text x="100" y="104" text-anchor="middle" font-size="11" fill="#4a5568">curl myapp.localhost</text>
+  <polyline points="172,90 218,90" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="195" y="82" text-anchor="middle" font-size="11" fill="#4a5568">:80</text>
+  <rect x="220" y="44" width="170" height="92" rx="12" fill="#eef2f6" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="234" y="63" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">NS ingress-nginx</text>
+  <rect x="236" y="70" width="138" height="52" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="305" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">ingress-nginx</text>
+  <text x="305" y="110" text-anchor="middle" font-size="11" fill="#4a5568">controller</text>
+  <rect x="410" y="44" width="550" height="350" rx="12" fill="#eef2f6" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="424" y="63" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">NAMESPACE capstone</text>
+  <rect x="428" y="70" width="130" height="52" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="493" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">Ingress myapp</text>
+  <text x="493" y="110" text-anchor="middle" font-size="11" fill="#4a5568">host myapp.localhost</text>
+  <polyline points="376,96 426,96" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="600" y="70" width="130" height="52" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="665" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">Service myapp</text>
+  <text x="665" y="110" text-anchor="middle" font-size="11" fill="#4a5568">80 → http (8080)</text>
+  <polyline points="560,96 598,96" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="790" y="70" width="150" height="52" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="865" y="91" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">HPA myapp</text>
+  <text x="865" y="110" text-anchor="middle" font-size="11" fill="#4a5568">2–5 replicas @ 50% CPU</text>
+  <rect x="790" y="170" width="150" height="52" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="865" y="191" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Deployment myapp</text>
+  <text x="865" y="210" text-anchor="middle" font-size="11" fill="#4a5568">maxUnavailable 0</text>
+  <polyline points="865,124 865,168" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="874" y="150" text-anchor="start" font-size="11" fill="#4a5568">scales</text>
+  <rect x="430" y="250" width="118" height="64" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="438" y="265" font-size="9" font-weight="600" letter-spacing="1" fill="#2d7a52">POD</text>
+  <text x="489" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#1f5c3d">myapp:0.2</text>
+  <text x="489" y="302" text-anchor="middle" font-size="10.5" fill="#4a5568">ready · UID 10001</text>
+  <rect x="560" y="250" width="118" height="64" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="568" y="265" font-size="9" font-weight="600" letter-spacing="1" fill="#2d7a52">POD</text>
+  <text x="619" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#1f5c3d">myapp:0.2</text>
+  <text x="619" y="302" text-anchor="middle" font-size="10.5" fill="#4a5568">ready · UID 10001</text>
+  <rect x="690" y="250" width="118" height="64" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="698" y="265" font-size="9" font-weight="600" letter-spacing="1" fill="#2d7a52">POD</text>
+  <text x="749" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#1f5c3d">myapp:0.2</text>
+  <text x="749" y="302" text-anchor="middle" font-size="10.5" fill="#4a5568">ready · UID 10001</text>
+  <polyline points="665,124 665,170 489,170 489,248" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="665,170 619,170 619,248" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="665,170 749,170 749,248" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="540" y="162" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">Ready endpoints</text>
+  <polyline points="865,224 865,282 810,282" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="874" y="256" text-anchor="start" font-size="11" fill="#4a5568">owns</text>
+  <rect x="430" y="336" width="150" height="44" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="505" y="353" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">ConfigMap</text>
+  <text x="505" y="372" text-anchor="middle" font-size="11" fill="#4a5568">GREETING</text>
+  <rect x="640" y="336" width="150" height="44" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="715" y="353" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">Secret</text>
+  <text x="715" y="372" text-anchor="middle" font-size="11" fill="#4a5568">API_KEY</text>
+  <polyline points="505,334 505,316" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <polyline points="715,334 715,316" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="514" y="328" text-anchor="start" font-size="10" fill="#4a5568">envFrom</text>
+  <text x="724" y="328" text-anchor="start" font-size="10" fill="#4a5568">secretKeyRef</text>
+  <text x="30" y="190" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">kind load docker-image</text>
+  <text x="30" y="206" text-anchor="start" font-size="11" fill="#4a5568">puts myapp:0.x on the node</text>
+  <text x="30" y="240" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Load generator Pod</text>
+  <text x="30" y="256" text-anchor="start" font-size="11" fill="#4a5568">wget loop → Service myapp</text>
+</svg>

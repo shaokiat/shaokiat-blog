@@ -10,6 +10,7 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 |---|---|
 | `/new-doc` | Create a new ML Engineering documentation page following the repo's style conventions |
 | `/new-genai-doc` | Create a new GenAI Agents documentation page following the MCP guide's style conventions |
+| `/ckad-doc` | Write or edit a Kubernetes (CKAD) page: page contracts, figure helper, YAML/lab validation (also auto-loads for `docs/kubernetes-ckad/`) |
 
 ---
 
