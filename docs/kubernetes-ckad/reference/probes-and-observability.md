@@ -1,13 +1,17 @@
 ---
 title: Probes & Observability
 sidebar_label: Probes & Observability
-sidebar_position: 12
+sidebar_position: 9
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Probes & Observability
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 3 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Liveness, readiness and startup probes](https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/) · [Configure probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) · [Logging](https://kubernetes.io/docs/concepts/cluster-administration/logging/) · [Deprecation guide](https://kubernetes.io/docs/reference/using-api/deprecation-guide/)
 
@@ -348,3 +352,7 @@ t "liveness probe failed"   "$(kubectl -n lab12 get events --field-selector reas
 - **Readiness failure is quiet and safe.** The Pod stops receiving traffic but keeps its state.
 - **Logs, events and `top` show now, not history.** `--previous` for crashes. Events vanish after about an hour.
 - **Watch for deprecation warnings.** Git manifests break on upgrade, not the stored objects.
+
+---
+
+**Next in path →** [Troubleshooting](./troubleshooting.md) (Phase 4)

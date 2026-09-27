@@ -9,6 +9,10 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Architecture
 
+:::note[👀 Skim]
+Read for context; the Deeper dive blocks are optional. Phase 1 of the [Learning Path](../start-here/learning-path.md).
+:::
+
 > Docs: [Cluster architecture](https://kubernetes.io/docs/concepts/architecture/) · [Controllers](https://kubernetes.io/docs/concepts/architecture/controller/) · [Objects](https://kubernetes.io/docs/concepts/overview/working-with-objects/)
 
 ## Overview
@@ -342,3 +346,7 @@ t "Deployment scaled it back"  "$(kubectl -n lab1 get events --field-selector re
 - **Spec is yours, status is theirs.** Debug by comparing the two, then ask which controller should have closed the gap.
 - **Change the owner, not the child.** Edits to Pods or ReplicaSets under a Deployment are undone.
 - **The data plane outlives the control plane.** Losing the API server freezes the cluster. It doesn't stop running apps.
+
+---
+
+**Next in path →** [Pods & Multi-Container](./pods-and-multi-container.md) (Phase 2)

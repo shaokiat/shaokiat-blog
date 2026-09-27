@@ -198,3 +198,7 @@ compdef _kubectl k
 ```
 
 Completion covers subcommands, resource types and live object names: `k get po<Tab>`, `k logs <Tab>`.
+
+---
+
+**Next in path →** [Command Patterns](./command-patterns.md)

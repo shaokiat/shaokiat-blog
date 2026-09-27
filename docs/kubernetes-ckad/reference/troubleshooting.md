@@ -1,10 +1,14 @@
 ---
 title: Troubleshooting
 sidebar_label: Troubleshooting
-sidebar_position: 13
+sidebar_position: 10
 ---
 
 # Troubleshooting
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 4 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Debug Pods](https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/) · [Debug Services](https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/) · [Debug running Pods](https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/) · [Learnk8s visual guide](https://learnkube.com/troubleshooting-deployments)
 
@@ -337,3 +341,7 @@ t "web answers"   "$(kubectl -n lab13 exec chk -- wget -qO- -T 3 http://web | gr
 - **Missing Pods mean admission.** Describe the ReplicaSet.
 - **Exit code 137 is a kill, usually OOM.** 127 is a missing command.
 - **Walk the chain in order.** Admission, scheduling, pull, start, readiness, Service. Stop at the first broken link.
+
+---
+
+**Next in path →** [Troubleshooting Drills](../scenarios/troubleshooting-drills.md)

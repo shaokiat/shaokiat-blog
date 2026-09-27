@@ -1,10 +1,14 @@
 ---
 title: Storage
 sidebar_label: Storage
-sidebar_position: 4
+sidebar_position: 12
 ---
 
 # Storage
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 5 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) · [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) · [Storage Classes](https://kubernetes.io/docs/concepts/storage/storage-classes/) · [Ephemeral volumes](https://kubernetes.io/docs/concepts/storage/ephemeral-volumes/)
 
@@ -301,3 +305,7 @@ t "reclaim policy Delete"   "$(kubectl get pv "$(kubectl -n lab4 get pvc data -o
 - **RWO means one node.** Multiple replicas need a StatefulSet or RWX storage.
 - **WaitForFirstConsumer makes `Pending` normal.** Look at the Pod before blaming the claim.
 - **Reclaim policy decides whether data survives the PVC.** `Retain` for anything you can't rebuild.
+
+---
+
+**Next in path →** [Multi-container patterns](./pods-and-multi-container.md#multi-container-patterns) · [Network Policy](./network-policy.md) (Phase 6)

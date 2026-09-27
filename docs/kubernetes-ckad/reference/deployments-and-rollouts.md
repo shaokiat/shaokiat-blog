@@ -1,7 +1,7 @@
 ---
 title: Deployments & Rollouts
 sidebar_label: Deployments & Rollouts
-sidebar_position: 5
+sidebar_position: 3
 ---
 
 import Link from "@docusaurus/Link";
@@ -9,6 +9,10 @@ import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Deployments & Rollouts
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 2 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) · [StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) · [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) · [kubectl rollout](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_rollout/)
 
@@ -465,3 +469,7 @@ t "both versions answer"     "$(kubectl -n lab5b exec c -- sh -c 'for i in $(seq
 - **Readiness probes make rollouts safe.** Without them, "available" means "started".
 - **Blue/green and canary are label tricks.** Two Deployments, one Service, move the selector or the ratio.
 - **Only the Pod template triggers a rollout.** Config changes need a restart or a new name.
+
+---
+
+**Next in path →** [Services & Ingress](./services-and-ingress.md)

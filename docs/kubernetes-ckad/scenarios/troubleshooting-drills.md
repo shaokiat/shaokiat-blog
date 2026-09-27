@@ -1,13 +1,17 @@
 ---
 title: Troubleshooting Drills
 sidebar_label: Troubleshooting Drills
-sidebar_position: 5
+sidebar_position: 3
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scenario: Troubleshooting Drills
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 4 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Builds on: [Troubleshooting](../reference/troubleshooting.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Services & Ingress](../reference/services-and-ingress.md) · [Resources & Scaling](../reference/resources-and-scaling.md)
 
@@ -612,3 +616,7 @@ The client Pod `c` used in drills 7 and 8: `kubectl run c --image=busybox:1.36 -
 - **Prevent:** narrate each step. In an interview the method counts as much as the fix.
 
 </details>
+
+---
+
+**Next in path →** [Capstone](./capstone-deploy-an-app.md), attempt 1 (untimed)

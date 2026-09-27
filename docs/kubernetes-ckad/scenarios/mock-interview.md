@@ -1,10 +1,14 @@
 ---
 title: Mock Interview
 sidebar_label: Mock Interview
-sidebar_position: 7
+sidebar_position: 2
 ---
 
 # Scenario: Mock Interview
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 8 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Builds on: [Troubleshooting](../reference/troubleshooting.md) · [Deployments & Rollouts](../reference/deployments-and-rollouts.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Network Policy](../reference/network-policy.md) · [Capstone](./capstone-deploy-an-app.md)
 
@@ -482,3 +486,7 @@ Labels are the identity. Anyone who can create Pods in `mock4` can claim `app=fr
 - **Prevent:** the trade-off: long grace periods make every rollout and node drain slow. Accept reconnects as normal behaviour and design clients for it.
 
 </details>
+
+---
+
+**Next in path →** [Troubleshooting Drills](./troubleshooting-drills.md) again, at the 🔴 tier. That completes the path.

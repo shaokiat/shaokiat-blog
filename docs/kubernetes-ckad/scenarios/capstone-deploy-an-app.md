@@ -1,13 +1,17 @@
 ---
 title: "Capstone: Deploy an App End to End"
 sidebar_label: "Capstone: Deploy an App"
-sidebar_position: 6
+sidebar_position: 1
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Capstone: Deploy an App End to End
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phases 4 and 8 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Builds on: [Container Images](../reference/container-images.md) · [Config & Secrets](../reference/config-and-secrets.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Resources & Scaling](../reference/resources-and-scaling.md) · [Services & Ingress](../reference/services-and-ingress.md) · [Deployments & Rollouts](../reference/deployments-and-rollouts.md)
 
@@ -383,3 +387,7 @@ Clean up with `kubectl delete namespace capstone`.
 - **Prevent:** the trade-off is speed against certainty: a short timeout rolls back slow-but-healthy releases, a long one leaves a broken release half-deployed for longer. Set it from the app's measured startup time. → See [Zero-Downtime Release](./zero-downtime-release.md).
 
 </details>
+
+---
+
+**Next in path →** [Jobs & CronJobs](../reference/jobs-and-cronjobs.md) after attempt 1 (Phase 5) · [Mock Interview](./mock-interview.md) after attempt 2 (Phase 8)

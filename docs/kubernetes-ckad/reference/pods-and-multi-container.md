@@ -9,6 +9,10 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Pods & Multi-Container
 
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 2 of the [Learning Path](../start-here/learning-path.md).
+:::
+
 > Docs: [Pods](https://kubernetes.io/docs/concepts/workloads/pods/) · [Init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/) · [Sidecar containers](https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/) · [Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
 
 ## Overview
@@ -309,3 +313,7 @@ t "nginx never started"       "$(kubectl -n lab2 get pod web -o jsonpath='{.stat
 - **Sidecars are init containers with `restartPolicy: Always`.** They start first, stop last, and don't block Job completion.
 - **Ambassador and adapter are sidecar jobs.** One proxies out, one translates out.
 - **Separate Pods unless they must share a lifecycle.** Scaling together is the cost of sharing a Pod.
+
+---
+
+**Next in path →** [Deployments & Rollouts](./deployments-and-rollouts.md)

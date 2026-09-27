@@ -1,10 +1,14 @@
 ---
 title: Jobs & CronJobs
 sidebar_label: Jobs & CronJobs
-sidebar_position: 3
+sidebar_position: 11
 ---
 
 # Jobs & CronJobs
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 5 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/) · [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) · [Indexed Jobs](https://kubernetes.io/docs/tasks/job/indexed-parallel-processing-static/)
 
@@ -297,3 +301,7 @@ t "never 2 scheduled at once" "$(kubectl -n lab3 get jobs -o jsonpath='{range .i
 - **`concurrencyPolicy: Forbid` stops overlapping runs.** The cost is skipped runs when one is slow.
 - **Always set `timeZone` and `ttlSecondsAfterFinished`.** UTC surprises and piles of finished Jobs are the two classic messes.
 - **Make every Job idempotent.** Retries and the occasional double run are part of the contract.
+
+---
+
+**Next in path →** [Storage](./storage.md)

@@ -1,13 +1,17 @@
 ---
 title: Zero-Downtime Release
 sidebar_label: Zero-Downtime Release
-sidebar_position: 3
+sidebar_position: 6
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scenario: Zero-Downtime Release
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 8 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Builds on: [Deployments & Rollouts](../reference/deployments-and-rollouts.md) · [Services & Ingress](../reference/services-and-ingress.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Scheduling & Shutdown](../reference/scheduling.md)
 
@@ -193,3 +197,7 @@ Promote by updating the stable Deployment's image and scaling the canary to 0. A
 - **Prevent:** reserve blue/green for releases that need it; canary or rolling costs almost nothing extra.
 
 </details>
+
+---
+
+**Next in path →** [Capstone](./capstone-deploy-an-app.md), attempt 2 (40 min, solutions closed)

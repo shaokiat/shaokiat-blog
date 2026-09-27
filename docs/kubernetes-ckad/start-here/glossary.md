@@ -1,7 +1,7 @@
 ---
 title: Glossary
 sidebar_label: Glossary
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 import Link from "@docusaurus/Link";
@@ -66,3 +66,7 @@ How these fit together: [the object map](./mental-model.md#the-object-map).
 | <Link id="deployment" />**Deployment** | Manages ReplicaSets to roll out new Pod templates and roll back. | [Deployments](../reference/deployments-and-rollouts.md#choosing-a-workload-resource) |
 | <Link id="service" />**Service** | A stable name and IP in front of the Pods its selector matches. | [Service types](../reference/services-and-ingress.md#service-types) |
 | <Link id="endpointslice" />**EndpointSlice** | The current list of Ready Pod IPs behind a Service. Empty means no traffic. | [Life of an apply](./mental-model.md#life-of-a-kubectl-apply) |
+
+---
+
+**Next in path →** [Learning Path](./learning-path.md)

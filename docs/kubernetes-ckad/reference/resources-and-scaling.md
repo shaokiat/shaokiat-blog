@@ -1,10 +1,14 @@
 ---
 title: Resources & Scaling
 sidebar_label: Resources & Scaling
-sidebar_position: 8
+sidebar_position: 7
 ---
 
 # Resources & Scaling
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 3 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Resource management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) · [QoS classes](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/) · [LimitRange](https://kubernetes.io/docs/concepts/policy/limit-range/) · [ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/) · [HPA](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
 
@@ -334,3 +338,7 @@ t "HPA scaled out under load"     "$(kubectl -n lab8 get events --field-selector
 - **QoS class sets eviction order.** Requests = limits for everything makes a Pod Guaranteed.
 - **LimitRange defaults each container; ResourceQuota caps the namespace.** Quota rejections show on the ReplicaSet.
 - **HPA scales on usage as a percentage of requests.** No request, no utilization, no autoscaling.
+
+---
+
+**Next in path →** [Scheduling & Shutdown](./scheduling.md)

@@ -1,13 +1,17 @@
 ---
 title: ML Model Serving
 sidebar_label: ML Model Serving
-sidebar_position: 1
+sidebar_position: 4
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scenario: ML Model Serving
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 8 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Builds on: [Pods & Multi-Container](../reference/pods-and-multi-container.md) · [Probes & Observability](../reference/probes-and-observability.md) · [Resources & Scaling](../reference/resources-and-scaling.md) · [Deployments & Rollouts](../reference/deployments-and-rollouts.md) · [Scheduling & Shutdown](../reference/scheduling.md)
 
@@ -209,3 +213,7 @@ spec:
 - **Prevent:** gate promotion on an offline evaluation in the training pipeline. → See [Nightly Retraining Pipeline](./nightly-retraining-pipeline.md) and [Zero-Downtime Release](./zero-downtime-release.md).
 
 </details>
+
+---
+
+**Next in path →** [Nightly Retraining Pipeline](./nightly-retraining-pipeline.md)

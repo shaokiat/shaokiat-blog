@@ -1,13 +1,17 @@
 ---
 title: Config & Secrets
 sidebar_label: Config & Secrets
-sidebar_position: 7
+sidebar_position: 6
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Config & Secrets
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 3 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/) · [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/) · [Good practices for Secrets](https://kubernetes.io/docs/concepts/security/secrets-good-practices/) · [Encrypting data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/)
 
@@ -324,3 +328,7 @@ t "env and file both debug" "$(kubectl -n lab7 exec deploy/cfg -- sh -c 'echo "e
 - **A config edit is not a rollout.** Restart, or version the ConfigMap name so it becomes one.
 - **Missing references fail loudly.** `CreateContainerConfigError` names the missing key.
 - **Guard Secrets with RBAC and an external source of truth.** Pod-create rights imply Secret-read rights.
+
+---
+
+**Next in path →** [Resources & Scaling](./resources-and-scaling.md)

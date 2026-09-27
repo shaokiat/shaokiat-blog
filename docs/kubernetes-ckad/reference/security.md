@@ -1,13 +1,17 @@
 ---
 title: Security
 sidebar_label: Security
-sidebar_position: 9
+sidebar_position: 14
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Security
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 6 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Controlling access to the API](https://kubernetes.io/docs/concepts/security/controlling-access/) · [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) · [Service accounts](https://kubernetes.io/docs/concepts/security/service-accounts/) · [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) · [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) · [Custom resources](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)
 
@@ -502,3 +506,7 @@ t "Backup stored"                 "$(kubectl -n lab9 get bk nightly-db -o jsonpa
 - **Give each workload its own ServiceAccount.** Test with `kubectl auth can-i --as`.
 - **SecurityContext hardens the process.** Non-root, no escalation, drop ALL, read-only root.
 - **CRDs add kinds; Operators make them act.** Same reconcile loop as the built-in controllers.
+
+---
+
+**Next in path →** [Multi-Tenant Platform](../scenarios/multi-tenant-platform.md)

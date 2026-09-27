@@ -5,21 +5,29 @@ sidebar_label: Overview
 
 # Kubernetes (CKAD)
 
-New to Kubernetes? Work through **Start Here** in order: [Mental Model](./start-here/mental-model.md) → [Local Setup](./start-here/local-setup.md) → [Command Patterns](./start-here/command-patterns.md). Every Lab has three tiers (🔴 Challenge, 🟡 Hints, 🟢 Guided), so pick your level.
+New to Kubernetes? Work through **Start Here** in order: [Mental Model](./start-here/mental-model.md) → [Local Setup](./start-here/local-setup.md) → [Command Patterns](./start-here/command-patterns.md) → [Learning Path](./start-here/learning-path.md). Every Lab has three tiers (🔴 Challenge, 🟡 Hints, 🟢 Guided), so pick your level.
 
-Notes for Kubernetes interviews, using the [CKAD curriculum](https://github.com/cncf/curriculum) as the syllabus. The exam is performance-based: you solve tasks in a live cluster with `kubectl`, so every reference page pairs concepts with commands and a hands-on lab.
+Notes for Kubernetes interviews, using the [CKAD curriculum](https://github.com/cncf/curriculum) as the syllabus. The exam is performance-based: you solve tasks in a live cluster with `kubectl`, so every reference page pairs concepts with commands and a hands-on lab that ends in a PASS/FAIL ✅ Check.
+
+:::tip[Interview prep path]
+Preparing for a hands-on interview? Follow the [Learning Path](./start-here/learning-path.md): eight phases, about 30 hours, with a "Next in path →" link at the bottom of every page. Short on time: phases 1–4 and 8.
+
+🔥 **Core pages**, the ones hands-on rounds test directly: [Troubleshooting](./reference/troubleshooting.md) · [Troubleshooting Drills](./scenarios/troubleshooting-drills.md) · [Deployments & Rollouts](./reference/deployments-and-rollouts.md) · [Services & Ingress](./reference/services-and-ingress.md) · [Config & Secrets](./reference/config-and-secrets.md) · [Probes & Observability](./reference/probes-and-observability.md) · [Resources & Scaling](./reference/resources-and-scaling.md) · [Scheduling & Shutdown](./reference/scheduling.md) · [Container Images](./reference/container-images.md) · [Capstone](./scenarios/capstone-deploy-an-app.md) · [Mock Interview](./scenarios/mock-interview.md)
+:::
 
 ## Scenarios
 
 Interview-style systems that combine several reference pages. Explain each one end to end before the interview.
 
+- [Capstone: Deploy an App](./scenarios/capstone-deploy-an-app.md): a timed 40-minute build, from Dockerfile to HPA and a rolled-back bad release
+- [Mock Interview](./scenarios/mock-interview.md): four timed tasks with setup scripts and no visible hints
 - [ML Model Serving](./scenarios/ml-model-serving.md): slow model load, startup probes, HPA, safe rollouts
 - [Nightly Retraining Pipeline](./scenarios/nightly-retraining-pipeline.md): CronJob, PVC for artifacts, `concurrencyPolicy: Forbid`
 - [Zero-Downtime Release](./scenarios/zero-downtime-release.md): rolling, canary and blue/green releases, rollback
 - [Multi-Tenant Platform](./scenarios/multi-tenant-platform.md): namespaces, ResourceQuota, RBAC, NetworkPolicy
 - [Troubleshooting Drills](./scenarios/troubleshooting-drills.md): Pending, CrashLoopBackOff, ImagePullBackOff, OOMKilled, Service with no endpoints
 
-**Fundamentals:** [Mental Model](./start-here/mental-model.md) · [Command Patterns](./start-here/command-patterns.md) · [Architecture](./reference/architecture.md) · [kubectl Cheatsheet](./reference/kubectl-cheatsheet.md)
+**Fundamentals:** [Mental Model](./start-here/mental-model.md) · [Local Setup add-ons](./start-here/local-setup.md#cluster-add-ons) · [Command Patterns](./start-here/command-patterns.md) · [Architecture](./reference/architecture.md) · [kubectl Cheatsheet](./reference/kubectl-cheatsheet.md)
 
 ---
 
@@ -81,3 +89,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 | [bmuschko/ckad-prep](https://github.com/bmuschko/ckad-prep) | Scenario-style exercise sequences |
 | [Learnk8s: troubleshooting deployments](https://learnkube.com/troubleshooting-deployments) | A visual debugging flowchart |
 | [KodeKloud CKAD course](https://kodekloud.com/) | Video course with browser-based labs |
+
+---
+
+**Next in path →** [Mental Model](./start-here/mental-model.md)

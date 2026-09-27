@@ -1,10 +1,14 @@
 ---
 title: Network Policy
 sidebar_label: Network Policy
-sidebar_position: 11
+sidebar_position: 13
 ---
 
 # Network Policy
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 6 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) · [Declare Network Policy](https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy/)
 
@@ -325,3 +329,7 @@ t "other blocked"    "$(kubectl -n lab11 exec other -- wget -qO- -T 3 http://api
 - **Egress deny blocks DNS.** Allow UDP/TCP 53 to kube-dns every time.
 - **One entry ANDs, two entries OR.** Watch the dash.
 - **Enforcement is the CNI's job.** Verify it with a real connection test, not by reading YAML.
+
+---
+
+**Next in path →** [Security](./security.md)

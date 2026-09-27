@@ -1,7 +1,7 @@
 ---
 title: Services & Ingress
 sidebar_label: Services & Ingress
-sidebar_position: 10
+sidebar_position: 4
 ---
 
 import Link from "@docusaurus/Link";
@@ -9,6 +9,10 @@ import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Services & Ingress
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 2 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Service](https://kubernetes.io/docs/concepts/services-networking/service/) · [EndpointSlices](https://kubernetes.io/docs/concepts/services-networking/endpoint-slices/) · [DNS for Services and Pods](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/) · [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) · [Gateway API](https://kubernetes.io/docs/concepts/services-networking/gateway/)
 
@@ -485,3 +489,7 @@ t "Ingress has 2 backends" "$(kubectl -n lab10b get ingress shop -o jsonpath='{.
 - **Only Ready Pods receive traffic.** Readiness probes control Service membership.
 - **Use DNS names, not IPs.** `svc.namespace` works across namespaces.
 - **Ingress routes HTTP and needs a controller.** Gateway API is its successor; both are worth knowing.
+
+---
+
+**Next in path →** [Container Images](./container-images.md)

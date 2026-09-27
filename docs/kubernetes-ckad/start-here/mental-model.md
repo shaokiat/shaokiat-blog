@@ -288,3 +288,7 @@ Next: [Lab 1-1](../reference/architecture.md#-lab) names the components behind e
 ## The 60-second interview answer
 
 > "Kubernetes is declarative. I tell the API server what should exist, it stores that in etcd, and controllers spend their lives closing the gap between that and reality. So when I apply a Deployment, six things happen, and each one is a different component reacting to a change it watched on the API server. The API server validates and stores the Deployment. The Deployment controller creates a ReplicaSet for that Pod template. The ReplicaSet controller creates the Pods. The scheduler binds each Pod to a node. The kubelet on that node pulls the image, starts the containers and reports Ready. Finally, the EndpointSlice controller adds the Pod's IP to any Service whose selector matches its labels. Nothing calls anything directly: everything goes through the API server, and objects find each other only by labels. That's also how I debug. Pending means step four, ImagePullBackOff and CrashLoopBackOff mean step five, and a Service that returns nothing means step six: readiness or labels."
+
+---
+
+**Next in path →** [Local Setup](./local-setup.md)

@@ -1,13 +1,17 @@
 ---
 title: Container Images
 sidebar_label: Container Images
-sidebar_position: 15
+sidebar_position: 5
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Container Images
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 2 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Images](https://kubernetes.io/docs/concepts/containers/images/) · [Pull an image from a private registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) · [Define a command and arguments](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) · [kind: loading an image](https://kind.sigs.k8s.io/docs/user/quick-start/#loading-an-image-into-your-cluster) · [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
 
@@ -415,3 +419,7 @@ t "runs as UID 10001"        "$(kubectl -n lab15 exec deploy/myapp -- id -u)" "1
 - **`:latest` defaults to `Always`.** Pin tags; pin digests where exactness matters.
 - **Private registries need credentials in the Pod's namespace.** `imagePullSecrets` on the Pod or its ServiceAccount.
 - **Build small, run non-root, probe in Kubernetes.** Multi-stage, slim base, numeric `USER`, no `HEALTHCHECK`.
+
+---
+
+**Next in path →** [Config & Secrets](./config-and-secrets.md) (Phase 3)

@@ -1,13 +1,17 @@
 ---
 title: Scheduling & Graceful Shutdown
 sidebar_label: Scheduling & Shutdown
-sidebar_position: 16
+sidebar_position: 8
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scheduling & Graceful Shutdown
+
+:::danger[Core]
+Drill until fluent: hands-on rounds test this directly. Phase 3 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Assigning Pods to nodes](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) · [Taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) · [Schedule GPUs](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/) · [Pod termination](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination) · [Disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)
 
@@ -395,3 +399,7 @@ t "preStop is 5s"         "$(kubectl -n lab16 get deploy web -o jsonpath='{.spec
 - **GPUs are extended resources.** Whole-number `nvidia.com/gpu` limits, a pool taint to tolerate, a type label to select.
 - **Deletion is a sequence.** Endpoint removal and `preStop` run together, then SIGTERM, then SIGKILL at the grace period.
 - **PDBs guard drains, not rollouts.** Use `maxUnavailable: 1`, and never budget every replica.
+
+---
+
+**Next in path →** [Probes & Observability](./probes-and-observability.md)

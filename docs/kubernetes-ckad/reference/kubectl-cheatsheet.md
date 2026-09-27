@@ -1,10 +1,14 @@
 ---
 title: kubectl Cheatsheet
 sidebar_label: kubectl Cheatsheet
-sidebar_position: 14
+sidebar_position: 16
 ---
 
 # kubectl Cheatsheet
+
+:::note[👀 Skim]
+Lookup, not reading: come back when a lab or drill needs speed. See the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [kubectl quick reference](https://kubernetes.io/docs/reference/kubectl/quick-reference/) · [JSONPath support](https://kubernetes.io/docs/reference/kubectl/jsonpath/) · [kubectl reference](https://kubernetes.io/docs/reference/kubectl/generated/)
 
@@ -326,3 +330,7 @@ t "CronJob tick"       "$(kubectl -n lab14 get cronjob tick -o jsonpath='{.spec.
 - **`--` after `run` sets args; after `create` it sets the command.**
 - **jsonpath for one field, custom-columns for a table, jq for logic.**
 - **Set the namespace per task and set it back.** Wrong-namespace work scores zero.
+
+---
+
+**Next in path →** [Learning Path](../start-here/learning-path.md)

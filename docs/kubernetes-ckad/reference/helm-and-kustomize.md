@@ -1,12 +1,16 @@
 ---
 title: Helm & Kustomize
 sidebar_label: Helm & Kustomize
-sidebar_position: 6
+sidebar_position: 15
 ---
 
 import Link from "@docusaurus/Link";
 
 # Helm & Kustomize
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 7 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Docs: [Helm](https://helm.sh/docs/) · [Helm cheat sheet](https://helm.sh/docs/intro/cheatsheet/) · [Kustomize in kubectl](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/)
 
@@ -461,3 +465,7 @@ t "message is hello"      "$(kubectl -n lab6-helm get deploy web-podinfo -o json
 - **`helm upgrade --install --rollback-on-failure` is the CI form.** Idempotent, and it rolls back on failure.
 - **Kustomize generators hash config into names.** A config change becomes a rollout automatically.
 - **`kubectl kustomize` and `helm template` render without applying.** Read the output before you ship it.
+
+---
+
+**Next in path →** [ML Model Serving](../scenarios/ml-model-serving.md) (Phase 8: interview mode)

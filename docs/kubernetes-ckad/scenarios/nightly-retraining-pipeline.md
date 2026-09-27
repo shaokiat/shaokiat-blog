@@ -1,13 +1,17 @@
 ---
 title: Nightly Retraining Pipeline
 sidebar_label: Nightly Retraining Pipeline
-sidebar_position: 2
+sidebar_position: 5
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scenario: Nightly Retraining Pipeline
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 8 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Builds on: [Jobs & CronJobs](../reference/jobs-and-cronjobs.md) · [Storage](../reference/storage.md) · [Config & Secrets](../reference/config-and-secrets.md) · [Resources & Scaling](../reference/resources-and-scaling.md)
 
@@ -175,3 +179,7 @@ kubectl -n ml-training patch cronjob retrain -p '{"spec":{"suspend":true}}'   # 
 - **Prevent:** a separate GPU node pool with taints, so only training Pods land there.
 
 </details>
+
+---
+
+**Next in path →** [Zero-Downtime Release](./zero-downtime-release.md)

@@ -176,4 +176,6 @@ Four images cover every lab. Pin the tags: the rollout labs rely on the differen
 
 **Keep a client Pod.** Start `c` once per lab and test through it with `kubectl exec c -- wget -qO- -T 3 http://<svc>`. It's faster than a new `run --rm` each time, and `run --rm -i` can lose output while it attaches.
 
-→ Next: [Glossary](./glossary.md) for any term above, or start with [Lab 0](./mental-model.md#-lab).
+---
+
+**Next in path →** [Learning Path](./learning-path.md): the order for everything else

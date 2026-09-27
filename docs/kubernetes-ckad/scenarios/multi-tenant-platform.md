@@ -1,13 +1,17 @@
 ---
 title: Multi-Tenant Platform
 sidebar_label: Multi-Tenant Platform
-sidebar_position: 4
+sidebar_position: 7
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Scenario: Multi-Tenant Platform
+
+:::info[📘 Know]
+Be able to explain it and pass its lab once. Phase 6 of the [Learning Path](../start-here/learning-path.md).
+:::
 
 > Builds on: [Security](../reference/security.md) · [Resources & Scaling](../reference/resources-and-scaling.md) · [Network Policy](../reference/network-policy.md)
 
@@ -208,3 +212,7 @@ spec:
 - **Prevent:** match isolation to the threat: internal teams get namespaces; untrusted code gets separate clusters.
 
 </details>
+
+---
+
+**Next in path →** [Helm & Kustomize](../reference/helm-and-kustomize.md) (Phase 7)
