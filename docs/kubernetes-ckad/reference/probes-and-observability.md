@@ -171,14 +171,14 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 12-1 ★★
+:::tip Lab 3-4 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Services](./services-and-ingress.md#service-types) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Watch readiness remove a Pod and liveness restart one.**
 
 **Goal**
 
-1. In namespace `lab12`, create a Pod `probe` (`busybox:1.36`) that creates `/tmp/healthy` and `/tmp/ready`, then sleeps. Give it an exec readiness probe on `/tmp/ready` and an exec liveness probe on `/tmp/healthy`, both every 5 s.
+1. In namespace `lab3-4`, create a Pod `probe` (`busybox:1.36`) that creates `/tmp/healthy` and `/tmp/ready`, then sleeps. Give it an exec readiness probe on `/tmp/ready` and an exec liveness probe on `/tmp/healthy`, both every 5 s.
 2. Expose it with a Service `probe` on port 80 and check its endpoints.
 3. Delete `/tmp/ready`. Watch the READY column and the endpoints.
 4. Delete `/tmp/healthy`. Watch RESTARTS and the events.
@@ -186,9 +186,9 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab12 get pod probe -w                                  # 1/1 → 0/1 → restart count increases
-kubectl -n lab12 get endpointslices -l kubernetes.io/service-name=probe -o jsonpath='{.items[0].endpoints[*].conditions.ready}{"\n"}'
-kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E "Unhealthy|Killing"
+kubectl -n lab3-4 get pod probe -w                                  # 1/1 → 0/1 → restart count increases
+kubectl -n lab3-4 get endpointslices -l kubernetes.io/service-name=probe -o jsonpath='{.items[0].endpoints[*].conditions.ready}{"\n"}'
+kubectl -n lab3-4 get events --field-selector involvedObject.name=probe | grep -E "Unhealthy|Killing"
 ```
 
 <details>
@@ -207,13 +207,13 @@ kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab12
+   kubectl create namespace lab3-4
    ```
 
 2. Create the Pod: two marker files, a readiness probe on one, a liveness probe on the other.
 
    ```bash
-   kubectl -n lab12 apply -f - <<'EOF'
+   kubectl -n lab3-4 apply -f - <<'EOF'
    apiVersion: v1
    kind: Pod
    metadata:
@@ -236,19 +236,19 @@ kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E
 3. Give it a Service so it has an endpoint to lose.
 
    ```bash
-   kubectl -n lab12 expose pod probe --port=80
+   kubectl -n lab3-4 expose pod probe --port=80
    ```
 
 4. Wait until both probes pass.
 
    ```bash
-   kubectl -n lab12 wait --for=condition=Ready pod/probe
+   kubectl -n lab3-4 wait --for=condition=Ready pod/probe
    ```
 
 5. Make readiness fail.
 
    ```bash
-   kubectl -n lab12 exec probe -- rm /tmp/ready
+   kubectl -n lab3-4 exec probe -- rm /tmp/ready
    ```
 
    ~15s later (3 failures × 5s): READY 0/1, RESTARTS 0. The endpoint is marked not ready: no traffic, no restart.
@@ -256,7 +256,7 @@ kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E
 6. Make liveness fail.
 
    ```bash
-   kubectl -n lab12 exec probe -- rm /tmp/healthy
+   kubectl -n lab3-4 exec probe -- rm /tmp/healthy
    ```
 
    ~15s later: events show "Liveness probe failed" then "Killing". RESTARTS only ticks up ~30s after that: sh runs as PID 1 and ignores SIGTERM, so the kubelet waits out terminationGracePeriodSeconds (30s) before SIGKILL. Real apps must handle SIGTERM. The restarted container recreates both files and becomes Ready again.
@@ -264,7 +264,7 @@ kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E
 7. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
-   kubectl delete namespace lab12
+   kubectl delete namespace lab3-4
    ```
 
 </details>
@@ -273,10 +273,10 @@ kubectl -n lab12 get events --field-selector involvedObject.name=probe | grep -E
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "liveness restarted it"   "$([ "$(kubectl -n lab12 get pod probe -o jsonpath='{.status.containerStatuses[0].restartCount}')" -ge 1 ] && echo yes)" "yes"
-t "Ready again"             "$(kubectl -n lab12 get pod probe -o jsonpath='{.status.containerStatuses[0].ready}')" "true"
-t "readiness probe failed"  "$(kubectl -n lab12 get events --field-selector reason=Unhealthy -o jsonpath='{.items[*].message}' | grep -c 'Readiness probe failed')" "1"
-t "liveness probe failed"   "$(kubectl -n lab12 get events --field-selector reason=Unhealthy -o jsonpath='{.items[*].message}' | grep -c 'Liveness probe failed')" "1"
+t "liveness restarted it"   "$([ "$(kubectl -n lab3-4 get pod probe -o jsonpath='{.status.containerStatuses[0].restartCount}')" -ge 1 ] && echo yes)" "yes"
+t "Ready again"             "$(kubectl -n lab3-4 get pod probe -o jsonpath='{.status.containerStatuses[0].ready}')" "true"
+t "readiness probe failed"  "$(kubectl -n lab3-4 get events --field-selector reason=Unhealthy -o jsonpath='{.items[*].message}' | grep -c 'Readiness probe failed')" "1"
+t "liveness probe failed"   "$(kubectl -n lab3-4 get events --field-selector reason=Unhealthy -o jsonpath='{.items[*].message}' | grep -c 'Liveness probe failed')" "1"
 ```
 :::
 

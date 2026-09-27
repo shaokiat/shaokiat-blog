@@ -51,8 +51,8 @@ const config = {
               });
               k8s.items = [
                 { ...phase("1 · Foundations", [
-                  "start-here/mental-model", "start-here/local-setup", "start-here/command-patterns",
-                  "start-here/learning-path", "reference/architecture",
+                  "start-here/learning-path", "start-here/mental-model", "start-here/local-setup",
+                  "start-here/command-patterns", "reference/architecture",
                 ]), collapsed: false },
                 phase("2 · Run an app", [
                   "reference/pods-and-multi-container", "reference/deployments-and-rollouts",

@@ -11,7 +11,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 > Docs: [Kubernetes objects](https://kubernetes.io/docs/concepts/overview/working-with-objects/) · [Controllers](https://kubernetes.io/docs/concepts/architecture/controller/) · [Labels and selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
 
-Read this page first. Every other page in this section is a detail of one idea explained here: the big idea, the object map, five concepts, the six-step chain behind every `kubectl apply`, and how to tell which step broke. Then set up a cluster with [Local Setup](./local-setup.md) and learn the commands in [Command Patterns](./command-patterns.md).
+Phase 1 starts here. Every other page in this section is a detail of one idea explained here: the big idea, the object map, five concepts, the six-step chain behind every `kubectl apply`, and how to tell which step broke. Then set up a cluster with [Local Setup](./local-setup.md) and learn the commands in [Command Patterns](./command-patterns.md).
 
 ## The big idea
 
@@ -124,7 +124,7 @@ The chain turns every symptom into a question: which step didn't happen? Find th
 
 ## 🧪 Lab
 
-:::tip Lab 0 ★
+:::tip Lab 1-1 ★
 **Requires:** [Standard lab setup](./local-setup.md#standard-lab-setup) · [Command Patterns](./command-patterns.md) (skim; the first pass only pastes commands) · [How the tiers work](./local-setup.md#lab-tiers).
 
 **See the chain and the glue for yourself.**
@@ -133,7 +133,7 @@ The chain turns every symptom into a question: which step didn't happen? Find th
 
 **Goal**
 
-1. In [namespace](./glossary.md#namespace) `lab0`, create a Deployment `web` with `nginx:1.27` and 3 replicas.
+1. In [namespace](./glossary.md#namespace) `lab1-1`, create a Deployment `web` with `nginx:1.27` and 3 replicas.
 2. Delete one Pod and watch a replacement appear. Which controller created it?
 3. Trace ownership from a Pod up to the Deployment using `kubectl describe`.
 4. Expose the Deployment as a Service on port 80 and list its endpoints.
@@ -142,10 +142,10 @@ The chain turns every symptom into a question: which step didn't happen? Find th
 **Verify**
 
 ```bash
-kubectl -n lab0 get pods                                         # 3 Running, one younger than the others
-kubectl -n lab0 describe pod <pod> | grep "Controlled By"        # ReplicaSet/web-<hash>
-kubectl -n lab0 describe rs | grep "Controlled By"               # Deployment/web
-kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, then <unset> after step 5
+kubectl -n lab1-1 get pods                                         # 3 Running, one younger than the others
+kubectl -n lab1-1 describe pod <pod> | grep "Controlled By"        # ReplicaSet/web-<hash>
+kubectl -n lab1-1 describe rs | grep "Controlled By"               # Deployment/web
+kubectl -n lab1-1 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, then <unset> after step 5
 ```
 
 <details>
@@ -165,31 +165,31 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab0
+   kubectl create namespace lab1-1
    ```
 
 2. Create a Deployment with 3 replicas of nginx.
 
    ```bash
-   kubectl -n lab0 create deployment web --image=nginx:1.27 --replicas=3
+   kubectl -n lab1-1 create deployment web --image=nginx:1.27 --replicas=3
    ```
 
 3. Wait until all 3 Pods are Ready.
 
    ```bash
-   kubectl -n lab0 rollout status deployment/web
+   kubectl -n lab1-1 rollout status deployment/web
    ```
 
 4. Stream Pod changes in the background so you see the replacement appear.
 
    ```bash
-   kubectl -n lab0 get pods -w &
+   kubectl -n lab1-1 get pods -w &
    ```
 
 5. Delete the first Pod; the ReplicaSet controller sees 2 of 3 and creates one (step 3 of the chain).
 
    ```bash
-   kubectl -n lab0 delete "$(kubectl -n lab0 get pods -o name | head -n 1)"
+   kubectl -n lab1-1 delete "$(kubectl -n lab1-1 get pods -o name | head -n 1)"
    ```
 
 6. Stop the background watch.
@@ -201,7 +201,7 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 7. Show which object owns a Pod.
 
    ```bash
-   kubectl -n lab0 describe "$(kubectl -n lab0 get pods -o name | head -n 1)" | grep "Controlled By"
+   kubectl -n lab1-1 describe "$(kubectl -n lab1-1 get pods -o name | head -n 1)" | grep "Controlled By"
    ```
 
    ```text
@@ -211,7 +211,7 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 8. Show which object owns the ReplicaSet.
 
    ```bash
-   kubectl -n lab0 describe rs | grep "Controlled By"
+   kubectl -n lab1-1 describe rs | grep "Controlled By"
    ```
 
    ```text
@@ -221,13 +221,13 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 9. Create a Service that selects the Deployment's Pods by label (step 6).
 
    ```bash
-   kubectl -n lab0 expose deployment web --port=80
+   kubectl -n lab1-1 expose deployment web --port=80
    ```
 
 10. List the Pod IPs the Service found.
 
     ```bash
-    kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web
+    kubectl -n lab1-1 get endpointslices -l kubernetes.io/service-name=web
     ```
 
     ```text
@@ -237,13 +237,13 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 11. Point the Service at a label no Pod carries.
 
     ```bash
-    kubectl -n lab0 patch service web -p '{"spec":{"selector":{"app":"wrong"}}}'
+    kubectl -n lab1-1 patch service web -p '{"spec":{"selector":{"app":"wrong"}}}'
     ```
 
 12. Confirm the selector changed and the endpoints emptied.
 
     ```bash
-    kubectl -n lab0 describe svc web | grep -E "Selector|Endpoints"
+    kubectl -n lab1-1 describe svc web | grep -E "Selector|Endpoints"
     ```
 
     ```text
@@ -254,7 +254,7 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 13. Call the Service from a throwaway Pod.
 
     ```bash
-    kubectl -n lab0 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
+    kubectl -n lab1-1 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
     ```
 
     ```text
@@ -266,7 +266,7 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 14. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab0
+    kubectl delete namespace lab1-1
     ```
 
 </details>
@@ -275,15 +275,15 @@ kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web   # 3 IPs, 
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "3 Pods Ready"             "$(kubectl -n lab0 get deploy web -o jsonpath='{.status.readyReplicas}')" "3"
-t "Pod owned by ReplicaSet"  "$(kubectl -n lab0 get pods -l app=web -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}')" "ReplicaSet"
-t "RS owned by Deployment"   "$(kubectl -n lab0 get rs -l app=web -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}')" "Deployment"
-t "selector now app=wrong"   "$(kubectl -n lab0 get svc web -o jsonpath='{.spec.selector.app}')" "wrong"
-t "Service has no endpoints" "$(kubectl -n lab0 get endpointslices -l kubernetes.io/service-name=web -o jsonpath='{range .items[*].endpoints[*]}x{end}')" ""
+t "3 Pods Ready"             "$(kubectl -n lab1-1 get deploy web -o jsonpath='{.status.readyReplicas}')" "3"
+t "Pod owned by ReplicaSet"  "$(kubectl -n lab1-1 get pods -l app=web -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}')" "ReplicaSet"
+t "RS owned by Deployment"   "$(kubectl -n lab1-1 get rs -l app=web -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}')" "Deployment"
+t "selector now app=wrong"   "$(kubectl -n lab1-1 get svc web -o jsonpath='{.spec.selector.app}')" "wrong"
+t "Service has no endpoints" "$(kubectl -n lab1-1 get endpointslices -l kubernetes.io/service-name=web -o jsonpath='{range .items[*].endpoints[*]}x{end}')" ""
 ```
 :::
 
-Next: [Lab 1-1](../reference/architecture.md#-lab) names the components behind each step, and [Lab 10-1](../reference/services-and-ingress.md#-lab) adds `targetPort` and Ingress failures.
+Next: [Lab 1-2](../reference/architecture.md#-lab) names the components behind each step, and [Lab 2-4](../reference/services-and-ingress.md#-lab) adds `targetPort` and Ingress failures.
 
 ## The 60-second interview answer
 

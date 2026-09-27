@@ -5,7 +5,7 @@ sidebar_label: Overview
 
 # Kubernetes (CKAD)
 
-New to Kubernetes? Work through **Start Here** in order: [Mental Model](./start-here/mental-model.md) → [Local Setup](./start-here/local-setup.md) → [Command Patterns](./start-here/command-patterns.md) → [Learning Path](./start-here/learning-path.md). Every Lab has three tiers (🔴 Challenge, 🟡 Hints, 🟢 Guided), so pick your level.
+New to Kubernetes? Start with the [Learning Path](./start-here/learning-path.md), then follow Phase 1: [Mental Model](./start-here/mental-model.md) → [Local Setup](./start-here/local-setup.md) → [Command Patterns](./start-here/command-patterns.md). Every Lab has three tiers (🔴 Challenge, 🟡 Hints, 🟢 Guided), so pick your level.
 
 Notes for Kubernetes interviews, using the [CKAD curriculum](https://github.com/cncf/curriculum) as the syllabus. The exam is performance-based: you solve tasks in a live cluster with `kubectl`, so every reference page pairs concepts with commands and a hands-on lab that ends in a PASS/FAIL ✅ Check.
 
@@ -33,7 +33,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 
 ## Domain 1: Application Design and Build (20%)
 
-- Define, build and modify container images → [Container Images](./reference/container-images.md#what-goes-in-the-dockerfile) · [imagePullPolicy](./reference/container-images.md#imagepullpolicy) · [Lab 15-1](./reference/container-images.md#-lab)
+- Define, build and modify container images → [Container Images](./reference/container-images.md#what-goes-in-the-dockerfile) · [imagePullPolicy](./reference/container-images.md#imagepullpolicy) · [Lab 2-6](./reference/container-images.md#-lab)
 - Choose the right workload resource: Deployment, DaemonSet, StatefulSet, Job, CronJob → [Deployments & Rollouts](./reference/deployments-and-rollouts.md#choosing-a-workload-resource) · [Jobs & CronJobs](./reference/jobs-and-cronjobs.md#job-fields)
 - Multi-container Pod patterns: init, sidecar, ambassador, adapter → [Pods & Multi-Container](./reference/pods-and-multi-container.md#multi-container-patterns) · [native sidecars](./reference/pods-and-multi-container.md#native-sidecars-vs-plain-extra-containers)
 - Persistent and ephemeral volumes → [Storage](./reference/storage.md#volume-types-by-lifetime) · [PV, PVC and StorageClass](./reference/storage.md#pv-pvc-and-storageclass) · [access modes](./reference/storage.md#access-modes)
@@ -43,8 +43,8 @@ Interview-style systems that combine several reference pages. Explain each one e
 ## Domain 2: Application Deployment (20%)
 
 - Rolling updates and rollback → [Deployments & Rollouts](./reference/deployments-and-rollouts.md#rollout-strategy)
-- Blue/green and canary with Kubernetes primitives → [Release strategies](./reference/deployments-and-rollouts.md#release-strategies-with-core-primitives) · [Lab 5-2](./reference/deployments-and-rollouts.md#lab-5-2) · [Zero-Downtime Release](./scenarios/zero-downtime-release.md)
-- Deploy existing packages with **Helm** → [Helm & Kustomize](./reference/helm-and-kustomize.md#helm-terms) · [Lab 6-2](./reference/helm-and-kustomize.md#lab-6-2)
+- Blue/green and canary with Kubernetes primitives → [Release strategies](./reference/deployments-and-rollouts.md#release-strategies-with-core-primitives) · [Lab 2-3](./reference/deployments-and-rollouts.md#lab-2-3) · [Zero-Downtime Release](./scenarios/zero-downtime-release.md)
+- Deploy existing packages with **Helm** → [Helm & Kustomize](./reference/helm-and-kustomize.md#helm-terms) · [Lab 7-2](./reference/helm-and-kustomize.md#lab-7-2)
 - Patch manifests per environment with **Kustomize** → [Helm & Kustomize](./reference/helm-and-kustomize.md#kustomize-features)
 
 ---
@@ -73,7 +73,7 @@ Interview-style systems that combine several reference pages. Explain each one e
 
 - NetworkPolicies → [How selection works](./reference/network-policy.md#how-selection-works) · [peer selectors](./reference/network-policy.md#peer-selectors)
 - Provide and troubleshoot access to applications via Services → [Service types](./reference/services-and-ingress.md#service-types) · [the four ports](./reference/services-and-ingress.md#the-four-ports)
-- Expose applications with Ingress rules → [Ingress vs Gateway API](./reference/services-and-ingress.md#ingress-vs-gateway-api) · [Lab 10-2](./reference/services-and-ingress.md#lab-10-2)
+- Expose applications with Ingress rules → [Ingress vs Gateway API](./reference/services-and-ingress.md#ingress-vs-gateway-api) · [Lab 2-5](./reference/services-and-ingress.md#lab-2-5)
 
 ---
 
@@ -92,4 +92,4 @@ Interview-style systems that combine several reference pages. Explain each one e
 
 ---
 
-**Next in path →** [Mental Model](./start-here/mental-model.md)
+**Next in path →** [Learning Path](./start-here/learning-path.md)

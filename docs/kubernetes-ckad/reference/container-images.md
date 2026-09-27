@@ -194,7 +194,7 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 15-1 ★★
+:::tip Lab 2-6 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) (plain kind) and Docker on your laptop · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Build an image, get it into kind, and break the pull on purpose.**
@@ -202,16 +202,16 @@ spec:
 **Goal**
 
 1. Save the four files above in a directory. Build `myapp:0.1` with `APP_VERSION=0.1` and load it into the `ckad` cluster.
-2. In namespace `lab15`, create Deployment `myapp` from it, expose it on port 80 → 8080, and call it from a client Pod `c`.
+2. In namespace `lab2-6`, create Deployment `myapp` from it, expose it on port 80 → 8080, and call it from a client Pod `c`.
 3. Build `myapp:0.2` and roll `myapp` to it **without** loading it first. Read the error, then fix it without touching the Deployment.
 4. Tag the same image as `myapp:latest`, load it, and create Deployment `latest` from it. Explain why it fails, then make it run without changing the tag.
 
 **Verify**
 
 ```bash
-kubectl -n lab15 exec c -- wget -qO- -T 3 http://myapp      # "version":"0.2"
-kubectl -n lab15 get deploy latest                          # 1/1
-kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
+kubectl -n lab2-6 exec c -- wget -qO- -T 3 http://myapp      # "version":"0.2"
+kubectl -n lab2-6 get deploy latest                          # 1/1
+kubectl -n lab2-6 exec deploy/myapp -- id -u                 # 10001
 ```
 
 <details>
@@ -230,8 +230,8 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
 1. Create the lab namespace and a client Pod to test from.
 
    ```bash
-   kubectl create namespace lab15
-   kubectl -n lab15 run c --image=busybox:1.36 --restart=Never -- sleep 3600
+   kubectl create namespace lab2-6
+   kubectl -n lab2-6 run c --image=busybox:1.36 --restart=Never -- sleep 3600
    ```
 
 2. In the directory with the four files, build the image with its version baked in.
@@ -253,15 +253,15 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
 4. Create the Deployment and wait for it. The pinned tag defaults to `IfNotPresent`, so the loaded copy is used.
 
    ```bash
-   kubectl -n lab15 create deployment myapp --image=myapp:0.1 --port=8080
-   kubectl -n lab15 rollout status deployment/myapp
+   kubectl -n lab2-6 create deployment myapp --image=myapp:0.1 --port=8080
+   kubectl -n lab2-6 rollout status deployment/myapp
    ```
 
 5. Expose it and call it.
 
    ```bash
-   kubectl -n lab15 expose deployment myapp --port=80 --target-port=8080
-   kubectl -n lab15 exec c -- wget -qO- -T 3 http://myapp
+   kubectl -n lab2-6 expose deployment myapp --port=80 --target-port=8080
+   kubectl -n lab2-6 exec c -- wget -qO- -T 3 http://myapp
    ```
 
    ```text
@@ -272,9 +272,9 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
 
    ```bash
    docker build -t myapp:0.2 --build-arg APP_VERSION=0.2 .
-   kubectl -n lab15 set image deployment/myapp myapp=myapp:0.2
-   kubectl -n lab15 get pods -l app=myapp
-   kubectl -n lab15 describe pod -l app=myapp | grep "Failed to pull"
+   kubectl -n lab2-6 set image deployment/myapp myapp=myapp:0.2
+   kubectl -n lab2-6 get pods -l app=myapp
+   kubectl -n lab2-6 describe pod -l app=myapp | grep "Failed to pull"
    ```
 
    ```text
@@ -293,7 +293,7 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
 
    ```bash
    kind load docker-image myapp:0.2 --name ckad
-   kubectl -n lab15 rollout status deployment/myapp
+   kubectl -n lab2-6 rollout status deployment/myapp
    ```
 
 8. Tag the same image as `latest`, load it, and deploy it.
@@ -301,8 +301,8 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
    ```bash
    docker tag myapp:0.2 myapp:latest
    kind load docker-image myapp:latest --name ckad
-   kubectl -n lab15 create deployment latest --image=myapp:latest --port=8080
-   kubectl -n lab15 get deploy latest -o jsonpath='{.spec.template.spec.containers[0].imagePullPolicy}{"\n"}'
+   kubectl -n lab2-6 create deployment latest --image=myapp:latest --port=8080
+   kubectl -n lab2-6 get deploy latest -o jsonpath='{.spec.template.spec.containers[0].imagePullPolicy}{"\n"}'
    ```
 
    ```text
@@ -314,15 +314,15 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
 9. Tell the kubelet to use the node's copy.
 
    ```bash
-   kubectl -n lab15 patch deployment latest --type=json \
+   kubectl -n lab2-6 patch deployment latest --type=json \
      -p '[{"op":"add","path":"/spec/template/spec/containers/0/imagePullPolicy","value":"IfNotPresent"}]'
-   kubectl -n lab15 rollout status deployment/latest
+   kubectl -n lab2-6 rollout status deployment/latest
    ```
 
 10. Confirm the Dockerfile's `USER` is what runs.
 
     ```bash
-    kubectl -n lab15 exec deploy/myapp -- id -u
+    kubectl -n lab2-6 exec deploy/myapp -- id -u
     ```
 
     ```text
@@ -332,7 +332,7 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
 11. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab15
+    kubectl delete namespace lab2-6
     ```
 
 </details>
@@ -341,10 +341,10 @@ kubectl -n lab15 exec deploy/myapp -- id -u                 # 10001
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "myapp serves 0.2"        "$(kubectl -n lab15 exec c -- wget -qO- -T 3 http://myapp | grep -o '"version":"[^"]*"')" '"version":"0.2"'
-t "latest uses IfNotPresent" "$(kubectl -n lab15 get deploy latest -o jsonpath='{.spec.template.spec.containers[0].imagePullPolicy}')" "IfNotPresent"
-t "latest is Ready"          "$(kubectl -n lab15 get deploy latest -o jsonpath='{.status.readyReplicas}')" "1"
-t "runs as UID 10001"        "$(kubectl -n lab15 exec deploy/myapp -- id -u)" "10001"
+t "myapp serves 0.2"        "$(kubectl -n lab2-6 exec c -- wget -qO- -T 3 http://myapp | grep -o '"version":"[^"]*"')" '"version":"0.2"'
+t "latest uses IfNotPresent" "$(kubectl -n lab2-6 get deploy latest -o jsonpath='{.spec.template.spec.containers[0].imagePullPolicy}')" "IfNotPresent"
+t "latest is Ready"          "$(kubectl -n lab2-6 get deploy latest -o jsonpath='{.status.readyReplicas}')" "1"
+t "runs as UID 10001"        "$(kubectl -n lab2-6 exec deploy/myapp -- id -u)" "10001"
 ```
 :::
 

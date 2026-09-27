@@ -108,14 +108,14 @@ kubectl run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 
 
 ## 🧪 Lab
 
-:::tip Lab 13-1 ★★★
+:::tip Lab 4-1 ★★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Config & Secrets](./config-and-secrets.md#injection-methods) · [Services & Ingress](./services-and-ingress.md#the-four-ports) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Three bugs, one manifest.**
 
 **Goal**
 
-Save this as `broken.yaml` and apply it to namespace `lab13`. Make `wget -qO- http://web` from a Pod in the namespace return the nginx welcome page. Fix every problem using only `get`, `describe`, `logs` and `edit`/`set`/`patch`, and write down the status that led you to each fix.
+Save this as `broken.yaml` and apply it to namespace `lab4-1`. Make `wget -qO- http://web` from a Pod in the namespace return the nginx welcome page. Fix every problem using only `get`, `describe`, `logs` and `edit`/`set`/`patch`, and write down the status that led you to each fix.
 
 ```yaml
 apiVersion: v1
@@ -160,8 +160,8 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab13 get pods                            # 2/2 Running, 1/1 Ready each
-kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web | head -4
+kubectl -n lab4-1 get pods                            # 2/2 Running, 1/1 Ready each
+kubectl -n lab4-1 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web | head -4
 ```
 
 <details>
@@ -180,80 +180,80 @@ kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab13
+   kubectl create namespace lab4-1
    ```
 
 2. Apply the broken manifest.
 
    ```bash
-   kubectl -n lab13 apply -f broken.yaml
+   kubectl -n lab4-1 apply -f broken.yaml
    ```
 
 3. Read the status: ErrImagePull / ImagePullBackOff.
 
    ```bash
-   kubectl -n lab13 get pods
+   kubectl -n lab4-1 get pods
    ```
 
 4. Read the first Pod's events: Failed to pull image `nginx:1.27-alpinee`: not found (tag typo).
 
    ```bash
-   kubectl -n lab13 describe pod -l app=web | grep -A3 Events -m1
+   kubectl -n lab4-1 describe pod -l app=web | grep -A3 Events -m1
    ```
 
 5. Fix the tag on the Deployment.
 
    ```bash
-   kubectl -n lab13 set image deployment/web nginx=nginx:1.27-alpine
+   kubectl -n lab4-1 set image deployment/web nginx=nginx:1.27-alpine
    ```
 
 6. Read the status again: CreateContainerConfigError.
 
    ```bash
-   kubectl -n lab13 get pods
+   kubectl -n lab4-1 get pods
    ```
 
 7. Find the message: configmap "web-config" not found (the ConfigMap is called web-conf).
 
    ```bash
-   kubectl -n lab13 describe pod -l app=web | grep -i configmap
+   kubectl -n lab4-1 describe pod -l app=web | grep -i configmap
    ```
 
 8. Point the env var at the right ConfigMap.
 
    ```bash
-   kubectl -n lab13 patch deployment web --type=json \
+   kubectl -n lab4-1 patch deployment web --type=json \
      -p '[{"op":"replace","path":"/spec/template/spec/containers/0/env/0/valueFrom/configMapKeyRef/name","value":"web-conf"}]'
    ```
 
 9. Wait for the fixed Pods.
 
    ```bash
-   kubectl -n lab13 rollout status deployment/web
+   kubectl -n lab4-1 rollout status deployment/web
    ```
 
 10. Call the Service: Connection refused.
 
     ```bash
-    kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
+    kubectl -n lab4-1 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- -T 3 http://web
     ```
 
 11. See why: `app=webapp`, Endpoints: `<none>`.
 
     ```bash
-    kubectl -n lab13 describe svc web | grep -E "Selector|Endpoints"
+    kubectl -n lab4-1 describe svc web | grep -E "Selector|Endpoints"
     ```
 
 12. Fix the selector; Verify now succeeds.
 
     ```bash
-    kubectl -n lab13 patch svc web -p '{"spec":{"selector":{"app":"web"}}}'
+    kubectl -n lab4-1 patch svc web -p '{"spec":{"selector":{"app":"web"}}}'
     ```
 
 13. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab13
+    kubectl delete namespace lab4-1
     ```
 
 </details>
@@ -262,9 +262,9 @@ kubectl -n lab13 run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-kubectl -n lab13 run chk --image=busybox:1.36 --restart=Never -- sleep 600 2>/dev/null; kubectl -n lab13 wait --for=condition=Ready pod/chk >/dev/null
-t "2 Pods Ready"  "$(kubectl -n lab13 get deploy web -o jsonpath='{.status.readyReplicas}')" "2"
-t "web answers"   "$(kubectl -n lab13 exec chk -- wget -qO- -T 3 http://web | grep -o '<title>.*</title>')" "<title>Welcome to nginx!</title>"
+kubectl -n lab4-1 run chk --image=busybox:1.36 --restart=Never -- sleep 600 2>/dev/null; kubectl -n lab4-1 wait --for=condition=Ready pod/chk >/dev/null
+t "2 Pods Ready"  "$(kubectl -n lab4-1 get deploy web -o jsonpath='{.status.readyReplicas}')" "2"
+t "web answers"   "$(kubectl -n lab4-1 exec chk -- wget -qO- -T 3 http://web | grep -o '<title>.*</title>')" "<title>Welcome to nginx!</title>"
 ```
 :::
 

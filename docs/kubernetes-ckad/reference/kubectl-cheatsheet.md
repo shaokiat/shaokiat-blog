@@ -120,14 +120,14 @@ k get secret db -o jsonpath='{.data.password}' | base64 -d
 
 ## 🧪 Lab
 
-:::tip Lab 14-1 ★★
+:::tip Lab 8-1 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [the `k` alias](../start-here/local-setup.md#kubeconfig-in-5-lines) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Speed drill: eight tasks in ten minutes.**
 
 **Goal**
 
-Work in namespace `lab14`. Only imperative commands and `$do` + a quick edit are allowed.
+Work in namespace `lab8-1`. Only imperative commands and `$do` + a quick edit are allowed.
 
 1. Pod `nginx` (`nginx:1.27`) with label `tier=web`.
 2. Deployment `api` (`nginx:1.27`, 3 replicas), exposed as ClusterIP Service `api` on 80.
@@ -141,10 +141,10 @@ Work in namespace `lab14`. Only imperative commands and `$do` + a quick edit are
 **Verify**
 
 ```bash
-k -n lab14 get pod nginx --show-labels
-k -n lab14 get deploy api -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}{"\n"}'   # 5 nginx:1.27
-k -n lab14 get job once -o jsonpath='{.status.succeeded}{"\n"}'                                             # 1
-k -n lab14 get cronjob tick
+k -n lab8-1 get pod nginx --show-labels
+k -n lab8-1 get deploy api -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}{"\n"}'   # 5 nginx:1.27
+k -n lab8-1 get job once -o jsonpath='{.status.succeeded}{"\n"}'                                             # 1
+k -n lab8-1 get cronjob tick
 ```
 
 <details>
@@ -162,7 +162,7 @@ k -n lab14 get cronjob tick
 1. Create the namespace and make it the default for every command below.
 
    ```bash
-   k create namespace lab14 && k config set-context --current --namespace=lab14
+   k create namespace lab8-1 && k config set-context --current --namespace=lab8-1
    ```
 
 2. A Pod with a label.
@@ -241,7 +241,7 @@ k -n lab14 get cronjob tick
 14. Run the ✅ Check below, then switch the default back and delete everything the lab created.
 
     ```bash
-    k config set-context --current --namespace=default && k delete namespace lab14
+    k config set-context --current --namespace=default && k delete namespace lab8-1
     ```
 
 </details>
@@ -250,12 +250,12 @@ k -n lab14 get cronjob tick
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "nginx labelled"     "$(kubectl -n lab14 get pod nginx -o jsonpath='{.metadata.labels.tier}')" "web"
-t "api: 5 on 1.27"     "$(kubectl -n lab14 get deploy api -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}')" "5 nginx:1.27"
-t "api reads cfg"      "$(kubectl -n lab14 get deploy api -o jsonpath='{.spec.template.spec.containers[0].env[0].valueFrom.configMapKeyRef.name}')" "cfg"
-t "Service api on 80"  "$(kubectl -n lab14 get svc api -o jsonpath='{.spec.ports[0].port}')" "80"
-t "Job once succeeded" "$(kubectl -n lab14 get job once -o jsonpath='{.status.succeeded}')" "1"
-t "CronJob tick"       "$(kubectl -n lab14 get cronjob tick -o jsonpath='{.spec.schedule}')" "*/5 * * * *"
+t "nginx labelled"     "$(kubectl -n lab8-1 get pod nginx -o jsonpath='{.metadata.labels.tier}')" "web"
+t "api: 5 on 1.27"     "$(kubectl -n lab8-1 get deploy api -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}')" "5 nginx:1.27"
+t "api reads cfg"      "$(kubectl -n lab8-1 get deploy api -o jsonpath='{.spec.template.spec.containers[0].env[0].valueFrom.configMapKeyRef.name}')" "cfg"
+t "Service api on 80"  "$(kubectl -n lab8-1 get svc api -o jsonpath='{.spec.ports[0].port}')" "80"
+t "Job once succeeded" "$(kubectl -n lab8-1 get job once -o jsonpath='{.status.succeeded}')" "1"
+t "CronJob tick"       "$(kubectl -n lab8-1 get cronjob tick -o jsonpath='{.spec.schedule}')" "*/5 * * * *"
 ```
 :::
 

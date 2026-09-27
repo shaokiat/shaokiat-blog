@@ -117,14 +117,14 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 4-1 ★★
+:::tip Lab 5-2 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Prove that data outlives the Pod.**
 
 **Goal**
 
-1. In namespace `lab4`, create the PVC `data` (1Gi, RWO). Check its status before any Pod uses it.
+1. In namespace `lab5-2`, create the PVC `data` (1Gi, RWO). Check its status before any Pod uses it.
 2. Create the Pod `writer` above. Check the PVC again and find the PV it bound to.
 3. Delete `writer`, create a Pod `reader` that mounts the same claim, and print `/data/log.txt`.
 4. Find the PV's reclaim policy and predict what deleting the PVC will do.
@@ -132,9 +132,9 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab4 get pvc data                                  # Bound
-kubectl -n lab4 logs reader                                   # the timestamp written by writer
-kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')" \
+kubectl -n lab5-2 get pvc data                                  # Bound
+kubectl -n lab5-2 logs reader                                   # the timestamp written by writer
+kubectl get pv "$(kubectl -n lab5-2 get pvc data -o jsonpath='{.spec.volumeName}')" \
   -o jsonpath='{.spec.persistentVolumeReclaimPolicy}{"\n"}'
 ```
 
@@ -154,49 +154,49 @@ kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab4
+   kubectl create namespace lab5-2
    ```
 
 2. Create the claim from the PVC skeleton above, saved as `pvc.yaml`.
 
    ```bash
-   kubectl -n lab4 apply -f pvc.yaml
+   kubectl -n lab5-2 apply -f pvc.yaml
    ```
 
 3. Check it: Pending, because kind's "standard" class is WaitForFirstConsumer.
 
    ```bash
-   kubectl -n lab4 get pvc data
+   kubectl -n lab5-2 get pvc data
    ```
 
 4. Create the writer Pod from the manifest above, saved as `writer.yaml`.
 
    ```bash
-   kubectl -n lab4 apply -f writer.yaml
+   kubectl -n lab5-2 apply -f writer.yaml
    ```
 
 5. Wait until the writer is running (this is what triggers provisioning).
 
    ```bash
-   kubectl -n lab4 wait --for=condition=Ready pod/writer --timeout=90s
+   kubectl -n lab5-2 wait --for=condition=Ready pod/writer --timeout=90s
    ```
 
 6. Check again: Bound, and VOLUME shows the PV name.
 
    ```bash
-   kubectl -n lab4 get pvc data
+   kubectl -n lab5-2 get pvc data
    ```
 
 7. Delete the writer; the claim and its data stay.
 
    ```bash
-   kubectl -n lab4 delete pod writer
+   kubectl -n lab5-2 delete pod writer
    ```
 
 8. Start a reader Pod that mounts the same claim and prints the file.
 
    ```bash
-   kubectl -n lab4 run reader --image=busybox:1.36 --restart=Never \
+   kubectl -n lab5-2 run reader --image=busybox:1.36 --restart=Never \
      --overrides='{"spec":{"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"data"}}],
      "containers":[{"name":"reader","image":"busybox:1.36","command":["cat","/data/log.txt"],
      "volumeMounts":[{"name":"data","mountPath":"/data"}]}]}}'
@@ -205,21 +205,21 @@ kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')
 9. Wait for the reader to finish, then read what it printed: the line the writer appended.
 
    ```bash
-   kubectl -n lab4 wait --for=jsonpath='{.status.phase}'=Succeeded pod/reader --timeout=60s
-   kubectl -n lab4 logs reader
+   kubectl -n lab5-2 wait --for=jsonpath='{.status.phase}'=Succeeded pod/reader --timeout=60s
+   kubectl -n lab5-2 logs reader
    ```
 
 10. Read the PV's reclaim policy: Delete, so deleting the PVC deletes the PV and its data.
 
     ```bash
-    kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')" \
+    kubectl get pv "$(kubectl -n lab5-2 get pvc data -o jsonpath='{.spec.volumeName}')" \
       -o jsonpath='{.spec.persistentVolumeReclaimPolicy}{"\n"}'
     ```
 
 11. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab4
+    kubectl delete namespace lab5-2
     ```
 
 </details>
@@ -228,9 +228,9 @@ kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "PVC Bound"               "$(kubectl -n lab4 get pvc data -o jsonpath='{.status.phase}')" "Bound"
-t "reader saw writer's line" "$(kubectl -n lab4 logs reader | grep -c UTC)" "1"
-t "reclaim policy Delete"   "$(kubectl get pv "$(kubectl -n lab4 get pvc data -o jsonpath='{.spec.volumeName}')" -o jsonpath='{.spec.persistentVolumeReclaimPolicy}')" "Delete"
+t "PVC Bound"               "$(kubectl -n lab5-2 get pvc data -o jsonpath='{.status.phase}')" "Bound"
+t "reader saw writer's line" "$(kubectl -n lab5-2 logs reader | grep -c UTC)" "1"
+t "reclaim policy Delete"   "$(kubectl get pv "$(kubectl -n lab5-2 get pvc data -o jsonpath='{.spec.volumeName}')" -o jsonpath='{.spec.persistentVolumeReclaimPolicy}')" "Delete"
 ```
 :::
 

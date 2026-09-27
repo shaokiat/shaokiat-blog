@@ -15,9 +15,9 @@ General prose rules (short declarative sentences, "use X when Y", tables over pa
 
    | Type | Location | Gold standard | Numbering prefix |
    |---|---|---|---|
-   | Reference | `reference/<topic>.md` | `reference/architecture.md` | its `sidebar_position` (Figure 5-1, Lab 5-1) |
+   | Reference | `reference/<topic>.md` | `reference/architecture.md` | Labs: `<Learning Path phase>-<n>` (Lab 2-2). Figures: the page's original `sidebar_position` (Figure 5-1) |
    | Scenario | `scenarios/<topic>.md` | `scenarios/ml-model-serving.md` | `S<sidebar_position>` (Figure S1-1) |
-   | Start Here primer | `start-here/*.md` (Mental Model → Local Setup → Command Patterns → Glossary) | `start-here/mental-model.md`, `start-here/command-patterns.md` | `0` (Figure 0-1, Lab 0) |
+   | Start Here primer | `start-here/*.md` (Learning Path → Mental Model → Local Setup → Command Patterns; Glossary is lookup) | `start-here/mental-model.md`, `start-here/command-patterns.md` | Labs: phase 1 (Lab 1-1). Figures: `0` (Figure 0-1) |
    | Hub | `index.md` | `docs/google-professional-cloud-architect/index.md` | n/a |
 
    Done when: you can list the gold standard's section order and its numbering for the new page.
@@ -58,14 +58,14 @@ General prose rules (short declarative sentences, "use X when Y", tables over pa
 Every lab has three **tiers**, defined once in `start-here/local-setup.md#lab-tiers`: 🔴 Challenge (Goal + Verify only), 🟡 Hints, 🟢 Guided.
 
 ```markdown
-:::tip Lab 5-1 ★★
-See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
+:::tip Lab 2-2 ★★
+**Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · prerequisite pages, and any [add-on](../start-here/local-setup.md#cluster-add-ons) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Imperative task name.**
 
 **Goal**
 
-1. Numbered outcomes in namespace `lab5`.
+1. Numbered outcomes in namespace `lab2-2`.
 
 **Verify**
 
@@ -93,13 +93,17 @@ See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Ho
 
    Prose for anything that explains rather than shows.
 
-(Step 1 creates the namespace; the last step is kubectl delete namespace lab5. File edits are text-only steps: "Edit `slow.yaml`: add `concurrencyPolicy: Forbid` under `spec:`.")
+(Step 1 creates the namespace; the last step is kubectl delete namespace lab2-2 (the namespace is `lab` + the lab ID). File edits are text-only steps: "Edit `slow.yaml`: add `concurrencyPolicy: Forbid` under `spec:`." The last step says "Run the ✅ Check below, then delete…".)
 
 </details>
+
+**✅ Check**
+
+(bash block: the one-line `t()` helper, then one `t "name" "$(command)" "expected"` line per Goal outcome; every line prints PASS or FAIL)
 :::
 ```
 
-Labs must run on a plain kind cluster. Difficulty: ★ recall, ★★ apply, ★★★ diagnose or design. When a lab repeats an earlier one, state what it builds on ("Builds on [Lab 0](...)") and keep only the new part. Guided commands use the patterns and images in `start-here/command-patterns.md`; a command pattern new to the section gets a row there first.
+Labs must run on a plain kind cluster. Difficulty: ★ recall, ★★ apply, ★★★ diagnose or design. When a lab repeats an earlier one, state what it builds on ("Builds on [Lab 1-1](...)") and keep only the new part. Guided commands use the patterns and images in `start-here/command-patterns.md`; a command pattern new to the section gets a row there first.
 
 ### Scenario questions
 

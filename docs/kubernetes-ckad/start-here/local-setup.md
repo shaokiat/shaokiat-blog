@@ -33,17 +33,17 @@ Every Lab in this section assumes the setup below. Do it once, then read [Comman
    kubectl get nodes
    ```
 
-3. **Give each lab its own namespace.** Every lab names one (`lab0`, `lab5`…). It isolates the lab and cleans up in one command. The Guided tier passes `-n lab<N>` on every command; to save typing, make it the default instead.
+3. **Give each lab its own namespace.** Every lab names one (`lab1-1`, `lab2-2`…). It isolates the lab and cleans up in one command. The Guided tier passes `-n lab<N>` on every command; to save typing, make it the default instead.
 
    ```bash
-   kubectl create namespace lab5
-   kubectl config set-context --current --namespace=lab5    # optional: now -n can be dropped
+   kubectl create namespace lab2-2
+   kubectl config set-context --current --namespace=lab2-2    # optional: now -n can be dropped
    ```
 
 4. **Clean up.** Delete the namespace to reset one lab. Delete the cluster to remove everything, including its context.
 
    ```bash
-   kubectl delete namespace lab5
+   kubectl delete namespace lab2-2
    kubectl config set-context --current --namespace=default # if you changed it in step 3
    kind delete cluster --name ckad
    ```

@@ -130,14 +130,14 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 3-1 ★★
+:::tip Lab 5-1 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Generate, edit, apply](../start-here/command-patterns.md#generate-edit-apply) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Watch `concurrencyPolicy: Forbid` skip a run.**
 
 **Goal**
 
-1. In namespace `lab3`, create a CronJob `slow` that runs every minute, sleeps 90 seconds, and uses `concurrencyPolicy: Forbid`.
+1. In namespace `lab5-1`, create a CronJob `slow` that runs every minute, sleeps 90 seconds, and uses `concurrencyPolicy: Forbid`.
 2. Watch Jobs for 4 minutes. Explain why there are fewer Jobs than minutes.
 3. Trigger a manual run from the CronJob and confirm it runs even while a scheduled one is active.
 4. Suspend the CronJob.
@@ -145,8 +145,8 @@ spec:
 **Verify**
 
 ```bash
-kubectl -n lab3 get cronjob slow -o jsonpath='{.spec.concurrencyPolicy} {.spec.suspend}{"\n"}'   # Forbid true
-kubectl -n lab3 get jobs
+kubectl -n lab5-1 get cronjob slow -o jsonpath='{.spec.concurrencyPolicy} {.spec.suspend}{"\n"}'   # Forbid true
+kubectl -n lab5-1 get jobs
 ```
 
 <details>
@@ -165,13 +165,13 @@ kubectl -n lab3 get jobs
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab3
+   kubectl create namespace lab5-1
    ```
 
 2. Generate a CronJob manifest that runs every minute and sleeps 90s.
 
    ```bash
-   kubectl -n lab3 create cronjob slow --image=busybox:1.36 --schedule="* * * * *" \
+   kubectl -n lab5-1 create cronjob slow --image=busybox:1.36 --schedule="* * * * *" \
      --dry-run=client -o yaml -- sleep 90 > slow.yaml
    ```
 
@@ -180,13 +180,13 @@ kubectl -n lab3 get jobs
 4. Create the CronJob from the edited file.
 
    ```bash
-   kubectl -n lab3 apply -f slow.yaml
+   kubectl -n lab5-1 apply -f slow.yaml
    ```
 
 5. Watch Jobs appear.
 
    ```bash
-   kubectl -n lab3 get jobs -w
+   kubectl -n lab5-1 get jobs -w
    ```
 
    ```text
@@ -201,7 +201,7 @@ kubectl -n lab3 get jobs
 6. Start a Job from the CronJob's template right now.
 
    ```bash
-   kubectl -n lab3 create job slow-manual --from=cronjob/slow
+   kubectl -n lab5-1 create job slow-manual --from=cronjob/slow
    ```
 
    Manual Jobs bypass concurrencyPolicy. That rule is the CronJob controller's, not the Job's.
@@ -209,13 +209,13 @@ kubectl -n lab3 get jobs
 7. Pause the schedule without deleting the CronJob.
 
    ```bash
-   kubectl -n lab3 patch cronjob slow -p '{"spec":{"suspend":true}}'
+   kubectl -n lab5-1 patch cronjob slow -p '{"spec":{"suspend":true}}'
    ```
 
 8. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
-   kubectl delete namespace lab3
+   kubectl delete namespace lab5-1
    ```
 
 </details>
@@ -224,10 +224,10 @@ kubectl -n lab3 get jobs
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "concurrencyPolicy Forbid" "$(kubectl -n lab3 get cronjob slow -o jsonpath='{.spec.concurrencyPolicy}')" "Forbid"
-t "suspended"                "$(kubectl -n lab3 get cronjob slow -o jsonpath='{.spec.suspend}')" "true"
-t "manual run created"       "$(kubectl -n lab3 get job slow-manual -o jsonpath='{.metadata.name}')" "slow-manual"
-t "never 2 scheduled at once" "$(kubectl -n lab3 get jobs -o jsonpath='{range .items[*]}{.metadata.name} {.status.active}{"\n"}{end}' | grep -v manual | grep -c ' 1$' | awk '{print ($1<=1)?"yes":"no"}')" "yes"
+t "concurrencyPolicy Forbid" "$(kubectl -n lab5-1 get cronjob slow -o jsonpath='{.spec.concurrencyPolicy}')" "Forbid"
+t "suspended"                "$(kubectl -n lab5-1 get cronjob slow -o jsonpath='{.spec.suspend}')" "true"
+t "manual run created"       "$(kubectl -n lab5-1 get job slow-manual -o jsonpath='{.metadata.name}')" "slow-manual"
+t "never 2 scheduled at once" "$(kubectl -n lab5-1 get jobs -o jsonpath='{range .items[*]}{.metadata.name} {.status.active}{"\n"}{end}' | grep -v manual | grep -c ' 1$' | awk '{print ($1<=1)?"yes":"no"}')" "yes"
 ```
 :::
 

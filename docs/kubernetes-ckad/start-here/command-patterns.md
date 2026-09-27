@@ -14,9 +14,9 @@ Skip memorising flags. Learn one grammar, the lookup commands, and the patterns 
 
 ```text
 kubectl <verb> <type>[/<name>] [-n <namespace>] [flags] [-- <command> <args>]
-kubectl  get    pods/web         -n lab5         -o wide
-kubectl  create deployment web   -n lab5         --image=nginx:1.27 --replicas=3
-kubectl  run    tmp              -n lab5         --image=busybox:1.36 --rm -it --restart=Never -- sh
+kubectl  get    pods/web         -n lab2-2         -o wide
+kubectl  create deployment web   -n lab2-2         --image=nginx:1.27 --replicas=3
+kubectl  run    tmp              -n lab2-2         --image=busybox:1.36 --rm -it --restart=Never -- sh
 ```
 
 | Part | What goes there | Find valid values with |
@@ -113,7 +113,7 @@ This is why the [image kit](#the-image-kit) starts agnhost with `-- netexec` und
 | See who did it | `kubectl get events -o custom-columns=REASON:.reason,SOURCE:.source.component,MESSAGE:.message` | `SOURCE` is `replicaset-controller`, `default-scheduler`, `kubelet`… |
 | Wait for a rollout | `kubectl rollout status deployment/<name>` | `kubectl rollout status deployment/web` |
 | Wait for a condition | `kubectl wait --for=condition=<c> <type>/<name> --timeout=<t>` | `kubectl wait --for=condition=Ready pod/web --timeout=60s` |
-| Check a permission | `kubectl auth can-i <verb> <type> --as=<who>` | `kubectl auth can-i list pods --as=system:serviceaccount:lab9:ci-bot` |
+| Check a permission | `kubectl auth can-i <verb> <type> --as=<who>` | `kubectl auth can-i list pods --as=system:serviceaccount:lab6-2:ci-bot` |
 
 ### Get inside
 
@@ -129,7 +129,7 @@ This is why the [image kit](#the-image-kit) starts agnhost with `-- netexec` und
 | I want to… | Pattern | Example |
 |---|---|---|
 | Delete one object | `kubectl delete <type> <name>` | `kubectl delete pod web` |
-| Delete a whole lab | `kubectl delete namespace <ns>` | `kubectl delete namespace lab5` |
+| Delete a whole lab | `kubectl delete namespace <ns>` | `kubectl delete namespace lab2-2` |
 
 ## Generate, edit, apply
 
@@ -178,4 +178,4 @@ Four images cover every lab. Pin the tags: the rollout labs rely on the differen
 
 ---
 
-**Next in path →** [Learning Path](./learning-path.md): the order for everything else
+**Next in path →** [Architecture](../reference/architecture.md) (skim), then Phase 2

@@ -42,7 +42,7 @@ Raw YAML stops scaling once the same app runs in three environments or you insta
 
 ### Kustomize features
 
-A base of plain YAML, plus one overlay per environment that patches it. The [base and prod overlay](#kubectl-essentials) below use every field Lab 6-1 needs.
+A base of plain YAML, plus one overlay per environment that patches it. The [base and prod overlay](#kubectl-essentials) below use every field Lab 7-1 needs.
 
 <details>
 <summary>Deeper dive</summary>
@@ -147,7 +147,7 @@ patches:
 
 ## 🧪 Lab
 
-:::tip Lab 6-1 ★★
+:::tip Lab 7-1 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [envFrom](./config-and-secrets.md#injection-methods) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **One base, two environments.**
@@ -155,14 +155,14 @@ patches:
 **Goal**
 
 1. Create `base/` with a Deployment `web` (`nginx:1.27`, 1 replica) that reads `LOG_LEVEL` from a generated ConfigMap `web-config`.
-2. Create `overlays/prod/` that sets namespace `lab6`, prefix `prod-`, 3 replicas, tag `1.28` and `LOG_LEVEL=info`.
+2. Create `overlays/prod/` that sets namespace `lab7-1`, prefix `prod-`, 3 replicas, tag `1.28` and `LOG_LEVEL=info`.
 3. Render the overlay, then apply it. Change `LOG_LEVEL` to `warn` and re-apply. What happens to the Pods, and why?
 
 **Verify**
 
 ```bash
-kubectl -n lab6 get deploy prod-web -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}{"\n"}'  # 3 nginx:1.28
-kubectl -n lab6 get configmap                                  # prod-web-config-<hash>, one per LOG_LEVEL applied
+kubectl -n lab7-1 get deploy prod-web -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}{"\n"}'  # 3 nginx:1.28
+kubectl -n lab7-1 get configmap                                  # prod-web-config-<hash>, one per LOG_LEVEL applied
 ```
 
 <details>
@@ -209,12 +209,12 @@ kubectl -n lab6 get configmap                                  # prod-web-config
 
 3. Write `base/kustomization.yaml` as shown above.
 
-4. Write `overlays/prod/kustomization.yaml` as shown above, but with `namespace: lab6`.
+4. Write `overlays/prod/kustomization.yaml` as shown above, but with `namespace: lab7-1`.
 
 5. Create the target namespace.
 
    ```bash
-   kubectl create namespace lab6
+   kubectl create namespace lab7-1
    ```
 
 6. Render the overlay without applying: names prefixed, configMapRef rewritten to the hashed name.
@@ -240,7 +240,7 @@ kubectl -n lab6 get configmap                                  # prod-web-config
 10. List ReplicaSets: a new one appeared.
 
     ```bash
-    kubectl -n lab6 get rs
+    kubectl -n lab7-1 get rs
     ```
 
     The ConfigMap name (hash) changed, so the Pod template changed, so a rollout happened.
@@ -248,7 +248,7 @@ kubectl -n lab6 get configmap                                  # prod-web-config
 11. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    cd .. && kubectl delete namespace lab6
+    cd .. && kubectl delete namespace lab7-1
     ```
 
 </details>
@@ -257,23 +257,23 @@ kubectl -n lab6 get configmap                                  # prod-web-config
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "3 replicas on 1.28"     "$(kubectl -n lab6 get deploy prod-web -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}')" "3 nginx:1.28"
-t "Pods see LOG_LEVEL=warn" "$(kubectl -n lab6 exec deploy/prod-web -- printenv LOG_LEVEL)" "warn"
-t "config change rolled"   "$(kubectl -n lab6 get rs --no-headers | wc -l | tr -d ' ')" "2"
-t "two hashed ConfigMaps"  "$(kubectl -n lab6 get configmap -o name | grep -c 'prod-web-config-')" "2"
+t "3 replicas on 1.28"     "$(kubectl -n lab7-1 get deploy prod-web -o jsonpath='{.spec.replicas} {.spec.template.spec.containers[0].image}')" "3 nginx:1.28"
+t "Pods see LOG_LEVEL=warn" "$(kubectl -n lab7-1 exec deploy/prod-web -- printenv LOG_LEVEL)" "warn"
+t "config change rolled"   "$(kubectl -n lab7-1 get rs --no-headers | wc -l | tr -d ' ')" "2"
+t "two hashed ConfigMaps"  "$(kubectl -n lab7-1 get configmap -o name | grep -c 'prod-web-config-')" "2"
 ```
 :::
 
-<Link id="lab-6-2" />
+<Link id="lab-7-2" />
 
-:::tip Lab 6-2 ★★
+:::tip Lab 7-2 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · the [helm CLI](https://helm.sh/docs/intro/install/) (v3 or v4) and internet access · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Install a chart, break its values, roll back.**
 
 **Goal**
 
-1. Add the `podinfo` repo. Install chart `podinfo/podinfo` version `6.15.0` as release `web` in namespace `lab6-helm`, with 2 replicas.
+1. Add the `podinfo` repo. Install chart `podinfo/podinfo` version `6.15.0` as release `web` in namespace `lab7-2`, with 2 replicas.
 2. Upgrade the release to set `ui.message=hello`, keeping 2 replicas.
 3. Upgrade again, passing only `--set ui.message=oops`. How many replicas are there now, and why?
 4. Roll back to the revision that had 2 replicas and `hello`.
@@ -281,9 +281,9 @@ t "two hashed ConfigMaps"  "$(kubectl -n lab6 get configmap -o name | grep -c 'p
 **Verify**
 
 ```bash
-helm history web -n lab6-helm                               # 4 revisions, the last "Rollback to 2"
-kubectl -n lab6-helm get deploy web-podinfo                 # 2/2
-helm get values web -n lab6-helm                            # replicaCount: 2, message: hello
+helm history web -n lab7-2                               # 4 revisions, the last "Rollback to 2"
+kubectl -n lab7-2 get deploy web-podinfo                 # 2/2
+helm get values web -n lab7-2                            # replicaCount: 2, message: hello
 ```
 
 <details>
@@ -315,13 +315,13 @@ helm get values web -n lab6-helm                            # replicaCount: 2, m
 2. Install a pinned chart version with 2 replicas.
 
    ```bash
-   helm install web podinfo/podinfo --version 6.15.0 -n lab6-helm --create-namespace --set replicaCount=2
-   kubectl -n lab6-helm rollout status deployment/web-podinfo
+   helm install web podinfo/podinfo --version 6.15.0 -n lab7-2 --create-namespace --set replicaCount=2
+   kubectl -n lab7-2 rollout status deployment/web-podinfo
    ```
 
    ```text
    NAME: web
-   NAMESPACE: lab6-helm
+   NAMESPACE: lab7-2
    STATUS: deployed
    REVISION: 1
    DESCRIPTION: Install complete
@@ -330,8 +330,8 @@ helm get values web -n lab6-helm                            # replicaCount: 2, m
 3. Upgrade, keeping the earlier values and adding a message.
 
    ```bash
-   helm upgrade web podinfo/podinfo --version 6.15.0 -n lab6-helm --reuse-values --set ui.message=hello
-   helm get values web -n lab6-helm
+   helm upgrade web podinfo/podinfo --version 6.15.0 -n lab7-2 --reuse-values --set ui.message=hello
+   helm get values web -n lab7-2
    ```
 
    ```text
@@ -344,9 +344,9 @@ helm get values web -n lab6-helm                            # replicaCount: 2, m
 4. Upgrade the careless way: a new `--set` and nothing else.
 
    ```bash
-   helm upgrade web podinfo/podinfo --version 6.15.0 -n lab6-helm --set ui.message=oops
-   kubectl -n lab6-helm get deploy web-podinfo -o jsonpath='{.spec.replicas}{"\n"}'
-   helm get values web -n lab6-helm
+   helm upgrade web podinfo/podinfo --version 6.15.0 -n lab7-2 --set ui.message=oops
+   kubectl -n lab7-2 get deploy web-podinfo -o jsonpath='{.spec.replicas}{"\n"}'
+   helm get values web -n lab7-2
    ```
 
    ```text
@@ -361,9 +361,9 @@ helm get values web -n lab6-helm                            # replicaCount: 2, m
 5. Roll back to revision 2 and read the history.
 
    ```bash
-   helm rollback web 2 -n lab6-helm
-   kubectl -n lab6-helm rollout status deployment/web-podinfo
-   helm history web -n lab6-helm
+   helm rollback web 2 -n lab7-2
+   kubectl -n lab7-2 rollout status deployment/web-podinfo
+   helm history web -n lab7-2
    ```
 
    ```text
@@ -379,7 +379,7 @@ helm get values web -n lab6-helm                            # replicaCount: 2, m
 6. Run the ✅ Check below, then delete everything the lab created.
 
    ```bash
-   kubectl delete namespace lab6-helm
+   kubectl delete namespace lab7-2
    ```
 
 </details>
@@ -388,10 +388,10 @@ helm get values web -n lab6-helm                            # replicaCount: 2, m
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-t "4 revisions"           "$(helm history web -n lab6-helm -o json | grep -o '"revision":' | wc -l | tr -d ' ')" "4"
-t "last is Rollback to 2" "$(helm history web -n lab6-helm --max 1 -o json | grep -o 'Rollback to 2')" "Rollback to 2"
-t "2 replicas again"      "$(kubectl -n lab6-helm get deploy web-podinfo -o jsonpath='{.status.readyReplicas}')" "2"
-t "message is hello"      "$(kubectl -n lab6-helm get deploy web-podinfo -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="PODINFO_UI_MESSAGE")].value}')" "hello"
+t "4 revisions"           "$(helm history web -n lab7-2 -o json | grep -o '"revision":' | wc -l | tr -d ' ')" "4"
+t "last is Rollback to 2" "$(helm history web -n lab7-2 --max 1 -o json | grep -o 'Rollback to 2')" "Rollback to 2"
+t "2 replicas again"      "$(kubectl -n lab7-2 get deploy web-podinfo -o jsonpath='{.status.readyReplicas}')" "2"
+t "message is hello"      "$(kubectl -n lab7-2 get deploy web-podinfo -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="PODINFO_UI_MESSAGE")].value}')" "hello"
 ```
 :::
 

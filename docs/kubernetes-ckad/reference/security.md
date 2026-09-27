@@ -252,27 +252,27 @@ spec:
 
 ## 🧪 Lab
 
-:::tip Lab 9-1 ★★
+:::tip Lab 6-2 ★★
 **Requires:** [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [How the tiers work](../start-here/local-setup.md#lab-tiers).
 
 **Least privilege, then a hardened Pod.**
 
 **Goal**
 
-1. In namespace `lab9`, create ServiceAccount `ci-bot` and a Role that allows managing Deployments and reading Pods and their logs. Bind it.
+1. In namespace `lab6-2`, create ServiceAccount `ci-bot` and a Role that allows managing Deployments and reading Pods and their logs. Bind it.
 2. Prove `ci-bot` can create Deployments but can't delete them, and can't read Secrets.
-3. Label `lab9` to enforce `restricted`. Try `kubectl run bad --image=nginx:1.27` and read the error.
+3. Label `lab6-2` to enforce `restricted`. Try `kubectl run bad --image=nginx:1.27` and read the error.
 4. Run the `hardened` Pod above and confirm its UID and that the root filesystem is read-only.
 5. Install the `Backup` CRD, create a `Backup` object, and list it with its short name.
 
 **Verify**
 
 ```bash
-kubectl -n lab9 auth can-i create deployments --as=system:serviceaccount:lab9:ci-bot   # yes
-kubectl -n lab9 auth can-i delete deployments --as=system:serviceaccount:lab9:ci-bot   # no
-kubectl -n lab9 auth can-i get secrets --as=system:serviceaccount:lab9:ci-bot          # no
-kubectl -n lab9 logs hardened                        # uid=1000 gid=3000 groups=2000,3000, then: wrote
-kubectl -n lab9 get bk
+kubectl -n lab6-2 auth can-i create deployments --as=system:serviceaccount:lab6-2:ci-bot   # yes
+kubectl -n lab6-2 auth can-i delete deployments --as=system:serviceaccount:lab6-2:ci-bot   # no
+kubectl -n lab6-2 auth can-i get secrets --as=system:serviceaccount:lab6-2:ci-bot          # no
+kubectl -n lab6-2 logs hardened                        # uid=1000 gid=3000 groups=2000,3000, then: wrote
+kubectl -n lab6-2 get bk
 ```
 
 <details>
@@ -292,67 +292,67 @@ kubectl -n lab9 get bk
 1. Create the lab namespace.
 
    ```bash
-   kubectl create namespace lab9
+   kubectl create namespace lab6-2
    ```
 
 2. Create the identity the CI system will use.
 
    ```bash
-   kubectl -n lab9 create serviceaccount ci-bot
+   kubectl -n lab6-2 create serviceaccount ci-bot
    ```
 
 3. A Role that manages Deployments, but has no delete verb.
 
    ```bash
-   kubectl -n lab9 create role deployer --verb=get,list,watch,create,update,patch --resource=deployments
+   kubectl -n lab6-2 create role deployer --verb=get,list,watch,create,update,patch --resource=deployments
    ```
 
 4. A Role that reads Pods and their logs.
 
    ```bash
-   kubectl -n lab9 create role pod-reader --verb=get,list --resource=pods,pods/log
+   kubectl -n lab6-2 create role pod-reader --verb=get,list --resource=pods,pods/log
    ```
 
 5. Bind the first Role to the ServiceAccount.
 
    ```bash
-   kubectl -n lab9 create rolebinding ci-bot-deployer --role=deployer --serviceaccount=lab9:ci-bot
+   kubectl -n lab6-2 create rolebinding ci-bot-deployer --role=deployer --serviceaccount=lab6-2:ci-bot
    ```
 
 6. Bind the second Role to the ServiceAccount.
 
    ```bash
-   kubectl -n lab9 create rolebinding ci-bot-pod-reader --role=pod-reader --serviceaccount=lab9:ci-bot
+   kubectl -n lab6-2 create rolebinding ci-bot-pod-reader --role=pod-reader --serviceaccount=lab6-2:ci-bot
    ```
 
 7. Ask the API server as ci-bot: yes.
 
    ```bash
-   kubectl -n lab9 auth can-i create deployments --as=system:serviceaccount:lab9:ci-bot
+   kubectl -n lab6-2 auth can-i create deployments --as=system:serviceaccount:lab6-2:ci-bot
    ```
 
 8. No: delete isn't in the Role.
 
    ```bash
-   kubectl -n lab9 auth can-i delete deployments --as=system:serviceaccount:lab9:ci-bot
+   kubectl -n lab6-2 auth can-i delete deployments --as=system:serviceaccount:lab6-2:ci-bot
    ```
 
 9. No: nothing grants Secrets.
 
    ```bash
-   kubectl -n lab9 auth can-i get secrets --as=system:serviceaccount:lab9:ci-bot
+   kubectl -n lab6-2 auth can-i get secrets --as=system:serviceaccount:lab6-2:ci-bot
    ```
 
 10. Enforce the restricted Pod Security Standard on the namespace.
 
     ```bash
-    kubectl label namespace lab9 pod-security.kubernetes.io/enforce=restricted
+    kubectl label namespace lab6-2 pod-security.kubernetes.io/enforce=restricted
     ```
 
 11. Try a default nginx Pod: rejected.
 
     ```bash
-    kubectl -n lab9 run bad --image=nginx:1.27
+    kubectl -n lab6-2 run bad --image=nginx:1.27
     ```
 
     ```text
@@ -363,19 +363,19 @@ kubectl -n lab9 get bk
 12. Create the hardened Pod above, saved as `hardened.yaml`.
 
     ```bash
-    kubectl -n lab9 apply -f hardened.yaml
+    kubectl -n lab6-2 apply -f hardened.yaml
     ```
 
 13. Read its output: `uid=1000` `gid=3000` `groups=2000`,3000, then "wrote".
 
     ```bash
-    kubectl -n lab9 logs hardened
+    kubectl -n lab6-2 logs hardened
     ```
 
 14. Try to write to the root filesystem: Read-only file system.
 
     ```bash
-    kubectl -n lab9 exec hardened -- touch /etc/x
+    kubectl -n lab6-2 exec hardened -- touch /etc/x
     ```
 
 15. Install the CRD above, saved as `backup-crd.yaml`.
@@ -387,7 +387,7 @@ kubectl -n lab9 get bk
 16. Create one Backup object from inline YAML.
 
     ```bash
-    kubectl -n lab9 apply -f - <<'EOF'
+    kubectl -n lab6-2 apply -f - <<'EOF'
     apiVersion: ops.example.com/v1
     kind: Backup
     metadata:
@@ -401,13 +401,13 @@ kubectl -n lab9 get bk
 17. List it by short name: stored, but nothing happens, because no Operator watches it.
 
     ```bash
-    kubectl -n lab9 get bk
+    kubectl -n lab6-2 get bk
     ```
 
 18. Run the ✅ Check below, then delete everything the lab created.
 
     ```bash
-    kubectl delete namespace lab9
+    kubectl delete namespace lab6-2
     ```
 
 19. The CRD is cluster-scoped, so delete it separately.
@@ -422,15 +422,15 @@ kubectl -n lab9 get bk
 
 ```bash
 t() { [ "$2" = "$3" ] && echo "PASS $1" || echo "FAIL $1: got '$2', want '$3'"; }
-sa=system:serviceaccount:lab9:ci-bot
-t "ci-bot can create deployments" "$(kubectl -n lab9 auth can-i create deployments --as=$sa)" "yes"
-t "ci-bot cannot delete them"     "$(kubectl -n lab9 auth can-i delete deployments --as=$sa)" "no"
-t "ci-bot can read Pod logs"      "$(kubectl -n lab9 auth can-i get pods/log --as=$sa)" "yes"
-t "ci-bot cannot read Secrets"    "$(kubectl -n lab9 auth can-i get secrets --as=$sa)" "no"
-t "restricted is enforced"        "$(kubectl get ns lab9 -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" "restricted"
-t "hardened runs as 1000"         "$(kubectl -n lab9 exec hardened -- id -u)" "1000"
-t "root filesystem read-only"     "$(kubectl -n lab9 exec hardened -- touch /etc/x 2>&1 | grep -c 'Read-only')" "1"
-t "Backup stored"                 "$(kubectl -n lab9 get bk nightly-db -o jsonpath='{.spec.retainDays}')" "7"
+sa=system:serviceaccount:lab6-2:ci-bot
+t "ci-bot can create deployments" "$(kubectl -n lab6-2 auth can-i create deployments --as=$sa)" "yes"
+t "ci-bot cannot delete them"     "$(kubectl -n lab6-2 auth can-i delete deployments --as=$sa)" "no"
+t "ci-bot can read Pod logs"      "$(kubectl -n lab6-2 auth can-i get pods/log --as=$sa)" "yes"
+t "ci-bot cannot read Secrets"    "$(kubectl -n lab6-2 auth can-i get secrets --as=$sa)" "no"
+t "restricted is enforced"        "$(kubectl get ns lab6-2 -o jsonpath='{.metadata.labels.pod-security\.kubernetes\.io/enforce}')" "restricted"
+t "hardened runs as 1000"         "$(kubectl -n lab6-2 exec hardened -- id -u)" "1000"
+t "root filesystem read-only"     "$(kubectl -n lab6-2 exec hardened -- touch /etc/x 2>&1 | grep -c 'Read-only')" "1"
+t "Backup stored"                 "$(kubectl -n lab6-2 get bk nightly-db -o jsonpath='{.spec.retainDays}')" "7"
 ```
 :::
 
