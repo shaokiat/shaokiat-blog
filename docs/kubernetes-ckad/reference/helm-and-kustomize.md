@@ -273,7 +273,7 @@ helm history web -n lab6-helm                                  # 3 revisions, th
 - **`helm upgrade` without `--reuse-values` or `-f` resets your values.** Earlier `--set` flags are dropped. Keep values in a file in Git and always pass `-f`.
 - **Releases are namespaced.** `helm list` shows the current namespace only. Use `-A`.
 - **Manual edits to Helm-managed objects drift.** The next upgrade overwrites them. Change values instead.
-- **Failed upgrades leave a `failed` release.** `helm history` shows it. `helm rollback` to the last `deployed` revision, or use `--atomic` to roll back automatically on failure.
+- **Failed upgrades leave a `failed` release.** `helm history` shows it. `helm rollback` to the last `deployed` revision, or pass `--rollback-on-failure` (Helm 4; `--atomic` in Helm 3, deprecated in 4) to roll back automatically on failure.
 - **kubectl's built-in Kustomize lags the standalone one.** Check `kubectl version` if a newer field isn't recognised.
 - **Generated ConfigMap names change on every edit.** Reference them only through Kustomize, which rewrites the references. A hand-written name won't match. Old generated ConfigMaps are left behind; clean them up or prune.
 
@@ -301,7 +301,7 @@ helm history web -n lab6-helm                                  # 3 revisions, th
 - **Observe:** `helm history` shows the failed revision. `kubectl get pods` and events show what broke.
 - **Hypothesise:** a failing pre-upgrade hook (such as a migration Job) or new Pods that never became Ready before `--wait` timed out.
 - **Fix:** `helm rollback <release> <last-good-revision>`, then fix and upgrade again.
-- **Prevent:** `helm upgrade --atomic --timeout 10m` in CI, which rolls back on failure. Test upgrades in staging with production-like values.
+- **Prevent:** `helm upgrade --rollback-on-failure --timeout 10m` in CI (`--atomic` on Helm 3), which rolls back on failure. Test upgrades in staging with production-like values.
 
 </details>
 
@@ -335,6 +335,6 @@ helm history web -n lab6-helm                                  # 3 revisions, th
 
 - **Helm packages and tracks releases; Kustomize patches plain YAML.** Choose by who installs it and how much varies.
 - **Pin chart versions and keep values in files.** `--set` and unpinned charts are unrepeatable.
-- **`helm upgrade --install --atomic` is the CI form.** Idempotent, and it rolls back on failure.
+- **`helm upgrade --install --rollback-on-failure` is the CI form.** Idempotent, and it rolls back on failure.
 - **Kustomize generators hash config into names.** A config change becomes a rollout automatically.
 - **`kubectl kustomize` and `helm template` render without applying.** Read the output before you ship it.

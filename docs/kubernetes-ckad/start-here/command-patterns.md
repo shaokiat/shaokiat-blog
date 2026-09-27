@@ -88,7 +88,7 @@ This is why the [image kit](#the-image-kit) starts agnhost with `-- netexec` und
 | Store a password | `kubectl create secret generic <name> --from-literal=<K>=<V>` | `kubectl create secret generic db --from-literal=password=s3cr3t` |
 | Inject them as env vars | `kubectl set env deployment/<name> --from=configmap/<cm>` | `kubectl set env deployment/web --from=configmap/cfg` |
 | Set requests and limits | `kubectl set resources deployment/<name> --requests=... --limits=...` | `kubectl set resources deployment/web --requests=cpu=100m,memory=128Mi` |
-| Autoscale | `kubectl autoscale deployment <name> --min=<n> --max=<n> --cpu=<pct>%` | `kubectl autoscale deployment web --min=2 --max=10 --cpu=50%` |
+| Autoscale | `kubectl autoscale deployment <name> --min=<n> --max=<n> --cpu-percent=<pct>` | `kubectl autoscale deployment web --min=2 --max=10 --cpu-percent=50`. kubectl 1.34+ prefers `--cpu=50%` and warns that `--cpu-percent` is deprecated; both create the same HPA. |
 
 ### Change it
 
@@ -110,6 +110,7 @@ This is why the [image kit](#the-image-kit) starts agnhost with `-- netexec` und
 | See why it isn't | `kubectl describe <type>/<name>`, then read **Events** | `kubectl describe pod/web-7d4f` |
 | See what it printed | `kubectl logs <pod> [-c <container>] [--previous] [-f]` | `kubectl logs web-7d4f --previous` |
 | See what just happened | `kubectl get events --sort-by=.lastTimestamp` | Add `--field-selector type=Warning` |
+| See who did it | `kubectl get events -o custom-columns=REASON:.reason,SOURCE:.source.component,MESSAGE:.message` | `SOURCE` is `replicaset-controller`, `default-scheduler`, `kubelet`… |
 | Wait for a rollout | `kubectl rollout status deployment/<name>` | `kubectl rollout status deployment/web` |
 | Wait for a condition | `kubectl wait --for=condition=<c> <type>/<name> --timeout=<t>` | `kubectl wait --for=condition=Ready pod/web --timeout=60s` |
 | Check a permission | `kubectl auth can-i <verb> <type> --as=<who>` | `kubectl auth can-i list pods --as=system:serviceaccount:lab9:ci-bot` |

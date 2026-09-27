@@ -78,7 +78,7 @@ Namespace guard rails and autoscaling:
 kubectl create quota team-a --hard=requests.cpu=2,requests.memory=4Gi,limits.memory=8Gi,pods=20
 kubectl describe quota                                  # used vs hard
 kubectl describe limitrange
-kubectl autoscale deployment web --min=2 --max=10 --cpu=50%   # older kubectl: --cpu-percent=50
+kubectl autoscale deployment web --min=2 --max=10 --cpu-percent=50   # kubectl 1.34+: --cpu=50% (old flag warns, still works)
 kubectl get hpa -w
 kubectl describe hpa web                                # events explain each scaling decision
 ```
@@ -161,7 +161,7 @@ See [Standard lab setup](../start-here/local-setup.md#standard-lab-setup) · [Ho
 
 **Quota, defaults, then autoscaling under load.**
 
-Needs metrics-server. On kind: `kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml`, then add `--kubelet-insecure-tls` to its args.
+**Requires:** metrics-server → [Cluster add-ons](../start-here/local-setup.md#cluster-add-ons).
 
 **Goal**
 
@@ -224,7 +224,7 @@ kubectl -n lab8 get hpa web                     # TARGETS shows a real %, not <u
 6. Autoscale on 50% of the CPU request, between 1 and 5 replicas.
 
    ```bash
-   kubectl -n lab8 autoscale deployment web --min=1 --max=5 --cpu=50%
+   kubectl -n lab8 autoscale deployment web --min=1 --max=5 --cpu-percent=50
    ```
 
 7. Generate load from a second terminal; Ctrl-C to stop.

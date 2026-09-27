@@ -20,7 +20,7 @@ Every Lab in this section assumes the setup below. Do it once, then read [Comman
    kubectl version --client
    ```
 
-1. **Create the cluster.** This also creates the context `kind-ckad` and switches to it.
+1. **Create the cluster.** This also creates the context `kind-ckad` and switches to it. To run every lab, including Ingress and HPA, create it from `kind.yaml` instead and install the [add-ons](#cluster-add-ons).
 
    ```bash
    kind create cluster --name ckad
@@ -50,6 +50,90 @@ Every Lab in this section assumes the setup below. Do it once, then read [Comman
 
 :::tip
 Always check `kubectl config current-context` before destructive commands.
+:::
+
+## Cluster add-ons
+
+Most labs run on the plain cluster above. Labs that need more say so in their **Requires:** line. Install everything once and every lab works.
+
+| Add-on | Needed by | Without it |
+|---|---|---|
+| Port mappings + `ingress-ready` label | Any Ingress curl from your laptop | Recreate the cluster: kind can't add port mappings later |
+| metrics-server | `kubectl top`, every HPA | `error: Metrics API not available`, HPA `TARGETS` stays `<unknown>` |
+| ingress-nginx | Ingress labs, the Capstone | Ingress objects are accepted, `ADDRESS` stays empty, nothing routes |
+
+Verified on 2026-09-27 with kind v0.33.0, Kubernetes v1.37.0, metrics-server v0.9.0 and ingress-nginx controller-v1.15.1.
+
+1. **Recreate the cluster with port mappings.** Save this as `kind.yaml`. It maps `localhost:80` and `:443` on your laptop to the node, and labels the node so the ingress controller lands on it.
+
+   ```yaml
+   # fragment: kind config, not a Kubernetes object
+   kind: Cluster
+   apiVersion: kind.x-k8s.io/v1alpha4
+   nodes:
+   - role: control-plane
+     labels:
+       ingress-ready: "true"          # the ingress-nginx kind manifest schedules only here
+     extraPortMappings:               # localhost:80/443 on your laptop → the node
+     - {containerPort: 80, hostPort: 80, protocol: TCP}
+     - {containerPort: 443, hostPort: 443, protocol: TCP}
+   ```
+
+   ```bash
+   kind delete cluster --name ckad
+   kind create cluster --name ckad --config kind.yaml
+   ```
+
+   If creation fails with `address already in use`, something on your laptop owns port 80. Stop it, or change `hostPort` to 8080 and add `:8080` to every curl below.
+
+2. **Install metrics-server.** kind's kubelets use self-signed certificates, so metrics-server needs `--kubelet-insecure-tls`. Never set that flag on a real cluster.
+
+   ```bash
+   kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.9.0/components.yaml
+   kubectl -n kube-system patch deployment metrics-server --type=json \
+     -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+   kubectl -n kube-system rollout status deployment/metrics-server
+   ```
+
+   Verify. The first scrape takes about 20 seconds; before that you get `Metrics API not available`.
+
+   ```bash
+   kubectl top nodes
+   ```
+
+   ```text
+   NAME                 CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+   ckad-control-plane   205m         2%       838Mi           10%
+   ```
+
+3. **Install the ingress controller.** This is ingress-nginx's kind manifest: it runs the controller on the labelled node with host ports 80 and 443, and creates the IngressClass `nginx`.
+
+   ```bash
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/kind/deploy.yaml
+   kubectl -n ingress-nginx wait --for=condition=Ready pod \
+     -l app.kubernetes.io/component=controller --timeout=180s
+   ```
+
+   Verify end to end with a throwaway app. `*.localhost` names resolve to `127.0.0.1` without editing `/etc/hosts`.
+
+   ```bash
+   kubectl create namespace addons-test
+   kubectl -n addons-test create deployment web --image=nginx:1.27
+   kubectl -n addons-test expose deployment web --port=80
+   kubectl -n addons-test create ingress web --class=nginx --rule="web.localhost/*=web:80"
+   kubectl -n addons-test rollout status deployment/web
+   curl -s http://web.localhost/ | grep -o '<title>.*</title>'
+   kubectl delete namespace addons-test
+   ```
+
+   ```text
+   <title>Welcome to nginx!</title>
+   ```
+
+   A `404 Not Found` from nginx means the controller works but no rule matched the host. `Connection refused` means the controller isn't running or the cluster has no port mapping.
+
+:::note ingress-nginx is retired
+The community ingress-nginx project ended maintenance in March 2026; controller-v1.15.1 is its last release and gets no more security fixes. It still works for learning the Ingress API, which is what interviews and the CKAD test. New platforms use a Gateway API implementation instead (→ [Ingress vs Gateway API](../reference/services-and-ingress.md#ingress-vs-gateway-api)). kind's own docs now use [cloud-provider-kind](https://github.com/kubernetes-sigs/cloud-provider-kind), which serves both Ingress and Gateway API without a third-party controller.
 :::
 
 ## Lab tiers
