@@ -8,7 +8,7 @@ sidebar_position: 3
 
 > Docs: [kubectl overview](https://kubernetes.io/docs/reference/kubectl/) · [kubectl quick reference](https://kubernetes.io/docs/reference/kubectl/quick-reference/) · [kubectl command reference](https://kubernetes.io/docs/reference/kubectl/generated/)
 
-Skip memorising flags. Learn one grammar, the lookup commands, and the patterns below, organized by what you want to do. `-h` fills in the rest. Every Lab's 🟢 Guided tier uses exactly these patterns, and the 🟡 Hints tier points you back to them. Exam-speed tricks (aliases, `$do`, jsonpath) live in the [kubectl Cheatsheet](../reference/kubectl-cheatsheet.md).
+Skip memorising flags. Learn one grammar, the lookup commands, and the patterns below, organized by what you want to do. `-h` fills in the rest. To see which object each command acts on, look at [the object map](./mental-model.md#the-object-map). Every Lab's 🟢 Guided tier uses exactly these patterns, and the 🟡 Hints tier points you back to them. Exam-speed tricks (aliases, `$do`, jsonpath) live in the [kubectl Cheatsheet](../reference/kubectl-cheatsheet.md).
 
 ## The grammar
 

@@ -57,6 +57,8 @@ One line per term. Follow the link for the full explanation.
 
 ## Workloads & networking
 
+How these fit together: [the object map](./mental-model.md#the-object-map).
+
 | Term | Definition | More |
 |---|---|---|
 | <Link id="pod" />**Pod** | One or more containers sharing a network and volumes. The smallest thing you run. | [Pods](../reference/pods-and-multi-container.md) |

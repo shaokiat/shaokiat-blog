@@ -11,7 +11,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 > Docs: [Kubernetes objects](https://kubernetes.io/docs/concepts/overview/working-with-objects/) · [Controllers](https://kubernetes.io/docs/concepts/architecture/controller/) · [Labels and selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
 
-Read this page first. Every other page in this section is a detail of one idea explained here: the big idea, five concepts, the six-step chain behind every `kubectl apply`, and how to tell which step broke. Then set up a cluster with [Local Setup](./local-setup.md) and learn the commands in [Command Patterns](./command-patterns.md).
+Read this page first. Every other page in this section is a detail of one idea explained here: the big idea, the object map, five concepts, the six-step chain behind every `kubectl apply`, and how to tell which step broke. Then set up a cluster with [Local Setup](./local-setup.md) and learn the commands in [Command Patterns](./command-patterns.md).
 
 ## The big idea
 
@@ -20,6 +20,41 @@ You never tell Kubernetes *what to do*. You tell it *what should exist*, and it 
 That's why a deleted [Pod](./glossary.md#pod) comes back, why a failed [node](./glossary.md#node)'s Pods reappear elsewhere, and why an edit to a live [object](./glossary.md#object) disappears on the next apply. None of these are special features. They're all the same loop.
 
 → See [Figure 1-2: the reconciliation loop](../reference/architecture.md#overview) in Architecture.
+
+## The object map
+
+Most commands act on one of a handful of objects. They connect in only two ways: one object **owns** another, or one object **finds** another by label or name.
+
+<ThemedImage
+  alt="Object hierarchy in a namespace: a Deployment owns a ReplicaSet, which owns three Pods, each holding a container. A Service finds the Pods by the label app=web; a ConfigMap or Secret is mounted into them by name. The Pods run on Nodes, which sit outside the namespace"
+  sources={{
+    light: useBaseUrl('/img/kubernetes-ckad/fig-mental-model-map-light.svg'),
+    dark: useBaseUrl('/img/kubernetes-ckad/fig-mental-model-map-dark.svg'),
+  }}
+/>
+
+*Figure 0-1: The objects behind a typical app. Amber is what you write, blue is what a controller writes for you, green is what runs, grey is the machines. Solid arrows are ownership, dashed arrows are lookups.*
+
+| Link | Example | Delete the one on the left | If it breaks |
+|---|---|---|---|
+| **Owns** (solid) | Deployment → ReplicaSet → Pod | Everything it owns goes too | Rare. The controller recreates what's missing. |
+| **Finds by label** (dashed) | Service → Pods | The Pods are untouched | Silent. The Service just has no endpoints. |
+| **Finds by name** (dashed) | Pod → ConfigMap, Secret | The Pod keeps running, but a new one fails to start | Loud. The new Pod shows `CreateContainerConfigError` (env) or stays `ContainerCreating` (volume). |
+
+What this means at the command line:
+
+| Object | You create it with | Edit it directly? | See it with |
+|---|---|---|---|
+| Deployment | `kubectl create deployment` / `apply` | Yes. This is the object you change. | `kubectl get deploy` |
+| ReplicaSet | The Deployment controller | No. The Deployment overwrites your edit. | `kubectl get rs` |
+| Pod | The ReplicaSet controller | No. Delete it and a new one replaces it. | `kubectl get pods -o wide` (shows the node) |
+| Service | `kubectl expose` / `apply` | Yes | `kubectl get svc`, `kubectl get endpointslices` |
+| ConfigMap / Secret | `kubectl create configmap` / `secret` | Yes. Running Pods don't see env changes until restarted. | `kubectl get cm,secret` |
+| Node | The cluster | No | `kubectl get nodes` (no `-n`: cluster-scoped) |
+
+Pod names encode the hierarchy. `web-69c6f74b8b-x2k9p` is Deployment `web`, ReplicaSet hash `69c6f74b8b`, Pod suffix `x2k9p`. `kubectl get all -n <ns>` lists Deployments, ReplicaSets, Pods and Services together, but not ConfigMaps or Secrets.
+
+→ Config wiring in detail: [Config & Secrets](../reference/config-and-secrets.md).
 
 ## Five core concepts
 
@@ -62,7 +97,7 @@ One `kubectl apply` of a 3-replica Deployment sets off six steps. Each is a diff
   }}
 />
 
-*Figure 0-1: The chain behind one `kubectl apply`. Amber is the API server, the only lifeline every arrow touches. Dashed arrows are watch events, solid arrows are writes. The numbers are the steps below.*
+*Figure 0-2: The chain behind one `kubectl apply`. Amber is the API server, the only lifeline every arrow touches. Dashed arrows are watch events, solid arrows are writes. The numbers are the steps below.*
 
 | # | Component | Watches | Writes | Stage |
 |---|---|---|---|---|
@@ -93,6 +128,8 @@ The chain turns every symptom into a question: which step didn't happen? Find th
 See [Standard lab setup](./local-setup.md#standard-lab-setup) · [How the tiers work](./local-setup.md#lab-tiers).
 
 **See the chain and the glue for yourself.**
+
+**First pass: open 🟢 Guided and paste the commands.** This lab is a demo of the ideas above, not a test. The commands are taught in [Command Patterns](./command-patterns.md). Come back to the Goal tier once you've read it.
 
 **Goal**
 

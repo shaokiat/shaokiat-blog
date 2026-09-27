@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 530" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Object hierarchy in a namespace: a Deployment owns a ReplicaSet, which owns three Pods, each holding a container. A Service finds the Pods by the label app=web; a ConfigMap or Secret is mounted into them by name. The Pods run on Nodes, which sit outside the namespace">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="980" height="510" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">CLUSTER</text>
+  <rect x="25" y="35" width="950" height="360" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="39" y="54" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">NAMESPACE  lab0</text>
+  <rect x="410" y="55" width="180" height="60" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="500" y="80" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Deployment</text>
+  <text x="500" y="99" text-anchor="middle" font-size="11" fill="#8896a8">you write this</text>
+  <rect x="410" y="160" width="180" height="60" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="500" y="185" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">ReplicaSet</text>
+  <text x="500" y="204" text-anchor="middle" font-size="11" fill="#8896a8">made by the Deployment</text>
+  <polyline points="500,115 500,158" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="510" y="142" text-anchor="start" font-size="11" fill="#8896a8">owns</text>
+  <rect x="272" y="262" width="456" height="118" rx="12" fill="#1b1b1d" stroke="#a5822f" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="286" y="281" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8"></text>
+  <text x="500" y="373" text-anchor="middle" font-size="10.5" fill="#e0cfa8" font-weight="600">every Pod carries label app=web</text>
+  <rect x="285" y="284" width="130" height="70" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="293" y="299" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="350" y="323" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">container</text>
+  <text x="350" y="339" text-anchor="middle" font-size="10.5" fill="#8896a8">nginx:1.27</text>
+  <rect x="435" y="284" width="130" height="70" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="443" y="299" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="500" y="323" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">container</text>
+  <text x="500" y="339" text-anchor="middle" font-size="10.5" fill="#8896a8">nginx:1.27</text>
+  <rect x="585" y="284" width="130" height="70" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="593" y="299" font-size="9" font-weight="600" letter-spacing="1" fill="#4a8f6a">POD</text>
+  <text x="650" y="323" text-anchor="middle" font-size="12" font-weight="600" fill="#b8dcc6">container</text>
+  <text x="650" y="339" text-anchor="middle" font-size="10.5" fill="#8896a8">nginx:1.27</text>
+  <polyline points="470,220 350,282" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="500,220 500,282" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="530,220 650,282" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="508" y="250" text-anchor="start" font-size="11" fill="#8896a8" stroke="#2a2f37" stroke-width="4" paint-order="stroke">owns ×3</text>
+  <rect x="40" y="285" width="140" height="60" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="110" y="310" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Service</text>
+  <text x="110" y="329" text-anchor="middle" font-size="11" fill="#8896a8">stable name + IP</text>
+  <polyline points="180,315 270,315" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="225" y="300" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#2a2f37" stroke-width="4" paint-order="stroke">selects</text>
+  <text x="225" y="334" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#2a2f37" stroke-width="4" paint-order="stroke">by label</text>
+  <rect x="825" y="285" width="140" height="60" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="895" y="310" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">ConfigMap</text>
+  <text x="895" y="329" text-anchor="middle" font-size="11" fill="#8896a8">or Secret</text>
+  <polyline points="825,315 730,315" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="778" y="300" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#2a2f37" stroke-width="4" paint-order="stroke">mounted</text>
+  <text x="778" y="334" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#2a2f37" stroke-width="4" paint-order="stroke">by name</text>
+  <rect x="300" y="430" width="190" height="60" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="395" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">Node</text>
+  <text x="395" y="474" text-anchor="middle" font-size="11" fill="#8896a8">kubelet runs its Pods</text>
+  <rect x="510" y="430" width="190" height="60" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="605" y="455" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">Node</text>
+  <text x="605" y="474" text-anchor="middle" font-size="11" fill="#8896a8">cluster-scoped</text>
+  <polyline points="420,380 420,428" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="580,380 580,428" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="500" y="418" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#202329" stroke-width="4" paint-order="stroke">runs on</text>
+</svg>
