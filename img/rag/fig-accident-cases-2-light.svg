@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 210" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Feedback loop: more policing in an area leads to more recorded incidents, which raise scores for residents, which justify more policing">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="740" height="190" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">FEEDBACK LOOP</text>
+  <rect x="40" y="46" width="180" height="64" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="130" y="73" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Policing</text>
+  <text x="130" y="92" text-anchor="middle" font-size="11" fill="#4a5568">more in an area</text>
+  <rect x="290" y="46" width="180" height="64" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="380" y="73" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Incidents</text>
+  <text x="380" y="92" text-anchor="middle" font-size="11" fill="#4a5568">more recorded</text>
+  <rect x="540" y="46" width="180" height="64" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="630" y="73" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">Scores</text>
+  <text x="630" y="92" text-anchor="middle" font-size="11" fill="#4a5568">rise for residents</text>
+  <polyline points="222,78 288,78" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="472,78 538,78" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="630,112 630,160 130,160 130,112" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="380" y="152" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">scores justify more policing</text>
+</svg>
