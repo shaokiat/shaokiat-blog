@@ -2,18 +2,74 @@
 sidebar_position: 0
 ---
 
-# Introduction
+import { ContentCard } from "@site/src/components/HomepageFeatures";
+import styles from "@site/src/components/HomepageFeatures.module.css";
 
-I will be documenting my journey throughout my preparations for technical interviews here :grin:.
+# Study Notes
 
-Hopefully it may prove useful to anybody reading this during their preparation for technical interviews like me.
+Notes for solutions engineering and architecture roles. Each page answers one question: **which option do I pick, and why?**
 
-:::tip resources
-Here is a list of the helpful resources I have came across:
+Pick a track below. Every track has its own overview page with a suggested reading order.
 
-- [Tech Interview Handbook](https://www.techinterviewhandbook.org/)
-- [Frontend Interview Handbook](https://www.frontendinterviewhandbook.com/introduction)
-- [Labuladong Blog](https://labuladong.gitbook.io/algo-en/)
-- [LeetCode](https://leetcode.com/)
+## Pick a track
+
+<div className={styles.contentGrid}>
+  <ContentCard
+    icon="☸️"
+    title="Kubernetes (CKAD)"
+    description="Hands-on labs at three difficulty levels, troubleshooting drills, and a mock interview. Built for live-cluster interview rounds."
+    link="/docs/kubernetes-ckad/start-here/learning-path"
+    cta="Start the Learning Path"
+  />
+  <ContentCard
+    icon="☁️"
+    title="GCP Cloud Architect"
+    description="17 decision guides comparing GCP services, plus walkthroughs of the 4 official exam case studies."
+    link="/docs/google-professional-cloud-architect/"
+    cta="View Notes"
+  />
+  <ContentCard
+    icon="⚡"
+    title="GenAI & Agents"
+    description="How agent loops are shaped, the techniques behind them, and real use cases that apply both."
+    link="/docs/genai-agents/"
+    cta="Explore"
+  />
+  <ContentCard
+    icon="🛠️"
+    title="ML Engineering"
+    description="Serving LLMs and building RAG systems for production, told through one running example."
+    link="/docs/ml-engineering/"
+    cta="Explore"
+  />
+  <ContentCard
+    icon="📊"
+    title="Data Science"
+    description="Which ML model fits which problem, and how one project runs from framing to production."
+    link="/docs/data-science/"
+    cta="View Notes"
+  />
+  <ContentCard
+    icon="🧮"
+    title="Algorithms & SQL"
+    description="LeetCode patterns grouped by problem type, plus a SQL cheatsheet with practice queries."
+    link="/docs/algorithms/arrays"
+    cta="Study Now"
+  />
+</div>
+
+## Reading the notes
+
+| You'll see | It means |
+|---|---|
+| 🔥 Core | Topic is tested directly in hands-on interview rounds |
+| → See | The full explanation lives on the linked page |
+| ✅ Check | The lab ends with a PASS/FAIL test you can run |
+
+:::tip Outside resources
+
+- **Kubernetes**: [Kubernetes docs](https://kubernetes.io/docs/home/) · [CKAD curriculum](https://github.com/cncf/curriculum)
+- **Google Cloud**: [Google Cloud docs](https://cloud.google.com/docs) · [PCA exam guide](https://cloud.google.com/learn/certification/cloud-architect)
+- **Interviews**: [Tech Interview Handbook](https://www.techinterviewhandbook.org/) · [LeetCode](https://leetcode.com/)
 
 :::
