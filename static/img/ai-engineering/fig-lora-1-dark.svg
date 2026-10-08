@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 280" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="One linear layer with LoRA: the input goes through the frozen weight matrix W and, in parallel, through two small trained matrices A and B of rank 8 and a scale of alpha over r; the two paths are summed to give the output">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="900" height="260" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">ONE LINEAR LAYER WITH LoRA</text>
+  <rect x="30" y="110" width="110" height="60" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="85" y="135" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Input x</text>
+  <text x="85" y="154" text-anchor="middle" font-size="11" fill="#8896a8">d = 4096</text>
+  <rect x="220" y="46" width="370" height="64" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="405" y="73" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">W · frozen</text>
+  <text x="405" y="92" text-anchor="middle" font-size="11" fill="#8896a8">4096 × 4096 ≈ 16.8M weights</text>
+  <rect x="220" y="170" width="110" height="64" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="275" y="197" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">A · trained</text>
+  <text x="275" y="216" text-anchor="middle" font-size="11" fill="#8896a8">8 × 4096</text>
+  <rect x="350" y="170" width="110" height="64" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="405" y="197" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">B · trained</text>
+  <text x="405" y="216" text-anchor="middle" font-size="11" fill="#8896a8">4096 × 8</text>
+  <rect x="480" y="170" width="110" height="64" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="535" y="197" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Scale</text>
+  <text x="535" y="216" text-anchor="middle" font-size="11" fill="#8896a8">× alpha / r</text>
+  <rect x="640" y="116" width="48" height="48" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="664" y="145" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">+</text>
+  <rect x="730" y="110" width="160" height="60" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="810" y="135" text-anchor="middle" font-size="13" font-weight="700" fill="#b8dcc6">Output</text>
+  <text x="810" y="154" text-anchor="middle" font-size="11" fill="#8896a8">Wx + scaled B(Ax)</text>
+  <polyline points="142,140 180,140 180,78 218,78" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="180,140 180,202 218,202" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="332,202 348,202" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="462,202 478,202" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="592,78 664,78 664,114" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="592,202 664,202 664,166" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="690,140 728,140" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="340" y="254" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#202329" stroke-width="4" paint-order="stroke">rank r = 8 · A + B ≈ 65k trained weights, about 0.4% of W</text>
+</svg>

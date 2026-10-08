@@ -1,20 +1,21 @@
 # New Documentation Page
 
-Create or extend a page in the ML Engineering section (`docs/ml-engineering/`) following the established conventions in this repo.
+Create or extend a page in the AI Engineering section (`docs/ai-engineering/`) following the established conventions in this repo.
 
 ## What to ask the user
 
 Before writing anything, ask for:
 1. **Topic name** — e.g. "Streaming Responses", "Background Tasks"
-2. **Section** — LLM Inference or RAG
+2. **Section** — LLM Inference, RAG, or Fine-Tuning
 3. **Scope** — stub (outline + official docs only) or expanded (fully written)
 
 ## Where it goes
 
 | Section | Directory | New file or append? |
 |---|---|---|
-| LLM Inference | `docs/ml-engineering/llm-inference/` | New file per topic |
-| RAG | `docs/ml-engineering/rag/` | **Append to an existing page.** Only create a new file if a page becomes unwieldy. |
+| LLM Inference | `docs/ai-engineering/llm-inference/` | New file per topic |
+| RAG | `docs/ai-engineering/rag/` | **Append to an existing page.** Only create a new file if a page becomes unwieldy. |
+| Fine-Tuning | `docs/ai-engineering/fine-tuning/` | Append to `index.md`, `lora.md` or `distillation.md`; new file only for a new method family |
 
 RAG has five content pages covering the whole pipeline. A new RAG technique is a new `##` section or a new table row on the page that owns that decision, not a new file:
 
@@ -32,7 +33,7 @@ File name for a new page: kebab-case of the topic. "Background Tasks" → `backg
 
 Sidebar position: check existing files in the target directory and use the next available integer.
 
-`docs/ml-engineering/archive/` holds the retired FastAPI foundation pages. Every file there carries `draft: true`, so it is excluded from the production build and visible only under `npm start`. Do not add pages there, and **never link to an archive page from a published page** — a link to a draft page fails `npm run build`.
+`docs/ai-engineering/archive/` holds the retired FastAPI foundation pages. Every file there carries `draft: true`, so it is excluded from the production build and visible only under `npm start`. Do not add pages there, and **never link to an archive page from a published page** — a link to a draft page fails `npm run build`.
 
 ## Page structure — follow this exactly
 
@@ -74,7 +75,7 @@ One-liner rule the reader should remember.
 
 ## After creating the file
 
-1. Update `docs/ml-engineering/index.md` — add a linked row to the correct section table and renumber if needed.
+1. Update `docs/ai-engineering/index.md` — add a linked row to the correct section table and renumber if needed.
 2. Update `CLAUDE.md` if the section structure changed.
 3. Run `npm run build` to confirm no broken links. If it reports a broken link to a page that clearly exists, run `npm run clear` first — a stale `.docusaurus` cache produces phantom broken links.
 

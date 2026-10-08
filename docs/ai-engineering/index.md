@@ -3,7 +3,7 @@
 
 # Overview
 
-A practical deep dive into building production-ready LLM inference and RAG systems with FastAPI — framed around real customer problems and FDE-style architectural thinking.
+A practical deep dive into building production-ready LLM inference, RAG, and fine-tuning systems with FastAPI — framed around real customer problems and FDE-style architectural thinking.
 
 Every topic answers: *"A customer needed X — here's the architecture and tradeoffs."*
 
@@ -30,6 +30,14 @@ Every topic answers: *"A customer needed X — here's the architecture and trade
 | 8 | [Retrieval](./rag/retrieval.md) | Hybrid search, BM25, RRF, metadata filtering, reranking, agentic retrieval |
 | 9 | [Evaluation & Guardrails](./rag/evaluation.md) | Recall@k and MRR, RAGAS, how much eval is enough, escalation thresholds |
 | 10 | [Production](./rag/production.md) | Latency budget, corpus scaling, tenant isolation, airgapped deployment |
+
+### Fine-Tuning
+
+| # | Topic | What it covers |
+|---|---|---|
+| 11 | [Fine-Tuning](./fine-tuning/index.md) | When to fine-tune, benefits and costs, full fine-tuning vs PEFT, pitfalls |
+| 12 | [LoRA](./fine-tuning/lora.md) | Low-rank updates, rank/alpha/target layers, QLoRA, merge vs multi-LoRA serving |
+| 13 | [Distillation](./fine-tuning/distillation.md) | Sequence-level distillation with LoRA, on-policy logit distillation (reverse vs top-K forward KL) |
 
 ### Archive — FastAPI Foundations
 

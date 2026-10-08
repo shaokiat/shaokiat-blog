@@ -80,4 +80,4 @@ Same numbers as the [Classification](../supervised/classification.md) page: 10,0
 4. **[Training](./model-training.md)** — why random k-fold lies on this problem and a time-based split doesn't.
 5. **[Production](./inference-and-production.md)** — monthly batch scoring, drift after a rush order doubles shifts, and proving it worked when labels arrive 30 days late.
 
-Where this section ends, [ML Engineering](../../ml-engineering/index.md) begins: serving the model behind an API, background jobs, streaming. This section owns the *decisions*; that one owns the FastAPI code.
+Where this section ends, [AI Engineering](../../ai-engineering/index.md) begins: serving the model behind an API, background jobs, streaming. This section owns the *decisions*; that one owns the FastAPI code.
