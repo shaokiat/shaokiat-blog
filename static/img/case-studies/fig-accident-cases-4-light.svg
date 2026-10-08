@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 540" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Ingestion pipeline in six stages, top to bottom: capture changes, extract content, clean and normalize, resolve entities, build case documents, index; low-confidence extractions and uncertain entity matches go to human review">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="760" height="520" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">WRITE PATH · INGESTION PIPELINE</text>
+  <rect x="160" y="46" width="300" height="56" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="310" y="69" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">1 · Capture changes</text>
+  <text x="310" y="88" text-anchor="middle" font-size="11" fill="#4a5568">CDC and file watcher</text>
+  <polyline points="310,104 310,124" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="160" y="126" width="300" height="56" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="310" y="149" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">2 · Extract content</text>
+  <text x="310" y="168" text-anchor="middle" font-size="11" fill="#4a5568">OCR, vision, layout parsing</text>
+  <polyline points="310,184 310,204" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="160" y="206" width="300" height="56" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="310" y="229" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">3 · Clean and normalize</text>
+  <text x="310" y="248" text-anchor="middle" font-size="11" fill="#4a5568">codes, dates, addresses</text>
+  <polyline points="310,264 310,284" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="160" y="286" width="300" height="56" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="310" y="309" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">4 · Resolve entities</text>
+  <text x="310" y="328" text-anchor="middle" font-size="11" fill="#4a5568">link people and vehicles</text>
+  <polyline points="310,344 310,364" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="160" y="366" width="300" height="56" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="310" y="389" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">5 · Build case documents</text>
+  <text x="310" y="408" text-anchor="middle" font-size="11" fill="#4a5568">one record per case</text>
+  <polyline points="310,424 310,444" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="160" y="446" width="300" height="56" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="310" y="469" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5c3d">6 · Index</text>
+  <text x="310" y="488" text-anchor="middle" font-size="11" fill="#4a5568">SQL, embeddings, metadata</text>
+  <rect x="560" y="190" width="180" height="64" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="650" y="217" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">Human review</text>
+  <text x="650" y="236" text-anchor="middle" font-size="11" fill="#4a5568">low confidence</text>
+  <polyline points="462,154 650,154 650,188" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="556" y="146" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">low confidence</text>
+  <polyline points="462,314 650,314 650,256" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="556" y="306" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">uncertain match</text>
+</svg>

@@ -56,7 +56,7 @@ const SKILLS = [
   },
 ];
 
-function ContentCard({ icon, title, description, link, cta }) {
+export function ContentCard({ icon, title, description, link, cta }) {
   return (
     <div className={styles.contentCard}>
       <span className={styles.cardIcon}>{icon}</span>

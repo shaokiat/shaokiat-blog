@@ -28,6 +28,8 @@ Every page in this section uses the same system: **Meridian Support Assist**, an
 
 The numbers are made up. The shape is not.
 
+See it applied: [Accident Case Management case study](../../genai-agents/case-studies/accident-case-management.md)
+
 ---
 
 ## RAG is a retrieval problem

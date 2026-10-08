@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 870 225" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="ReAct loop: the user query goes to a Thought step, which picks an Action, web search or run SQL; the Observation returns to Thought until the model is done or hits the step cap, then it answers">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="100" width="140" height="64" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="90" y="127" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">User query</text>
+  <text x="90" y="146" text-anchor="middle" font-size="11" fill="#8896a8">plain English</text>
+  <rect x="220" y="100" width="170" height="64" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="305" y="127" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Thought</text>
+  <text x="305" y="146" text-anchor="middle" font-size="11" fill="#8896a8">LLM picks next step</text>
+  <rect x="450" y="100" width="170" height="64" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="535" y="127" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Action</text>
+  <text x="535" y="146" text-anchor="middle" font-size="11" fill="#8896a8">web_search or run_sql</text>
+  <rect x="680" y="100" width="170" height="64" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="765" y="127" text-anchor="middle" font-size="13" font-weight="700" fill="#b8dcc6">Observation</text>
+  <text x="765" y="146" text-anchor="middle" font-size="11" fill="#8896a8">tool result</text>
+  <rect x="680" y="16" width="170" height="48" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="765" y="45" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Answer</text>
+  <polyline points="162,132 218,132" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="392,132 448,132" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="622,132 678,132" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="765,166 765,206 305,206 305,166" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="535" y="200" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#1b1b1d" stroke-width="4" paint-order="stroke">back to Thought: until done or step cap</text>
+  <polyline points="305,98 305,40 678,40" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="490" y="34" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#1b1b1d" stroke-width="4" paint-order="stroke">done</text>
+</svg>

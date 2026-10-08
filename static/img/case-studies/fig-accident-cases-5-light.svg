@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 535" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Data model: CASES and ENTITIES are joined by CASE_ENTITIES; CASES have DOCUMENTS, which yield EXTRACTIONS resolved to ENTITIES; CHUNKS belong to CASES and come from DOCUMENTS">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="50" y="40" width="220" height="130" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="62" y="60" text-anchor="start" font-size="12.5" fill="#1e3a4f" font-weight="700">CASES</text>
+  <line x1="50" y1="68" x2="270" y2="68" stroke="#3a6f9a" stroke-width="1"/>
+  <text x="62" y="86" text-anchor="start" font-size="10.5" fill="#4a5568">case_id PK</text>
+  <text x="62" y="102" text-anchor="start" font-size="10.5" fill="#4a5568">incident_type</text>
+  <text x="62" y="118" text-anchor="start" font-size="10.5" fill="#4a5568">occurred_at</text>
+  <text x="62" y="134" text-anchor="start" font-size="10.5" fill="#4a5568">location</text>
+  <text x="62" y="150" text-anchor="start" font-size="10.5" fill="#4a5568">status</text>
+  <text x="62" y="166" text-anchor="start" font-size="10.5" fill="#4a5568">access_level</text>
+  <rect x="390" y="40" width="220" height="82" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="402" y="60" text-anchor="start" font-size="12.5" fill="#1e3a4f" font-weight="700">CASE_ENTITIES</text>
+  <line x1="390" y1="68" x2="610" y2="68" stroke="#3a6f9a" stroke-width="1"/>
+  <text x="402" y="86" text-anchor="start" font-size="10.5" fill="#4a5568">case_id FK</text>
+  <text x="402" y="102" text-anchor="start" font-size="10.5" fill="#4a5568">entity_id FK</text>
+  <text x="402" y="118" text-anchor="start" font-size="10.5" fill="#4a5568">role</text>
+  <rect x="730" y="40" width="220" height="98" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="742" y="60" text-anchor="start" font-size="12.5" fill="#1e3a4f" font-weight="700">ENTITIES</text>
+  <line x1="730" y1="68" x2="950" y2="68" stroke="#3a6f9a" stroke-width="1"/>
+  <text x="742" y="86" text-anchor="start" font-size="10.5" fill="#4a5568">entity_id PK</text>
+  <text x="742" y="102" text-anchor="start" font-size="10.5" fill="#4a5568">entity_type</text>
+  <text x="742" y="118" text-anchor="start" font-size="10.5" fill="#4a5568">license_or_plate</text>
+  <text x="742" y="134" text-anchor="start" font-size="10.5" fill="#4a5568">display_name</text>
+  <rect x="50" y="230" width="220" height="98" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="62" y="250" text-anchor="start" font-size="12.5" fill="#52606d" font-weight="700">DOCUMENTS</text>
+  <line x1="50" y1="258" x2="270" y2="258" stroke="#94a3b8" stroke-width="1"/>
+  <text x="62" y="276" text-anchor="start" font-size="10.5" fill="#4a5568">document_id PK</text>
+  <text x="62" y="292" text-anchor="start" font-size="10.5" fill="#4a5568">case_id FK</text>
+  <text x="62" y="308" text-anchor="start" font-size="10.5" fill="#4a5568">doc_type</text>
+  <text x="62" y="324" text-anchor="start" font-size="10.5" fill="#4a5568">file_uri</text>
+  <rect x="730" y="230" width="220" height="114" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="742" y="250" text-anchor="start" font-size="12.5" fill="#713f12" font-weight="700">EXTRACTIONS</text>
+  <line x1="730" y1="258" x2="950" y2="258" stroke="#d97706" stroke-width="1"/>
+  <text x="742" y="276" text-anchor="start" font-size="10.5" fill="#4a5568">document_id FK</text>
+  <text x="742" y="292" text-anchor="start" font-size="10.5" fill="#4a5568">field_name</text>
+  <text x="742" y="308" text-anchor="start" font-size="10.5" fill="#4a5568">value</text>
+  <text x="742" y="324" text-anchor="start" font-size="10.5" fill="#4a5568">confidence</text>
+  <text x="742" y="340" text-anchor="start" font-size="10.5" fill="#4a5568">entity_id FK</text>
+  <rect x="50" y="390" width="220" height="130" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="62" y="410" text-anchor="start" font-size="12.5" fill="#1f5c3d" font-weight="700">CHUNKS</text>
+  <line x1="50" y1="418" x2="270" y2="418" stroke="#2d7a52" stroke-width="1"/>
+  <text x="62" y="436" text-anchor="start" font-size="10.5" fill="#4a5568">chunk_id PK</text>
+  <text x="62" y="452" text-anchor="start" font-size="10.5" fill="#4a5568">case_id FK</text>
+  <text x="62" y="468" text-anchor="start" font-size="10.5" fill="#4a5568">document_id FK</text>
+  <text x="62" y="484" text-anchor="start" font-size="10.5" fill="#4a5568">chunk_type</text>
+  <text x="62" y="500" text-anchor="start" font-size="10.5" fill="#4a5568">chunk_text</text>
+  <text x="62" y="516" text-anchor="start" font-size="10.5" fill="#4a5568">embedding</text>
+  <polyline points="272,80 388,80" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="330" y="72" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#ffffff" stroke-width="4" paint-order="stroke">involves</text>
+  <polyline points="728,80 612,80" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="670" y="72" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#ffffff" stroke-width="4" paint-order="stroke">appears in</text>
+  <polyline points="160,172 160,228" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="168" y="204" text-anchor="start" font-size="11" fill="#4a5568" stroke="#ffffff" stroke-width="4" paint-order="stroke">has</text>
+  <polyline points="272,270 728,270" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="500" y="262" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#ffffff" stroke-width="4" paint-order="stroke">yields</text>
+  <polyline points="840,140 840,228" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="848" y="190" text-anchor="start" font-size="11" fill="#4a5568" stroke="#ffffff" stroke-width="4" paint-order="stroke">resolved to</text>
+  <polyline points="160,330 160,388" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="168" y="364" text-anchor="start" font-size="11" fill="#4a5568" stroke="#ffffff" stroke-width="4" paint-order="stroke">source of</text>
+  <polyline points="48,110 30,110 30,440 48,440" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="858" y="235" width="84" height="18" rx="9" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/><text x="900" y="248" text-anchor="middle" font-size="10.5" font-weight="600" fill="#713f12">the bridge</text>
+</svg>

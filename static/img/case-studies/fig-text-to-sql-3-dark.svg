@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 285" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Plan-and-execute: the planner writes the full plan upfront, code validates it, and the executor runs steps by dependency, the web fact first and then the SQL that uses it; a failed step goes to a replanner">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="76" width="120" height="64" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="80" y="113" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">User query</text>
+  <rect x="180" y="76" width="160" height="64" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="260" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Planner</text>
+  <text x="260" y="122" text-anchor="middle" font-size="11" fill="#8896a8">LLM, full plan upfront</text>
+  <rect x="380" y="76" width="150" height="64" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="455" y="103" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Validate plan</text>
+  <text x="455" y="122" text-anchor="middle" font-size="11" fill="#8896a8">code</text>
+  <rect x="570" y="30" width="260" height="156" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="584" y="49" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">EXECUTOR · BY DEPENDENCY</text>
+  <rect x="590" y="58" width="220" height="48" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="700" y="77" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">1 · Web fact</text>
+  <text x="700" y="96" text-anchor="middle" font-size="11" fill="#8896a8">the reference value</text>
+  <rect x="590" y="122" width="220" height="48" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="700" y="141" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">2 · SQL using it</text>
+  <text x="700" y="160" text-anchor="middle" font-size="11" fill="#8896a8">value bound as parameter</text>
+  <polyline points="700,108 700,120" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="870" y="80" width="110" height="56" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="925" y="113" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Answer</text>
+  <polyline points="142,108 178,108" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="342,108 378,108" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="532,108 568,108" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="832,108 868,108" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="570" y="220" width="260" height="52" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="700" y="241" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Replanner</text>
+  <text x="700" y="260" text-anchor="middle" font-size="11" fill="#8896a8">only when a step fails</text>
+  <polyline points="700,188 700,218" fill="none" stroke="#5b6675" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="708" y="207" text-anchor="start" font-size="11" fill="#8896a8" stroke="#1b1b1d" stroke-width="4" paint-order="stroke">step fails</text>
+  <polyline points="568,246 260,246 260,142" fill="none" stroke="#5b6675" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="414" y="240" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#1b1b1d" stroke-width="4" paint-order="stroke">new plan</text>
+</svg>
