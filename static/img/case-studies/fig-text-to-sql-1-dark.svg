@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 190" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Five areas in order: problem framing, decomposition, architecture, guardrails and evaluation, delivery, each with the output it produces; framing and decomposition are highlighted">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="980" height="170" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">CASE STUDY BREAKDOWN · WORK LEFT TO RIGHT</text>
+  <rect x="30" y="46" width="168" height="76" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="114" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Framing</text>
+  <text x="114" y="91" text-anchor="middle" font-size="11" fill="#8896a8">year · unit · definition</text>
+  <text x="114" y="105" text-anchor="middle" font-size="11" fill="#8896a8">trust · access</text>
+  <text x="114" y="148" text-anchor="middle" font-size="11" fill="#8896a8" font-weight="600">→ definitions</text>
+  <polyline points="200,84 220,84" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="222" y="46" width="168" height="76" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="306" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Decomposition</text>
+  <text x="306" y="91" text-anchor="middle" font-size="11" fill="#8896a8">required facts</text>
+  <text x="306" y="105" text-anchor="middle" font-size="11" fill="#8896a8">mapped to sources</text>
+  <text x="306" y="148" text-anchor="middle" font-size="11" fill="#8896a8" font-weight="600">→ fact-to-source map</text>
+  <polyline points="392,84 412,84" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="414" y="46" width="168" height="76" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="498" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Architecture</text>
+  <text x="498" y="91" text-anchor="middle" font-size="11" fill="#8896a8">components</text>
+  <text x="498" y="105" text-anchor="middle" font-size="11" fill="#8896a8">control flow</text>
+  <text x="498" y="148" text-anchor="middle" font-size="11" fill="#8896a8" font-weight="600">→ components</text>
+  <polyline points="584,84 604,84" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="606" y="46" width="168" height="76" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="690" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Guardrails</text>
+  <text x="690" y="91" text-anchor="middle" font-size="11" fill="#8896a8">checks</text>
+  <text x="690" y="105" text-anchor="middle" font-size="11" fill="#8896a8">success measures</text>
+  <text x="690" y="148" text-anchor="middle" font-size="11" fill="#8896a8" font-weight="600">→ checks + metrics</text>
+  <polyline points="776,84 796,84" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="798" y="46" width="168" height="76" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="882" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Delivery</text>
+  <text x="882" y="91" text-anchor="middle" font-size="11" fill="#8896a8">v1 scope</text>
+  <text x="882" y="105" text-anchor="middle" font-size="11" fill="#8896a8">upgrade triggers</text>
+  <text x="882" y="148" text-anchor="middle" font-size="11" fill="#8896a8" font-weight="600">→ v1 + triggers</text>
+</svg>

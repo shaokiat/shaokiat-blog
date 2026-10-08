@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Case Study: AI Assistant for Accident Case Management
 
-> Builds on: [RAG](../index.md) · [Ingestion & Indexing](../ingestion-and-indexing.md) · [Retrieval](../retrieval.md) · [Generation & Grounding](../generation.md) · [Evaluation & Guardrails](../evaluation.md)
+> Builds on: [RAG](../../ml-engineering/rag/index.md) · [Ingestion & Indexing](../../ml-engineering/rag/ingestion-and-indexing.md) · [Retrieval](../../ml-engineering/rag/retrieval.md) · [Generation & Grounding](../../ml-engineering/rag/generation.md) · [Evaluation & Guardrails](../../ml-engineering/rag/evaluation.md)
 
 A police force wants an AI system for accident cases, and the brief is three sentences long. This breakdown works through it the way a forward deployed engineer would: discovery before design, decomposition before architecture. It avoids the most common failure: jumping straight to "vector database + LLM" and building the wrong thing well.
 
@@ -30,8 +30,8 @@ No user. No workflow. No definition of "similar" or "rating". Framing closes the
 <ThemedImage
   alt="Five areas in order: framing, decomposition, architecture, guardrails and evaluation, delivery, each with the output it produces"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-1-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-1-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-1-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-1-dark.svg'),
   }}
 />
 
@@ -82,8 +82,8 @@ As stated, this is the highest-risk requirement in the brief. Raise it during fr
 <ThemedImage
   alt="Feedback loop: more policing in an area leads to more recorded incidents, which raise scores for residents, which justify more policing"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-2-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-2-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-2-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-2-dark.svg'),
   }}
 />
 
@@ -125,8 +125,8 @@ The system splits into a background **write path** and a live **read path** that
 <ThemedImage
   alt="Big picture: a background write path from the legacy system through ingestion into storage, and a live read path from officer to chatbot to retrieval, both sharing a storage layer of SQL store, vector index, workflow catalog and procedures index; access control, audit logs and evaluation span every layer"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-3-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-3-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-3-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-3-dark.svg'),
   }}
 />
 
@@ -167,8 +167,8 @@ Serialize every row as `column: value` text, embed it, and embed PDF text too. I
 <ThemedImage
   alt="Ingestion pipeline in six stages, top to bottom: capture changes, extract content, clean and normalize, resolve entities, build case documents, index; low-confidence extractions and uncertain entity matches go to human review"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-4-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-4-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-4-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-4-dark.svg'),
   }}
 />
 
@@ -211,7 +211,7 @@ A false merge gives someone another person's history. A missed match only loses 
 
 </details>
 
-→ See [The ingestion pipeline](../ingestion-and-indexing.md#the-ingestion-pipeline) and [Keeping the index current](../ingestion-and-indexing.md#keeping-the-index-current)
+→ See [The ingestion pipeline](../../ml-engineering/rag/ingestion-and-indexing.md#the-ingestion-pipeline) and [Keeping the index current](../../ml-engineering/rag/ingestion-and-indexing.md#keeping-the-index-current)
 
 ### Storage
 
@@ -222,8 +222,8 @@ Everything links through two keys: `case_id` and `entity_id`.
 <ThemedImage
   alt="Data model: CASES and ENTITIES are joined by CASE_ENTITIES; CASES have DOCUMENTS, which yield EXTRACTIONS resolved to ENTITIES; CHUNKS belong to CASES and come from DOCUMENTS"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-5-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-5-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-5-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-5-dark.svg'),
   }}
 />
 
@@ -332,7 +332,7 @@ results = client.search(
 
 **Filter before ranking.** Post-filtering takes the top-k by similarity and then drops non-matching rows, which can leave 2 results out of 10, or none. Pre-filtering ranks only matching records, and it's the only safe way to enforce access. **Use pgvector by default**: links, filters and access checks run in one transaction. A dedicated vector database earns its place at large scale. Then sync it through the pipeline, stamp `source_version` on every chunk, and monitor drift from SQL.
 
-→ See [Selectivity breaks ANN, not BM25](../retrieval.md#selectivity-breaks-ann-not-bm25) and [Choosing the vector store](../ingestion-and-indexing.md#choosing-the-vector-store)
+→ See [Selectivity breaks ANN, not BM25](../../ml-engineering/rag/retrieval.md#selectivity-breaks-ann-not-bm25) and [Choosing the vector store](../../ml-engineering/rag/ingestion-and-indexing.md#choosing-the-vector-store)
 
 ### Retrieval (read path)
 
@@ -343,8 +343,8 @@ One officer message usually holds several searches and a rule. An LLM planner sp
 <ThemedImage
   alt="Query planning: the planner turns the officer's message into vector search, keyword search, entity lookup and workflow rules; vector and keyword results are fused into ranked similar cases, while entity history and the workflow chosen by rules stay separate, and all three feed hydration and the answer"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-6-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-6-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-6-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-6-dark.svg'),
   }}
 />
 
@@ -392,7 +392,7 @@ Code validates and normalizes the plan before running it. It uppercases plates, 
 
 The planner handles every turn, follow-ups included, using the case state. Agent-style tool loops are an option later, for open-ended analyst queries.
 
-→ See [Plan and Execute](../../../genai-agents/agent_design_patterns.md#2-plan-and-execute) and [Query transformation](../retrieval.md#query-transformation)
+→ See [Plan and Execute](../agent_design_patterns.md#2-plan-and-execute) and [Query transformation](../../ml-engineering/rag/retrieval.md#query-transformation)
 
 #### Combining the results
 
@@ -438,7 +438,7 @@ Answer only from the sections above. Cite case and workflow IDs.
 If a section is empty or pending, say so and ask for what's missing.
 ```
 
-→ See [Combining them with RRF](../retrieval.md#combining-them-with-rrf), [Reranking](../retrieval.md#reranking) and [Grounding and citations](../generation.md#grounding-and-citations)
+→ See [Combining them with RRF](../../ml-engineering/rag/retrieval.md#combining-them-with-rrf), [Reranking](../../ml-engineering/rag/retrieval.md#reranking) and [Grounding and citations](../../ml-engineering/rag/generation.md#grounding-and-citations)
 
 #### Selecting the workflow
 
@@ -478,8 +478,8 @@ A decision table picks a base workflow, then add-ons:
 <ThemedImage
   alt="Conversation loop: each officer message goes to the planner LLM call, which returns state updates; code validates and merges them into the case state and reruns only what changed against the stores; the answer LLM call replies from sectioned context; every turn is written to the audit log"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-7-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-7-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-7-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-7-dark.svg'),
   }}
 />
 
@@ -509,7 +509,7 @@ Three turns of one conversation:
 | 2 | "No injuries, the other driver stayed." | `injuries = false`, `other_driver_present = true` | Workflow rules only | W-RE-01 v3 with steps and forms F-12, F-19. "Confirm this workflow?" |
 | 3 | "Correction, the plate is ABC1243." | Plate ABC1234 → ABC1243 | Entity lookup and keyword search; similar cases re-fused | New entity history for ABC1243. Workflow unchanged. |
 
-→ See [Memory Management](../../../genai-agents/agent_design_patterns.md#9-memory-management)
+→ See [Memory Management](../agent_design_patterns.md#9-memory-management)
 
 ## Guardrails and evaluation
 
@@ -530,15 +530,15 @@ Three turns of one conversation:
 | Entity-resolution precision and recall | Linking quality. False merges weighted heavily. |
 | Time saved per case | The original goal |
 
-→ See [Retrieval metrics first](../evaluation.md#retrieval-metrics-first)
+→ See [Retrieval metrics first](../../ml-engineering/rag/evaluation.md#retrieval-metrics-first)
 
 ## Delivery
 
 <ThemedImage
   alt="Three delivery phases separated by gates: intake and workflow guidance, then similar case search after officer adoption and relevance feedback, then entity history and flags after governance is agreed"
   sources={{
-    light: useBaseUrl('/img/rag/fig-accident-cases-8-light.svg'),
-    dark: useBaseUrl('/img/rag/fig-accident-cases-8-dark.svg'),
+    light: useBaseUrl('/img/case-studies/fig-accident-cases-8-light.svg'),
+    dark: useBaseUrl('/img/case-studies/fig-accident-cases-8-dark.svg'),
   }}
 />
 

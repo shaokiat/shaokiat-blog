@@ -1,4 +1,4 @@
-"""Figures for docs/ml-engineering/rag/case-studies/: accident-cases-1 … accident-cases-8. Written to static/img/rag/.
+"""Figures for docs/genai-agents/case-studies/: accident-cases-1 … accident-cases-8. Written to static/img/case-studies/.
 
 Architecture figures (3–7) colour by role: blue write path / processing, amber read path / LLM,
 green storage, grey dashed human review, grey solid external source."""
@@ -6,7 +6,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fig
 from fig import *
-fig.OUT = str(fig.REPO / "static/img/rag")
+fig.OUT = str(fig.REPO / "static/img/case-studies")
 H, W = "#f6f8fa", "#ffffff"
 
 # ---- C1-1 the order to work through it ----
@@ -145,3 +145,125 @@ P = [outer(10, 10, 1000, 140, "DELIVERY · EACH GATE MUST PASS BEFORE THE NEXT P
      box(840, 50, 150, 72, "Phase 3", "entity history", "blue", sub2="+ flags", dashed=True),
      arrow((212, 86), (238, 86)), arrow((412, 86), (438, 86)), arrow((612, 86), (638, 86)), arrow((812, 86), (838, 86))]
 fig.save("accident-cases-8", 1020, 160, "Three delivery phases separated by gates: intake and procedures, then similar case search after officer adoption and relevance feedback, then entity history and flags after governance is agreed", P)
+
+
+# ======== Text-to-SQL with web search: text-to-sql-1 … text-to-sql-7 (C2-5 is Mermaid on the page) ========
+# Colour by role: amber LLM step, blue code, green data store / returns, grey external (web, user),
+# dashed grey failure or caveat path.
+
+# ---- C2-1 the order to work through it ----
+areas = [("Framing", "year · unit · definition", "trust · access", "amber", "definitions"),
+         ("Decomposition", "required facts", "mapped to sources", "amber", "fact-to-source map"),
+         ("Architecture", "components", "control flow", "blue", "components"),
+         ("Guardrails", "checks", "success measures", "blue", "checks + metrics"),
+         ("Delivery", "v1 scope", "upgrade triggers", "blue", "v1 + triggers")]
+P = [outer(10, 10, 980, 170, "CASE STUDY BREAKDOWN · WORK LEFT TO RIGHT")]
+for i, (t, s, s2, k, out) in enumerate(areas):
+    x = 30 + i * 192
+    P += [box(x, 46, 168, 76, t, s, k, sub2=s2), label(x + 84, 148, "→ " + out, color="#52606d", weight="600")]
+    if i < 4:
+        P.append(arrow((x + 170, 84), (x + 190, 84)))
+fig.save("text-to-sql-1", 1000, 190, "Five areas in order: problem framing, decomposition, architecture, guardrails and evaluation, delivery, each with the output it produces; framing and decomposition are highlighted", P)
+
+# ---- C2-2 ReAct loop ----
+P = [box(20, 100, 140, 64, "User query", "plain English", "grey"),
+     box(220, 100, 170, 64, "Thought", "LLM picks next step", "amber"),
+     box(450, 100, 170, 64, "Action", "web_search or run_sql", "blue"),
+     box(680, 100, 170, 64, "Observation", "tool result", "green"),
+     box(680, 16, 170, 48, "Answer", None, "amber"),
+     arrow((162, 132), (218, 132)), arrow((392, 132), (448, 132)), arrow((622, 132), (678, 132)),
+     arrow((765, 166), (765, 206), (305, 206), (305, 166)), label(535, 200, "back to Thought: until done or step cap", halo=W),
+     arrow((305, 98), (305, 40), (678, 40)), label(490, 34, "done", halo=W)]
+fig.save("text-to-sql-2", 870, 225, "ReAct loop: the user query goes to a Thought step, which picks an Action, web search or run SQL; the Observation returns to Thought until the model is done or hits the step cap, then it answers", P)
+
+# ---- C2-3 plan-and-execute ----
+P = [box(20, 76, 120, 64, "User query", None, "grey"),
+     box(180, 76, 160, 64, "Planner", "LLM, full plan upfront", "amber"),
+     box(380, 76, 150, 64, "Validate plan", "code", "blue"),
+     boundary(570, 30, 260, 156, "EXECUTOR · BY DEPENDENCY"),
+     box(590, 58, 220, 48, "1 · Web fact", "the reference value", "blue"),
+     box(590, 122, 220, 48, "2 · SQL using it", "value bound as parameter", "blue"),
+     arrow((700, 108), (700, 120)),
+     box(870, 80, 110, 56, "Answer", None, "amber"),
+     arrow((142, 108), (178, 108)), arrow((342, 108), (378, 108)), arrow((532, 108), (568, 108)), arrow((832, 108), (868, 108)),
+     box(570, 220, 260, 52, "Replanner", "only when a step fails", "amber", dashed=True),
+     arrow((700, 188), (700, 218), dashed=True, color=GREY), label(708, 207, "step fails", "start", halo=W),
+     arrow((568, 246), (260, 246), (260, 142), dashed=True, color=GREY), label(414, 240, "new plan", halo=W)]
+fig.save("text-to-sql-3", 1000, 285, "Plan-and-execute: the planner writes the full plan upfront, code validates it, and the executor runs steps by dependency, the web fact first and then the SQL that uses it; a failed step goes to a replanner", P)
+
+# ---- C2-4 where the SQL gets written ----
+def slot(i, span=1):
+    return 30 + i * 164, 140 + (span - 1) * 164
+P = [boundary(10, 10, 1000, 120, "OPTION A · SQL AT PLANNING"),
+     boundary(10, 150, 1000, 120, "OPTION B · FEED BACK BEFORE SQL")]
+A = [("Planner", "plan + SQL", "amber", 1, "with placeholder"), ("Web fact", "typed value", "amber", 1, None),
+     ("Checks", "code", "blue", 1, None), ("Bind and run SQL", "no LLM", "blue", 2, None), ("Answer", None, "amber", 1, None)]
+B = [("Planner", "SQL intent", "amber", 1, None), ("Web fact", "typed value", "amber", 1, None), ("Checks", "code", "blue", 1, None),
+     ("SQL writer", "LLM", "amber", 1, "sees fact metadata"), ("Run SQL", "value bound", "blue", 1, None), ("Answer", None, "amber", 1, None)]
+for y, row in ((40, A), (180, B)):
+    i = 0
+    for t, s, k, span, s2 in row:
+        x, w = slot(i, span)
+        P.append(box(x, y, w, 70, t, s, k, sub2=s2))
+        if i + span < 6:
+            P.append(arrow((x + w + 2, y + 35), (x + w + 22, y + 35)))
+        i += span
+fig.save("text-to-sql-4", 1020, 280, "Two options side by side: in option A the planner writes SQL with a placeholder upfront and code binds the checked web value; in option B a separate SQL writer LLM step writes the query after seeing the checked fact's metadata", P)
+
+# ---- C2-6 system overview ----
+CX, CW = 380, 240
+def spine(y, t, s, k):
+    return box(CX, y, CW, 64, t, s, k)
+P = [spine(20, "User", "question in plain English", "grey"),
+     spine(110, "Planner", "agent · schema tools only", "amber"),
+     spine(220, "Web fact", "code search + 1 LLM extraction", "amber"),
+     spine(330, "Checks", "source · range · definition", "blue"),
+     spine(440, "SQL writer", "LLM · uses fact metadata", "amber"),
+     spine(550, "SQL validator", "read-only · columns · placeholder", "blue"),
+     spine(660, "Execute", "bind value · run SQL", "blue"),
+     spine(770, "Answer", "result + provenance", "amber"),
+     box(40, 220, 200, 64, "Web", "trusted sources only", "grey"),
+     box(760, 330, 200, 76, "Database", "read-only role", "green"),
+     arrow((500, 86), (500, 108)),
+     arrow((500, 176), (500, 218)), label(508, 202, "needs web", "start", halo=W),
+     arrow((500, 286), (500, 328)),
+     arrow((500, 396), (500, 438)), label(508, 422, "pass", "start", halo=W),
+     arrow((500, 506), (500, 548)),
+     arrow((500, 616), (500, 658)), label(508, 642, "pass", "start", halo=W),
+     arrow((500, 726), (500, 768)),
+     arrow((242, 252), (378, 252), both=True), label(310, 246, "allowlist", halo=W),
+     arrow((622, 130), (860, 130), (860, 328), both=True), label(742, 124, "schema discovery", halo=W),
+     arrow((622, 692), (860, 692), (860, 408)), label(742, 686, "read-only", halo=W),
+     arrow((622, 156), (700, 156), (700, 456), (622, 456)), label(708, 300, "no web", "start", halo=W),
+     arrow((622, 600), (660, 600), (660, 488), (622, 488)), label(668, 548, "retry, max 1", "start", halo=W),
+     arrow((378, 362), (300, 362), (300, 794), (378, 794), dashed=True, color=GREY), label(339, 356, "fail", halo=W),
+     arrow((378, 582), (330, 582), (330, 814), (378, 814), dashed=True, color=GREY), label(354, 576, "fail", halo=W),
+     label(290, 640, "caveat", "end", halo=W, italic=True),
+     boundary(20, 856, 960, 34, "UNDER EVERY STEP · SHARED STATE + AUDIT LOG", dashed=True)]
+fig.save("text-to-sql-6", 1000, 900, "System overview: the user's question goes to the planner, which reads the database schema; when it needs the web, the web fact step searches trusted sources and extracts one typed fact, checks verify it, and the SQL writer, validator and execute steps run the query on the read-only database; failed checks or an invalid query after one retry go to the answer as a caveat; shared state and an audit log sit under every step", P)
+
+# ---- C2-7 LangGraph node graph ----
+def node(x, y, w, name, kind, t):
+    return pod(x, y, w, 58, name, None, kind, tag=t)
+P = [tag(20, 60, "START", "grey"),
+     node(100, 40, 140, "planner", "amber", "AGENT"),
+     node(290, 40, 120, "route", "grey", "EDGE"),
+     node(470, 40, 140, "web_fact", "amber", "LLM"),
+     node(660, 40, 130, "checks", "blue", "FUNCTION"),
+     node(100, 180, 140, "schema_tools", "blue", "TOOLS"),
+     node(290, 180, 130, "sql_writer", "amber", "LLM"),
+     node(470, 180, 140, "sql_validator", "blue", "FUNCTION"),
+     node(660, 180, 130, "execute_sql", "blue", "FUNCTION"),
+     node(840, 180, 130, "answer", "amber", "LLM"),
+     tag(1010, 200, "END", "grey"),
+     arrow((76, 69), (98, 69)), arrow((242, 69), (288, 69)),
+     arrow((170, 100), (170, 178), both=True),
+     arrow((412, 69), (468, 69)), label(440, 61, "needs web", halo=W),
+     arrow((612, 69), (658, 69)),
+     arrow((340, 100), (340, 178)), label(332, 140, "no web", "end", halo=W),
+     arrow((725, 100), (725, 140), (390, 140), (390, 178)), label(560, 134, "pass", halo=W),
+     arrow((422, 209), (468, 209)), arrow((612, 209), (658, 209)), arrow((792, 209), (838, 209)), arrow((972, 209), (1008, 209)),
+     arrow((520, 240), (520, 272), (355, 272), (355, 240)), label(438, 266, "retry, max 1", halo=W),
+     arrow((580, 240), (580, 292), (905, 292), (905, 240), dashed=True, color=GREY), label(742, 286, "fail", halo=W),
+     arrow((792, 69), (905, 69), (905, 178), dashed=True, color=GREY), label(848, 61, "fail", halo=W)]
+fig.save("text-to-sql-7", 1060, 305, "LangGraph node graph: START to the planner agent node, which calls schema tools; a conditional edge routes to web_fact and checks when the web is needed, otherwise straight to sql_writer; sql_validator retries the writer once, then execute_sql, answer and END; failed checks or validation go to answer", P)

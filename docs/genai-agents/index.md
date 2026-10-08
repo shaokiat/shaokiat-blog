@@ -6,7 +6,7 @@
 A working knowledge base for GenAI workflows and agentic systems — focused on practical evaluation of real implementations rather than theory.
 
 :::info Suggested reading order
-Start with **Agent Design Patterns** to build the vocabulary. Then read a **Use Case** to see the patterns applied to a concrete problem. Dip into **Core Concepts** as a use case links to them — they're reference pages, not a course. Cross-references link between all three throughout.
+Start with **Agent Design Patterns** to build the vocabulary. Then read a **Use Case** or a **Case Study** to see the patterns applied to a concrete problem. Dip into **Core Concepts** as needed — they're reference pages, not a course.
 :::
 
 ## Topics
@@ -32,6 +32,16 @@ End-to-end implementations that map each use case to the relevant patterns and w
 
 - [Data Validation Agent](./use_cases/data-validation-agent/index.md) — Tool Use, ReAct, HITL, Parallelization
 - [Researcher Agent](./use_cases/researcher-agent/index.md) — Plan-and-Execute, Parallelization, Pipeline/DAG, Guardrails
+
+### Case Studies
+
+- **Use Cases:** systems I built. Implementation, code, measured results.
+- **Case Studies:** design problems I worked through. Framing, tradeoffs, architecture, no build.
+
+Worked through the way a forward deployed engineer would: framing before design, tradeoffs before architecture.
+
+- [Accident Case Management](./case-studies/accident-case-management.md) — Plan-and-Execute, Tool Use, HITL, Guardrails
+- [Text-to-SQL with Web Search](./case-studies/text-to-sql-web-search.md) — Plan-and-Execute, Tool Use, Guardrails
 
 ### Model Context Protocol (MCP)
 
