@@ -8,7 +8,7 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 
 | Command | What it does |
 |---|---|
-| `/new-doc` | Create a new ML Engineering documentation page following the repo's style conventions |
+| `/new-doc` | Create a new AI Engineering documentation page following the repo's style conventions |
 | `/new-genai-doc` | Create a new GenAI Agents documentation page following the MCP guide's style conventions |
 | `/ckad-doc` | Write or edit a Kubernetes (CKAD) page: page contracts, figure helper, YAML/lab validation (also auto-loads for `docs/kubernetes-ckad/`) |
 
@@ -16,7 +16,7 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 
 ## Writing & Diagram Style
 
-Applies to every page under `docs/ml-engineering/` and `docs/google-professional-cloud-architect/`, when editing as well as when creating. `docs/genai-agents/` implementation pages are the exception — there the code *is* the artifact, so they keep it.
+Applies to every page under `docs/ai-engineering/` and `docs/google-professional-cloud-architect/`, when editing as well as when creating. `docs/genai-agents/` implementation pages are the exception — there the code *is* the artifact, so they keep it.
 
 **Prose**
 - Short declarative sentences. Prefer a period over an em-dash; chains of em-dashes read as machine-written.
@@ -65,12 +65,13 @@ Linking convention: use case pages link into concepts with `→ Concept: [Title]
 
 ---
 
-## ML Engineering Section
+## AI Engineering Section
 
-Content lives under `docs/ml-engineering/`. Two active subfolders plus an archive:
+Content lives under `docs/ai-engineering/`. Three active subfolders plus an archive:
 
 - `llm-inference/` (sidebar position 2) — model serving, vLLM, streaming, agent endpoints
 - `rag/` (position 3) — `index.md`, `ingestion-and-indexing.md`, `retrieval.md`, `generation.md`, `evaluation.md`, `production.md`, in that sidebar order
+- `fine-tuning/` (position 4) — `index.md` (when to fine-tune, full vs PEFT), `lora.md`, `distillation.md`. Reuses Meridian: distilling the hosted model into the on-prem open-weight model with LoRA. Figures come from `.claude/skills/ckad-doc/scripts/figures/fine_tuning.py` into `static/img/ai-engineering/`.
 - `archive/` — the old Tier 1 FastAPI foundation pages. Every page carries `draft: true`, so they are excluded from the production build and visible only via `npm start` (same pattern as the Supabase pages in `docs/database/`). Do not link to them from published pages: a link to a draft page breaks `npm run build`.
 
 RAG pages share one running example: **Meridian Support Assist**, a multi-tenant internal-docs assistant. Keep it when adding sections. New RAG material is appended to one of the five existing pages; add a sixth only when a page becomes unwieldy.

@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Case Study: AI Assistant for Accident Case Management
 
-> Builds on: [RAG](../../ml-engineering/rag/index.md) · [Ingestion & Indexing](../../ml-engineering/rag/ingestion-and-indexing.md) · [Retrieval](../../ml-engineering/rag/retrieval.md) · [Generation & Grounding](../../ml-engineering/rag/generation.md) · [Evaluation & Guardrails](../../ml-engineering/rag/evaluation.md)
+> Builds on: [RAG](../../ai-engineering/rag/index.md) · [Ingestion & Indexing](../../ai-engineering/rag/ingestion-and-indexing.md) · [Retrieval](../../ai-engineering/rag/retrieval.md) · [Generation & Grounding](../../ai-engineering/rag/generation.md) · [Evaluation & Guardrails](../../ai-engineering/rag/evaluation.md)
 
 A police force wants an AI system for accident cases, and the brief is three sentences long. This breakdown works through it the way a forward deployed engineer would: discovery before design, decomposition before architecture. It avoids the most common failure: jumping straight to "vector database + LLM" and building the wrong thing well.
 
@@ -211,7 +211,7 @@ A false merge gives someone another person's history. A missed match only loses 
 
 </details>
 
-→ See [The ingestion pipeline](../../ml-engineering/rag/ingestion-and-indexing.md#the-ingestion-pipeline) and [Keeping the index current](../../ml-engineering/rag/ingestion-and-indexing.md#keeping-the-index-current)
+→ See [The ingestion pipeline](../../ai-engineering/rag/ingestion-and-indexing.md#the-ingestion-pipeline) and [Keeping the index current](../../ai-engineering/rag/ingestion-and-indexing.md#keeping-the-index-current)
 
 ### Storage
 
@@ -332,7 +332,7 @@ results = client.search(
 
 **Filter before ranking.** Post-filtering takes the top-k by similarity and then drops non-matching rows, which can leave 2 results out of 10, or none. Pre-filtering ranks only matching records, and it's the only safe way to enforce access. **Use pgvector by default**: links, filters and access checks run in one transaction. A dedicated vector database earns its place at large scale. Then sync it through the pipeline, stamp `source_version` on every chunk, and monitor drift from SQL.
 
-→ See [Selectivity breaks ANN, not BM25](../../ml-engineering/rag/retrieval.md#selectivity-breaks-ann-not-bm25) and [Choosing the vector store](../../ml-engineering/rag/ingestion-and-indexing.md#choosing-the-vector-store)
+→ See [Selectivity breaks ANN, not BM25](../../ai-engineering/rag/retrieval.md#selectivity-breaks-ann-not-bm25) and [Choosing the vector store](../../ai-engineering/rag/ingestion-and-indexing.md#choosing-the-vector-store)
 
 ### Retrieval (read path)
 
@@ -392,7 +392,7 @@ Code validates and normalizes the plan before running it. It uppercases plates, 
 
 The planner handles every turn, follow-ups included, using the case state. Agent-style tool loops are an option later, for open-ended analyst queries.
 
-→ See [Plan and Execute](../agent_design_patterns.md#2-plan-and-execute) and [Query transformation](../../ml-engineering/rag/retrieval.md#query-transformation)
+→ See [Plan and Execute](../agent_design_patterns.md#2-plan-and-execute) and [Query transformation](../../ai-engineering/rag/retrieval.md#query-transformation)
 
 #### Combining the results
 
@@ -438,7 +438,7 @@ Answer only from the sections above. Cite case and workflow IDs.
 If a section is empty or pending, say so and ask for what's missing.
 ```
 
-→ See [Combining them with RRF](../../ml-engineering/rag/retrieval.md#combining-them-with-rrf), [Reranking](../../ml-engineering/rag/retrieval.md#reranking) and [Grounding and citations](../../ml-engineering/rag/generation.md#grounding-and-citations)
+→ See [Combining them with RRF](../../ai-engineering/rag/retrieval.md#combining-them-with-rrf), [Reranking](../../ai-engineering/rag/retrieval.md#reranking) and [Grounding and citations](../../ai-engineering/rag/generation.md#grounding-and-citations)
 
 #### Selecting the workflow
 
@@ -530,7 +530,7 @@ Three turns of one conversation:
 | Entity-resolution precision and recall | Linking quality. False merges weighted heavily. |
 | Time saved per case | The original goal |
 
-→ See [Retrieval metrics first](../../ml-engineering/rag/evaluation.md#retrieval-metrics-first)
+→ See [Retrieval metrics first](../../ai-engineering/rag/evaluation.md#retrieval-metrics-first)
 
 ## Delivery
 

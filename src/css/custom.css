@@ -162,6 +162,11 @@
   fill: transparent !important;
 }
 
+/* Mermaid 11 wraps edge labels in .labelBkg with a grey fill; use the page background as a halo instead */
+.docusaurus-mermaid-container .labelBkg {
+  background: var(--ifm-background-color) !important;
+}
+
 .docusaurus-mermaid-container .edgeLabel span,
 .docusaurus-mermaid-container .edgeLabel p {
   color: var(--ml-label) !important;

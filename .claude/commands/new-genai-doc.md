@@ -354,4 +354,4 @@ Start with the simplest pattern. Only reach for a more complex one when a specif
 |---|---|---|
 | Agent design patterns (tool use, HITL, guardrails, orchestrator) | `agent_design_patterns.md` | `#4-tool-use`, `#8-human-in-the-loop-hitl`, `#10-guardrails-and-validation`, `#5-orchestratorsubagent` |
 | MCP server/client architecture | `mcp.md` | `#what-youre-building`, `#how-it-works-end-to-end` |
-| Auth patterns | `../ml-engineering/foundation/auth-patterns.md` | — |
+| Auth patterns | `../ai-engineering/foundation/auth-patterns.md` | — |
