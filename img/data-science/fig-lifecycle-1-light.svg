@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 190" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Six stages in a row: frame, explore, preprocess, features, train, deploy. A dashed arrow loops from deploy back to explore for drift and retraining">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="880" height="170" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">ML PROJECT LIFECYCLE</text>
+  <rect x="30" y="46" width="124" height="58" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="92" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">Frame</text>
+  <text x="92" y="89" text-anchor="middle" font-size="11" fill="#4a5568">decision + label</text>
+  <rect x="173" y="46" width="124" height="58" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="235" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Explore</text>
+  <text x="235" y="89" text-anchor="middle" font-size="11" fill="#4a5568">EDA decision log</text>
+  <polyline points="154,75 171,75" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="316" y="46" width="124" height="58" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="378" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Preprocess</text>
+  <text x="378" y="89" text-anchor="middle" font-size="11" fill="#4a5568">leak-free pipeline</text>
+  <polyline points="297,75 314,75" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="459" y="46" width="124" height="58" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="521" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Features</text>
+  <text x="521" y="89" text-anchor="middle" font-size="11" fill="#4a5568">build, then delete</text>
+  <polyline points="440,75 457,75" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="602" y="46" width="124" height="58" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="664" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Train</text>
+  <text x="664" y="89" text-anchor="middle" font-size="11" fill="#4a5568">honest validation</text>
+  <polyline points="583,75 600,75" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="745" y="46" width="124" height="58" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="807" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Deploy</text>
+  <text x="807" y="89" text-anchor="middle" font-size="11" fill="#4a5568">monitor + prove</text>
+  <polyline points="726,75 743,75" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="807,106 807,146 235,146 235,106" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="450" y="141" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">drift or decay → back to explore, retrain</text>
+</svg>

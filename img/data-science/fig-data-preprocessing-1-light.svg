@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 310" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Timeline for one failed machine. The correct feature window covers the 30 days before the 1 May snapshot. The dashboard window covers the 30 days before the query ran on 10 June, which is almost entirely after the 12 May breakdown, when vibration was zero">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="880" height="290" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">ONE FAILED MACHINE</text>
+  <polyline points="200,50 860,50" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="860" y="40" text-anchor="end" font-size="11" fill="#4a5568">time</text>
+  <line x1="470" y1="40" x2="470" y2="268" stroke="#3a6f9a" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="470" y="284" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke" font-weight="600">snapshot · 1 May</text>
+  <line x1="532" y1="40" x2="532" y2="120" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="536" y="40" text-anchor="start" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">breakdown · 12 May</text>
+  <line x1="697" y1="140" x2="697" y2="268" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="703" y="284" text-anchor="start" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">query run · 10 Jun</text>
+  <text x="40" y="95" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Machine</text>
+  <rect x="200" y="74" width="332" height="36" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="366" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">running</text>
+  <rect x="532" y="74" width="165" height="36" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="614.5" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">stopped · vibration 0</text>
+  <text x="40" y="165" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Correct feature</text>
+  <rect x="300" y="144" width="170" height="36" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="385" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5c3d">30 days to snapshot</text>
+  <text x="40" y="235" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Dashboard feature</text>
+  <rect x="527" y="214" width="170" height="36" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="612" y="237" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">30 days to query run</text>
+</svg>

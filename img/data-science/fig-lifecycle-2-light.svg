@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Four rows. Three historical snapshots, one month apart, each with a 90-day feature window before the snapshot date and a 30-day label window after it. A fourth row scores today: features from the last 90 days, label not yet known">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="880" height="300" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">ONE ROW PER MACHINE PER SNAPSHOT</text>
+  <text x="30" y="73" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Snapshot 1 Jan</text>
+  <rect x="150" y="48" width="216" height="38" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="258" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">features</text>
+  <text x="258" y="81" text-anchor="middle" font-size="11" fill="#4a5568">90 days of events</text>
+  <rect x="366" y="48" width="72" height="38" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="402" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5c3d">label</text>
+  <line x1="366" y1="42" x2="366" y2="92" stroke="#d97706" stroke-width="2"/>
+  <text x="30" y="131" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Snapshot 1 Feb</text>
+  <rect x="224" y="106" width="216" height="38" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="332" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">features</text>
+  <text x="332" y="139" text-anchor="middle" font-size="11" fill="#4a5568">90 days of events</text>
+  <rect x="440" y="106" width="72" height="38" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="476" y="130" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5c3d">label</text>
+  <line x1="440" y1="100" x2="440" y2="150" stroke="#d97706" stroke-width="2"/>
+  <text x="30" y="189" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Snapshot 1 Mar</text>
+  <rect x="298" y="164" width="216" height="38" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="406" y="178" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">features</text>
+  <text x="406" y="197" text-anchor="middle" font-size="11" fill="#4a5568">90 days of events</text>
+  <rect x="514" y="164" width="72" height="38" rx="8" fill="#e3f1e8" stroke="#2d7a52" stroke-width="1.5"/>
+  <text x="550" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5c3d">label</text>
+  <line x1="514" y1="158" x2="514" y2="208" stroke="#d97706" stroke-width="2"/>
+  <text x="30" y="247" text-anchor="start" font-size="11" fill="#1e3a4f" font-weight="600">Scoring · today</text>
+  <rect x="520" y="222" width="216" height="38" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="628" y="236" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">features</text>
+  <text x="628" y="255" text-anchor="middle" font-size="11" fill="#4a5568">90 days of events</text>
+  <rect x="736" y="222" width="72" height="38" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="772" y="246" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">label</text>
+  <line x1="736" y1="216" x2="736" y2="266" stroke="#d97706" stroke-width="2"/>
+  <text x="450" y="290" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">amber line = snapshot date · features only from before it, label only from the 30 days after</text>
+</svg>
