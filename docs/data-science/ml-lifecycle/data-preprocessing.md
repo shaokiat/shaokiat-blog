@@ -66,7 +66,7 @@ The column came from an old dashboard query that computed "last 30 days" at quer
 | Validation score too good for the problem | AUC 0.99 on a problem where engineers can't call failures |
 | Collapse after launch | Production AUC 0.65 one month later |
 
-The fix is structural, not a reminder. One feature-building function takes `snapshot_date` and filters `event_time < snapshot_date` on every table. Dashboard queries, historian views and "convenient existing columns" are the usual carriers, because none were built with a [snapshot date](../start-here/glossary.md#snapshot-date) in mind. Rebuild a suspect feature from raw events through that function and watch the score drop to something honest.
+The fix is structural, not a reminder. One feature-building function takes `snapshot_date` and filters `event_time < snapshot_date` on every table. Dashboard queries, historian views and "convenient existing columns" are the usual carriers, because none were built with a [snapshot date](../glossary.md#snapshot-date) in mind. Rebuild a suspect feature from raw events through that function and watch the score drop to something honest.
 
 ### Missing values
 
@@ -132,7 +132,7 @@ On the plant data: `log1p` on load cycles, then `RobustScaler` across the numeri
 
 ### Encoding categoricals
 
-Cardinality picks the encoder. [Target encoding](../start-here/glossary.md#target-encoding) leaks by default unless it's out-of-fold.
+Cardinality picks the encoder. [Target encoding](../glossary.md#target-encoding) leaks by default unless it's out-of-fold.
 
 | Encoder | Use when | Plant example | Result |
 |---|---|---|---|

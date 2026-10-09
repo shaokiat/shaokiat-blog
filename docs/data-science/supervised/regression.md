@@ -290,7 +290,7 @@ Average hundreds of overfit trees and the overfitting cancels out. → See [bagg
 
 ### Gradient boosting
 
-Each tree fits the errors of the ensemble so far. Boosting removes bias, and [early stopping](../start-here/glossary.md#early-stopping) is non-negotiable. → See [bagging vs boosting](./index.md#ensembles-bagging-vs-boosting).
+Each tree fits the errors of the ensemble so far. Boosting removes bias, and [early stopping](../glossary.md#early-stopping) is non-negotiable. → See [bagging vs boosting](./index.md#ensembles-bagging-vs-boosting).
 
 | Library | Pick it when |
 |---|---|

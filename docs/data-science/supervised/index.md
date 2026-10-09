@@ -13,7 +13,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Overview
 
-Supervised learning trains a model on labelled input-output pairs and generalises the mapping to inputs it hasn't seen. This page owns the ideas every model shares: how to split data, [cross-validation](../start-here/glossary.md#cross-validation), the bias–variance trade-off, regularisation and ensembles. The two model pages build on it. The failure people hit is judging a model on the data it trained on, then watching it collapse on anything new.
+Supervised learning trains a model on labelled input-output pairs and generalises the mapping to inputs it hasn't seen. This page owns the ideas every model shares: how to split data, [cross-validation](../glossary.md#cross-validation), the bias–variance trade-off, regularisation and ensembles. The two model pages build on it. The failure people hit is judging a model on the data it trained on, then watching it collapse on anything new.
 
 ## Key concepts
 
@@ -85,7 +85,7 @@ Regularisation adds a penalty for complexity, moving a model left on Figure M0-1
 | **L2 (Ridge)** | Sum of squared weights | Shrinks all weights; stable with correlated features | [Ridge](./regression.md#ridge-regression-l2) |
 | **ElasticNet** | L1 + L2 | Sparsity that keeps correlated groups together | [ElasticNet](./regression.md#elasticnet) |
 
-Trees regularise differently: `max_depth`, minimum samples per leaf, and for boosting, learning rate plus [early stopping](../start-here/glossary.md#early-stopping).
+Trees regularise differently: `max_depth`, minimum samples per leaf, and for boosting, learning rate plus [early stopping](../glossary.md#early-stopping).
 
 ### Ensembles: bagging vs boosting
 
@@ -137,7 +137,7 @@ For the stages around model choice (framing, preprocessing, features, production
 
 - **Clarify:** what model, how much data, and how was validation drawn?
 - **Observe:** the gap between training and validation error is large; training error is near zero.
-- **Hypothesise:** high variance. The model memorised the training set. Less likely: [leakage](../start-here/glossary.md#leakage) in training only, or a distribution shift between splits.
+- **Hypothesise:** high variance. The model memorised the training set. Less likely: [leakage](../glossary.md#leakage) in training only, or a distribution shift between splits.
 - **Fix:** regularise (shallower trees, stronger penalty, early stopping) or add data.
 - **Prevent:** track training and validation curves together. The trade-off is a little training accuracy for generalisation.
 
@@ -149,7 +149,7 @@ For the stages around model choice (framing, preprocessing, features, production
 <summary>Model answer</summary>
 
 - **Clarify:** how much tuning time is there, and how much accuracy matters?
-- **Observe:** on the machine-failure data, the untuned forest scores [PR-AUC](../start-here/glossary.md#pr-auc) 0.40; tuned XGBoost 0.46.
+- **Observe:** on the machine-failure data, the untuned forest scores [PR-AUC](../glossary.md#pr-auc) 0.40; tuned XGBoost 0.46.
 - **Hypothesise:** the forest reduces variance with almost no tuning. Boosting reduces bias but needs early stopping and a search.
 - **Fix:** forest for a fast, robust baseline; boosting when the extra accuracy is worth the tuning bill.
 - **Prevent:** always have the forest as the baseline boosting must beat. The trade-off is one more model to train.
@@ -164,7 +164,7 @@ For the stages around model choice (framing, preprocessing, features, production
 - **Clarify:** how big is the data, and is it temporal?
 - **Observe:** scores vary by a few points across different random splits.
 - **Hypothesise:** a single split is a noisy estimate, and a lucky split flatters the model.
-- **Fix:** k-fold (stratified for classification), or a [time-based split](../start-here/glossary.md#time-based-split) for temporal data, reporting the mean and spread.
+- **Fix:** k-fold (stratified for classification), or a [time-based split](../glossary.md#time-based-split) for temporal data, reporting the mean and spread.
 - **Prevent:** cross-validation inside a pipeline as the default. The trade-off is k times the training cost.
 
 </details>

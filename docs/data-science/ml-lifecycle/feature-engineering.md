@@ -58,7 +58,7 @@ Selection is mostly deletion. The goal is the smallest feature set that keeps th
 | **Embedded** | [Lasso](../supervised/regression.md#lasso-regression-l1) for linear; permutation importance for trees | One fit | The main selection pass | Built-in `feature_importances_` favours high-cardinality features ([same warning](../supervised/classification.md#random-forest-classifier)) |
 | **Wrapper** | Recursive feature elimination | N refits | Small feature counts with cheap models | Rarely worth the compute |
 
-[Permutation importance](../start-here/glossary.md#permutation-importance) shuffles one column and measures the score drop. No drop means the model wasn't using it.
+[Permutation importance](../glossary.md#permutation-importance) shuffles one column and measures the score drop. No drop means the model wasn't using it.
 
 | Knob (`permutation_importance`) | Setting here | Why |
 |---|---|---|
@@ -74,7 +74,7 @@ Selection is mostly deletion. The goal is the smallest feature set that keeps th
 
 ### Explaining the model
 
-[SHAP](../start-here/glossary.md#shap) tells you what the model used, not what causes failures. The planners won't act on a score they can't interrogate, so explain at two levels.
+[SHAP](../glossary.md#shap) tells you what the model used, not what causes failures. The planners won't act on a score they can't interrogate, so explain at two levels.
 
 | Level | Method | Example | Use it for |
 |---|---|---|---|
@@ -85,11 +85,11 @@ Say the caveat in every readout. "Alarms drive failures" is a statement about th
 
 ## Gotchas
 
-- **Windows aligned to calendar periods.** "This month" crosses the [snapshot date](../start-here/glossary.md#snapshot-date). Count back from the snapshot instead.
+- **Windows aligned to calendar periods.** "This month" crosses the [snapshot date](../glossary.md#snapshot-date). Count back from the snapshot instead.
 - **Reimplementing features for serving.** Two code paths drift apart. Call one feature function from training and the batch job.
 - **Trusting `feature_importances_`.** Impurity importance inflates high-cardinality columns. Use permutation importance on the validation set.
 - **Selecting with a filter alone.** Correlation screens kill interaction features. Confirm with a model-based method.
-- **Reading SHAP as causation.** Attributions describe the model. Test interventions with a [control group](../start-here/glossary.md#control-group).
+- **Reading SHAP as causation.** Attributions describe the model. Test interventions with a [control group](../glossary.md#control-group).
 
 ## Scenario questions
 
@@ -106,7 +106,7 @@ Say the caveat in every readout. "Alarms drive failures" is a statement about th
 
 </details>
 
-**Q2 ★★ 60 features give [PR-AUC](../start-here/glossary.md#pr-auc) 0.46. 18 give 0.45. Which do you ship?**
+**Q2 ★★ 60 features give [PR-AUC](../glossary.md#pr-auc) 0.46. 18 give 0.45. Which do you ship?**
 
 <details>
 <summary>Model answer</summary>
@@ -126,7 +126,7 @@ Say the caveat in every readout. "Alarms drive failures" is a statement about th
 
 - **Clarify:** how was `machine_model` encoded, and with how many categories?
 - **Observe:** run permutation importance on the validation set and compare the ranking.
-- **Hypothesise:** impurity importance favours high-cardinality features. Or the [target encoding](../start-here/glossary.md#target-encoding) leaked if it wasn't out-of-fold.
+- **Hypothesise:** impurity importance favours high-cardinality features. Or the [target encoding](../glossary.md#target-encoding) leaked if it wasn't out-of-fold.
 - **Fix:** rank by permutation importance; check the encoder is out-of-fold.
 - **Prevent:** permutation importance is the default ranking. The trade-off is extra compute per evaluation.
 

@@ -29,7 +29,7 @@ Use classification when the target is a category: fails or runs, fraud or legit,
 
 ### Running example: machine failure
 
-Every model is applied to one problem: **predict which machines will have an unplanned breakdown in the next 30 days** from vibration, temperature, load cycles, service history and work orders. 10,000 machines, ~300 failures per window: a 3% positive class. The metric is [PR-AUC](../start-here/glossary.md#pr-auc), never accuracy. Numbers show the typical pattern, not one specific run.
+Every model is applied to one problem: **predict which machines will have an unplanned breakdown in the next 30 days** from vibration, temperature, load cycles, service history and work orders. 10,000 machines, ~300 failures per window: a 3% positive class. The metric is [PR-AUC](../glossary.md#pr-auc), never accuracy. Numbers show the typical pattern, not one specific run.
 
 | Model | ROC-AUC | PR-AUC | Notes |
 |---|---|---|---|
@@ -182,7 +182,7 @@ Hundreds of overfit trees and a majority vote. → See [bagging vs boosting](./i
 
 ### Gradient boosting classifiers
 
-Each tree trains on the previous ensemble's mistakes. [Early stopping](../start-here/glossary.md#early-stopping) is non-negotiable. → See [bagging vs boosting](./index.md#ensembles-bagging-vs-boosting).
+Each tree trains on the previous ensemble's mistakes. [Early stopping](../glossary.md#early-stopping) is non-negotiable. → See [bagging vs boosting](./index.md#ensembles-bagging-vs-boosting).
 
 | Library | Reach for it when |
 |---|---|
@@ -312,7 +312,7 @@ A universal approximator that boosting still usually beats on tabular data. Earn
 <details>
 <summary>Model answer</summary>
 
-- **Clarify:** what's the [base rate](../start-here/glossary.md#base-rate) of failures?
+- **Clarify:** what's the [base rate](../glossary.md#base-rate) of failures?
 - **Observe:** 3%. Predicting "no failure" for every machine also scores 97%.
 - **Hypothesise:** accuracy is dominated by the majority class and says nothing about catching failures.
 - **Fix:** report PR-AUC (0.46 for tuned XGBoost against 0.03 for the do-nothing model) and precision and recall at the chosen threshold.

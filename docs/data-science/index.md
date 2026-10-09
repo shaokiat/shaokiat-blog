@@ -5,7 +5,9 @@ sidebar_label: Overview
 
 # Data Science
 
-Study notes for applied machine learning, written for interviews: every page ends in scenario questions answered out loud, and every number comes from one of two running examples. The pages are for reading, not running. Start with the [Learning Path](./start-here/learning-path.md); look terms up in the [Glossary](./start-here/glossary.md).
+Study notes for applied machine learning, written for interviews: every page ends in scenario questions answered out loud, and every number comes from one of two running examples. The pages are for reading, not running. Read Section 1 before Section 2; look terms up in the [Glossary](./glossary.md).
+
+Question stars: ★ recall a fact · ★★ apply it to the running example · ★★★ diagnose a failure or design a trade-off.
 
 ## Running examples
 

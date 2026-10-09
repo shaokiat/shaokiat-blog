@@ -85,7 +85,7 @@ The retrieval/generation boundary is the shortlist: `retrieval.md` ends when the
 
 Content lives under `docs/data-science/`. Pages follow `/ds-doc`: the CKAD page contract (Overview → Key concepts → Gotchas → Scenario questions → Summary) without labs, setup or code blocks.
 
-- `index.md` — hub; `start-here/` — learning path and glossary
+- `index.md` — hub (reading order, star legend); `glossary.md` — one-line terms, linked from first prose mentions
 - `ml-lifecycle/` — framing → EDA → preprocessing → features → training → production, on the **machine-failure** example
 - `supervised/` — shared concepts, regression (**bike-rental** example), classification (machine failure)
 - `landscape.md` — unsupervised, deep learning, RL; `scenarios/` — interview-format end-to-end projects, hidden from the build by `exclude` in `docusaurus.config.js` until ready (don't link to them)

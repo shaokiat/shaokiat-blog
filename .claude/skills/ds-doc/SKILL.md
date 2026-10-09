@@ -1,6 +1,6 @@
 ---
 name: ds-doc
-description: Write or edit pages in docs/data-science/ (lifecycle and model reference pages, the predictive-maintenance scenario, hub, start-here pages, figures). Use when adding or changing Data Science study notes.
+description: Write or edit pages in docs/data-science/ (lifecycle and model reference pages, the predictive-maintenance scenario, hub, glossary, figures). Use when adding or changing Data Science study notes.
 ---
 
 # DS Doc
@@ -18,7 +18,7 @@ General prose rules live in CLAUDE.md → *Writing & Diagram Style*, including *
    | Reference (lifecycle) | `ml-lifecycle/*.md` | `ml-lifecycle/model-training.md` | `L<sidebar_position>` (Figure L4-1) |
    | Reference (models) | `supervised/*.md`, `landscape.md` | `supervised/classification.md` | `M<sidebar_position>`; landscape is `M3` |
    | Scenario | `scenarios/*.md` | `scenarios/predictive-maintenance.md` | `S<sidebar_position>` (Figure S1-1). Hidden from the build for now: don't link to it |
-   | Start Here | `start-here/learning-path.md`, `start-here/glossary.md` | themselves | none |
+   | Glossary | `glossary.md` | itself | none |
    | Hub | `index.md` | itself (modelled on the PCA `index.md`) | n/a |
 
    Model pages give each model an H3 with a one-sentence lead, an optional figure, and a two-column table (`Use when` / `Get it right` / `On the … data`).
@@ -31,7 +31,7 @@ General prose rules live in CLAUDE.md → *Writing & Diagram Style*, including *
 
 4. **Write to the page contract** (below), then add figures (see *Figures*).
 
-5. **Wire it in.** Link the first prose mention of a glossary term to `start-here/glossary.md#<term>` (new terms get a row with a `<Link id="term" />` anchor), add a hub bullet in `index.md`, update the learning path and backlinks, then:
+5. **Wire it in.** Link the first prose mention of a glossary term to `glossary.md#<term>` (new terms get a row with a `<Link id="term" />` anchor), add a hub bullet in `index.md` and backlinks, then:
 
    ```bash
    npm run build && python3 .claude/skills/ckad-doc/scripts/check_anchors.py docs/data-science

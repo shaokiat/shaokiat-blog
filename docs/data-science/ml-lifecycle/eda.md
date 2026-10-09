@@ -161,7 +161,7 @@ For any suspicious feature, ask three things: where the column came from, when i
 
 ### Stability over time
 
-Anything that shifted during the training window will shift again after you ship. Plot key feature medians and the [base rate](../start-here/glossary.md#base-rate) by month.
+Anything that shifted during the training window will shift again after you ship. Plot key feature medians and the [base rate](../glossary.md#base-rate) by month.
 
 | Finding | What it is | Where it goes |
 |---|---|---|
@@ -213,7 +213,7 @@ If a plot doesn't produce a row here, it was tourism.
 <summary>Model answer</summary>
 
 - **Clarify:** where does the column come from, and when is it computed?
-- **Observe:** `avg_vibration_last_30d` comes from a dashboard query, computed at query time, not at the [snapshot date](../start-here/glossary.md#snapshot-date).
+- **Observe:** `avg_vibration_last_30d` comes from a dashboard query, computed at query time, not at the [snapshot date](../glossary.md#snapshot-date).
 - **Hypothesise:** the window crosses the breakdown, so the feature sees the outcome.
 - **Fix:** mark it as a leak in the decision log; preprocessing rebuilds it from raw events.
 - **Prevent:** a standing leak scan where every suspicious separator gets its lineage traced. The trade-off is telling the manager the good news isn't real.

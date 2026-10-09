@@ -107,7 +107,7 @@ Two traps at the end of the lifecycle share one answer.
 | **The feedback loop eats your labels** | Technicians service flagged machines, so some don't fail *because of the intervention*. They look like false positives, and a retrained model learns "high-risk profile → didn't fail" |
 | **Prediction isn't impact** | "We flagged 120 machines and 80 didn't fail" doesn't mean 80 breakdowns prevented. Most may have run fine anyway |
 
-The answer is a **[control group](../start-here/glossary.md#control-group)**: a random slice of flagged, non-critical machines that stay on the old schedule. Nobody runs a safety-critical asset to failure for science.
+The answer is a **[control group](../glossary.md#control-group)**: a random slice of flagged, non-critical machines that stay on the old schedule. Nobody runs a safety-critical asset to failure for science.
 
 | Group | Failure rate |
 |---|---|

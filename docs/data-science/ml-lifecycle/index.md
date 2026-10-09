@@ -65,7 +65,7 @@ Every word is load-bearing.
 
 ### The snapshot date
 
-The [snapshot date](../start-here/glossary.md#snapshot-date) is the moment you freeze time. Every feature uses only data from before it. The label comes only from the window after it. This rule prevents the most expensive bug in applied ML: [leakage](./data-preprocessing.md#the-leakage-bug-that-scores-099).
+The [snapshot date](../glossary.md#snapshot-date) is the moment you freeze time. Every feature uses only data from before it. The label comes only from the window after it. This rule prevents the most expensive bug in applied ML: [leakage](./data-preprocessing.md#the-leakage-bug-that-scores-099).
 
 <ThemedImage
   alt="Three historical snapshots a month apart, each with a 90-day feature window before it and a 30-day label window after it, plus a scoring row today whose label is unknown"
@@ -154,7 +154,7 @@ This section owns the decisions. [AI Engineering](../../ai-engineering/index.md)
 <summary>Model answer</summary>
 
 - **Clarify:** what does a missed breakdown cost, and what does the rule miss?
-- **Observe:** the rule scores [PR-AUC](../start-here/glossary.md#pr-auc) 0.24; a quick logistic regression scores 0.31.
+- **Observe:** the rule scores [PR-AUC](../glossary.md#pr-auc) 0.24; a quick logistic regression scores 0.31.
 - **Hypothesise:** a model pays off only if it clears the rule by enough to cover monitoring, retraining and on-call.
 - **Fix:** build a time-boxed model. Ship it only if it clearly beats the rule (here 0.46, about double).
 - **Prevent:** the rule stays as the fallback and the yardstick. The trade-off is maintaining two systems for a while.

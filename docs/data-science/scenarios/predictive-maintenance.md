@@ -62,13 +62,13 @@ A plant network runs 10,000 machines. About 300 break down without warning in an
 
 ## Walkthrough
 
-**1. Frame the decision.** A monthly ranked list for limited inspection hours. That sets batch scoring, a ranking metric (PR-AUC) and a threshold driven by cost. The label: an unplanned breakdown in the 30 days after the [snapshot date](../start-here/glossary.md#snapshot-date), planned stops excluded.
+**1. Frame the decision.** A monthly ranked list for limited inspection hours. That sets batch scoring, a ranking metric (PR-AUC) and a threshold driven by cost. The label: an unplanned breakdown in the 30 days after the [snapshot date](../glossary.md#snapshot-date), planned stops excluded.
 
-**2. Score the rule first.** The CMMS rule (temperature alarm or over 5,000 hours since service) scores [PR-AUC](../start-here/glossary.md#pr-auc) 0.24. That's the bar.
+**2. Score the rule first.** The CMMS rule (temperature alarm or over 5,000 hours since service) scores [PR-AUC](../glossary.md#pr-auc) 0.24. That's the bar.
 
-**3. Audit before modelling.** The [base rate](../start-here/glossary.md#base-rate) is 3% and stable by month. 14 machines were marked failed after producing output, a broken ERP join fixed at source. `avg_vibration_last_30d` separated failures almost perfectly; its lineage was a query-time dashboard window, so it was rebuilt from raw events.
+**3. Audit before modelling.** The [base rate](../glossary.md#base-rate) is 3% and stable by month. 14 machines were marked failed after producing output, a broken ERP join fixed at source. `avg_vibration_last_30d` separated failures almost perfectly; its lineage was a query-time dashboard window, so it was rebuilt from raw events.
 
-**4. Build leak-free features.** One function takes the event tables and the snapshot date and filters to events before it. About 60 candidates (alarms, service hours, failed starts, vibration trend) were cut to 18 with [permutation importance](../start-here/glossary.md#permutation-importance), at a cost of 0.01 PR-AUC.
+**4. Build leak-free features.** One function takes the event tables and the snapshot date and filters to events before it. About 60 candidates (alarms, service hours, failed starts, vibration trend) were cut to 18 with [permutation importance](../glossary.md#permutation-importance), at a cost of 0.01 PR-AUC.
 
 **5. Validate the way production predicts.**
 
@@ -113,7 +113,7 @@ A plant network runs 10,000 machines. About 300 break down without warning in an
 
 - **Clarify:** how long will the new regime last?
 - **Observe:** load and temperature drift alerts fire in week one; matured PR-AUC drops a month later.
-- **Hypothesise:** [covariate drift](../start-here/glossary.md#covariate-drift) (inputs shift) and [concept drift](../start-here/glossary.md#concept-drift) (the same readings now mean higher risk).
+- **Hypothesise:** [covariate drift](../glossary.md#covariate-drift) (inputs shift) and [concept drift](../glossary.md#concept-drift) (the same readings now mean higher risk).
 - **Fix:** retrain on recent snapshots once enough labels mature, through the same validation and sign-off as the first model.
 - **Prevent:** drift-triggered retraining with gates, never automatic promotion. The trade-off is a weaker model for a few weeks.
 
@@ -125,7 +125,7 @@ A plant network runs 10,000 machines. About 300 break down without warning in an
 <summary>Model answer</summary>
 
 - **Clarify:** are flagged machines being serviced, and is the retraining data including them?
-- **Observe:** flagged-and-serviced machines rarely fail; in the [control group](../start-here/glossary.md#control-group), flagged machines fail at 22%.
+- **Observe:** flagged-and-serviced machines rarely fail; in the [control group](../glossary.md#control-group), flagged machines fail at 22%.
 - **Hypothesise:** the feedback loop. Interventions prevent failures, so serviced machines look like false positives.
 - **Fix:** measure precision on the control group, and retrain on control-group labels or mark serviced machines as censored.
 - **Prevent:** keep the control group permanently. The trade-off is a small, continuing cost of unserviced at-risk machines.

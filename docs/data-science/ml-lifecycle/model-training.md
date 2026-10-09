@@ -74,7 +74,7 @@ Random search beats grid search at equal budget, because the parameters that mat
 | Optuna (Bayesian) | ~50 trials | ✅ Use when fits are expensive. Later trials search near earlier winners |
 | Any search scored on the Jun test set | — | ❌ The test set stops measuring generalisation |
 
-Search inside the training window only. Tuning moved the failure XGBoost from [PR-AUC](../start-here/glossary.md#pr-auc) 0.42 to 0.46 and plateaued around trial 40. When the search flatlines, the next gain is in the [features](./feature-engineering.md), not the hyperparameters.
+Search inside the training window only. Tuning moved the failure XGBoost from [PR-AUC](../glossary.md#pr-auc) 0.42 to 0.46 and plateaued around trial 40. When the search flatlines, the next gain is in the [features](./feature-engineering.md), not the hyperparameters.
 
 | Knob (XGBoost) | Setting here | Why |
 |---|---|---|
@@ -111,8 +111,8 @@ A weak slice needs an explicit decision: ship with a documented carve-out ("plan
 
 ## Gotchas
 
-- **Random k-fold on monthly snapshots.** Validation leaks the future and over-reports. Split by [snapshot date](../start-here/glossary.md#snapshot-date).
-- **[Early stopping](../start-here/glossary.md#early-stopping) on the test set.** The early-stopping set is a tuning input. Stop on validation (May), never on Jun.
+- **Random k-fold on monthly snapshots.** Validation leaks the future and over-reports. Split by [snapshot date](../glossary.md#snapshot-date).
+- **[Early stopping](../glossary.md#early-stopping) on the test set.** The early-stopping set is a tuning input. Stop on validation (May), never on Jun.
 - **Re-scoring the test set after each tweak.** Each look turns it into a validation set and its number into fiction. Freeze decisions, then score once.
 - **Comparing runs on different data.** Without a data hash, a gain could be a new snapshot, not a better model. Log the snapshot range with every run.
 - **Tuning past the plateau.** 200 trials buying 0.01 is noise. Go back to features.
@@ -126,7 +126,7 @@ A weak slice needs an explicit decision: ship with a documented carve-out ("plan
 
 - **Clarify:** good compared to what? What does the plant do today?
 - **Observe:** score the maintenance rule (0.24) and logistic regression (0.31) on the same split.
-- **Hypothesise:** 0.46 could be strong or trivial. The [base rate](../start-here/glossary.md#base-rate) is 3%, so a random model scores about 0.03.
+- **Hypothesise:** 0.46 could be strong or trivial. The [base rate](../glossary.md#base-rate) is 3%, so a random model scores about 0.03.
 - **Fix:** report it as roughly double the current rule and +50% over linear.
 - **Prevent:** baselines go in the first experiment log, before any model. The trade-off is half a day spent on models nobody will ship.
 
