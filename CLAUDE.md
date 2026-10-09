@@ -88,7 +88,7 @@ Content lives under `docs/data-science/`. Pages follow `/ds-doc`: the CKAD page 
 - `index.md` — hub; `start-here/` — learning path and glossary
 - `ml-lifecycle/` — framing → EDA → preprocessing → features → training → production, on the **machine-failure** example
 - `supervised/` — shared concepts, regression (**bike-rental** example), classification (machine failure)
-- `landscape.md` — unsupervised, deep learning, RL; `scenarios/` — interview-format end-to-end projects
+- `landscape.md` — unsupervised, deep learning, RL; `scenarios/` — interview-format end-to-end projects, hidden from the build by `exclude` in `docusaurus.config.js` until ready (don't link to them)
 
 Figures: `fig.py` diagrams from `.claude/skills/ds-doc/scripts/figures/` into `static/img/data-science/`; data plots are inline `.ml-diagram` SVGs.
 

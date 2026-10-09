@@ -17,7 +17,7 @@ General prose rules live in CLAUDE.md → *Writing & Diagram Style*, including *
    |---|---|---|---|
    | Reference (lifecycle) | `ml-lifecycle/*.md` | `ml-lifecycle/model-training.md` | `L<sidebar_position>` (Figure L4-1) |
    | Reference (models) | `supervised/*.md`, `landscape.md` | `supervised/classification.md` | `M<sidebar_position>`; landscape is `M3` |
-   | Scenario | `scenarios/*.md` | `scenarios/predictive-maintenance.md` | `S<sidebar_position>` (Figure S1-1) |
+   | Scenario | `scenarios/*.md` | `scenarios/predictive-maintenance.md` | `S<sidebar_position>` (Figure S1-1). Hidden from the build for now: don't link to it |
    | Start Here | `start-here/learning-path.md`, `start-here/glossary.md` | themselves | none |
    | Hub | `index.md` | itself (modelled on the PCA `index.md`) | n/a |
 

@@ -164,7 +164,3 @@ Planned deep-dive pages, in priority order: anomaly detection and clustering on 
 - **Bagging fixes variance, boosting fixes bias.** Stacking trades complexity for a little of both.
 - **Deep learning earns its place with unstructured data or scale.** On small tabular data, boosting wins.
 - **RL needs a reward and a simulator.** Without both, it isn't the tool.
-
----
-
-**Next →** [Predictive Maintenance scenario](./scenarios/predictive-maintenance.md)

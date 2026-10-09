@@ -19,7 +19,7 @@ Read the section in this order. Lifecycle first, because it's where projects fai
 | 3 | **Features and training** | [Feature Engineering](../ml-lifecycle/feature-engineering.md) · [Model Training](../ml-lifecycle/model-training.md) | Features Q1–Q4 · Training Q1–Q4 | 2.5 h |
 | 4 | **Production** | [Inference & Production](../ml-lifecycle/inference-and-production.md) | Production Q1–Q4 | 1 h |
 | 5 | **Models** | [Supervised Learning](../supervised/index.md) · [Regression](../supervised/regression.md) · [Classification](../supervised/classification.md) · [Model Landscape](../landscape.md) (skim) | Each page's Q1–Q4 | 4 h |
-| 6 | **Interview mode** | [Predictive Maintenance](../scenarios/predictive-maintenance.md): rehearse "How I'd explain" out loud | Follow-up Q1–Q3 · every ★★★ question again | 1.5 h |
+| 6 | **Interview mode** | Every page's Summary, said from memory | Every ★★★ question again, out loud | 1.5 h |
 
 ## How to use a phase
 

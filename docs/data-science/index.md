@@ -9,7 +9,7 @@ Study notes for applied machine learning, written for interviews: every page end
 
 ## Running examples
 
-- **Machine failure** — 10,000 machines, 3% fail in any 30-day window. Used by the [ML Project Lifecycle](./ml-lifecycle/index.md), [Classification](./supervised/classification.md) and the [Predictive Maintenance scenario](./scenarios/predictive-maintenance.md).
+- **Machine failure** — 10,000 machines, 3% fail in any 30-day window. Used by the [ML Project Lifecycle](./ml-lifecycle/index.md) and [Classification](./supervised/classification.md).
 - **Bike-rental demand** — hourly rentals from weather and time. Used by [Regression](./supervised/regression.md).
 
 ---
@@ -63,10 +63,6 @@ Study notes for applied machine learning, written for interviews: every page end
 ### 2.4 Beyond supervised → [Model Landscape](./landscape.md)
 - Unsupervised → [Clustering](./landscape.md#clustering) · [Anomaly detection](./landscape.md#anomaly-detection)
 - Deep learning and RL → [Deep learning](./landscape.md#deep-learning) · [Reinforcement learning](./landscape.md#reinforcement-learning)
-
-## Section 3: Scenarios
-
-- [Predictive Maintenance](./scenarios/predictive-maintenance.md) — the whole failure project as one interview answer
 
 ---
 

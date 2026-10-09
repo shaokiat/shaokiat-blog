@@ -31,7 +31,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl: "https://github.com/shaokiat/shaokiat-blog/tree/main/",
-          exclude: ["**/web-dev/**", "**/web3/**"],
+          exclude: ["**/web-dev/**", "**/web3/**", "**/data-science/scenarios/**"],
           // Kubernetes section: group pages by Learning Path phase instead of by folder.
           // File paths (and URLs) stay the same; only the sidebar grouping changes.
           async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {

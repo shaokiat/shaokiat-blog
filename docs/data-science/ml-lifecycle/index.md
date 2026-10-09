@@ -109,7 +109,6 @@ Agree the mapping up front. If you can't write it down, you'll ship a model with
 | [Features](./feature-engineering.md) | Rolling sensor windows from the snapshot date, then deleting most of them |
 | [Training](./model-training.md) | Why random k-fold lies on this problem and a time-based split doesn't |
 | [Production](./inference-and-production.md) | Monthly batch scoring, drift after a rush order, and proving impact with a control group |
-| [Scenario](../scenarios/predictive-maintenance.md) | The whole project as an interview answer |
 
 This section owns the decisions. [AI Engineering](../../ai-engineering/index.md) owns the serving code.
 
