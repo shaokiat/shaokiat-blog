@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Historian, CMMS and ERP feed a snapshot-filtered feature function and a serialized pipeline that scores 10,000 machines monthly. Top-ranked machines go to inspection, a random slice of flagged machines stays on the old schedule as a control group, monitoring watches scores and drift, and outcomes return as labels 30 days later">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4a7fa5"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="880" height="340" rx="14" fill="#202329" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">PREDICTIVE MAINTENANCE · MONTHLY BATCH</text>
+  <rect x="26" y="40" width="170" height="230" rx="12" fill="#2a2f37" stroke="#3f4854" stroke-width="1.5"/>
+  <text x="40" y="59" font-size="10" font-weight="600" letter-spacing="1.2" fill="#8896a8">SOURCES</text>
+  <rect x="40" y="66" width="142" height="50" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="111" y="86" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Historian</text>
+  <text x="111" y="105" text-anchor="middle" font-size="11" fill="#8896a8">sensor readings</text>
+  <rect x="40" y="132" width="142" height="50" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="111" y="152" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">CMMS</text>
+  <text x="111" y="171" text-anchor="middle" font-size="11" fill="#8896a8">work orders, failures</text>
+  <rect x="40" y="198" width="142" height="50" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="111" y="218" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">ERP</text>
+  <text x="111" y="237" text-anchor="middle" font-size="11" fill="#8896a8">install dates, models</text>
+  <rect x="236" y="116" width="160" height="62" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="316" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">build_features</text>
+  <text x="316" y="161" text-anchor="middle" font-size="11" fill="#8896a8">events before snapshot</text>
+  <rect x="436" y="116" width="150" height="62" rx="8" fill="#3d3320" stroke="#a5822f" stroke-width="1.5"/>
+  <text x="511" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#e0cfa8">Pipeline</text>
+  <text x="511" y="161" text-anchor="middle" font-size="11" fill="#8896a8">preprocess + XGBoost</text>
+  <rect x="626" y="116" width="120" height="62" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="686" y="142" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Scores</text>
+  <text x="686" y="161" text-anchor="middle" font-size="11" fill="#8896a8">10,000 machines</text>
+  <rect x="626" y="214" width="120" height="50" rx="8" fill="#1e3347" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="686" y="234" text-anchor="middle" font-size="13" font-weight="700" fill="#c5d5e8">Monitoring</text>
+  <text x="686" y="253" text-anchor="middle" font-size="11" fill="#8896a8">drift, volume, PR-AUC</text>
+  <rect x="780" y="72" width="96" height="50" rx="8" fill="#1f3529" stroke="#4a8f6a" stroke-width="1.5"/>
+  <text x="828" y="92" text-anchor="middle" font-size="13" font-weight="700" fill="#b8dcc6">Inspect</text>
+  <text x="828" y="111" text-anchor="middle" font-size="11" fill="#8896a8">top-ranked</text>
+  <rect x="780" y="160" width="96" height="50" rx="8" fill="#2a2f37" stroke="#5b6675" stroke-width="1.5"/>
+  <text x="828" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#8896a8">Control</text>
+  <text x="828" y="199" text-anchor="middle" font-size="11" fill="#8896a8">old schedule</text>
+  <polyline points="184,91 210,91 210,137 234,137" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="184,157 234,157" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="184,223 210,223 210,167 234,167" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="398,147 434,147" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="588,147 624,147" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="748,135 764,135 764,97 778,97" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="748,160 764,160 764,185 778,185" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="686,180 686,212" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M 828 212 L 828 310 L 300 310 L 300 180" fill="none" stroke="#4a7fa5" stroke-width="1.5" marker-end="url(#a)" stroke-dasharray="5 4"/>
+  <text x="560" y="304" text-anchor="middle" font-size="11" fill="#8896a8" stroke="#202329" stroke-width="4" paint-order="stroke">30 days later: outcomes become labels · control group gives clean labels and the impact number</text>
+</svg>

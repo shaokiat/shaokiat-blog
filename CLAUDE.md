@@ -11,6 +11,7 @@ This is a personal study and portfolio blog built with **Docusaurus v3**. Conten
 | `/new-doc` | Create a new AI Engineering documentation page following the repo's style conventions |
 | `/new-genai-doc` | Create a new GenAI Agents documentation page following the MCP guide's style conventions |
 | `/ckad-doc` | Write or edit a Kubernetes (CKAD) page: page contracts, figure helper, YAML/lab validation (also auto-loads for `docs/kubernetes-ckad/`) |
+| `/ds-doc` | Write or edit a Data Science page: CKAD-style contract without labs or code, figure forms, running-example numbers (also auto-loads for `docs/data-science/`) |
 
 ---
 
@@ -77,6 +78,19 @@ Content lives under `docs/ai-engineering/`. Three active subfolders plus an arch
 RAG pages share one running example: **Meridian Support Assist**, a multi-tenant internal-docs assistant. Keep it when adding sections. New RAG material is appended to one of the five existing pages; add a sixth only when a page becomes unwieldy.
 
 The retrieval/generation boundary is the shortlist: `retrieval.md` ends when the top ~5 chunks are chosen, `generation.md` starts there. Metadata is split the same way — `ingestion-and-indexing.md` owns what is attached and how it is indexed, `retrieval.md` owns how it gates, boosts, and interacts with ANN selectivity.
+
+---
+
+## Data Science Section
+
+Content lives under `docs/data-science/`. Pages follow `/ds-doc`: the CKAD page contract (Overview → Key concepts → Gotchas → Scenario questions → Summary) without labs, setup or code blocks.
+
+- `index.md` — hub; `start-here/` — learning path and glossary
+- `ml-lifecycle/` — framing → EDA → preprocessing → features → training → production, on the **machine-failure** example
+- `supervised/` — shared concepts, regression (**bike-rental** example), classification (machine failure)
+- `landscape.md` — unsupervised, deep learning, RL; `scenarios/` — interview-format end-to-end projects
+
+Figures: `fig.py` diagrams from `.claude/skills/ds-doc/scripts/figures/` into `static/img/data-science/`; data plots are inline `.ml-diagram` SVGs.
 
 ---
 

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Top: bagging trains deep trees in parallel on bootstrap samples and averages them, cancelling variance. Bottom: boosting trains shallow trees in sequence, each fitting the residuals of the ensemble so far, and sums them, cancelling bias">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#3a6f9a"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="10" width="880" height="230" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="30" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">BAGGING · RANDOM FOREST · TREES IN PARALLEL</text>
+  <rect x="30" y="104" width="130" height="50" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="95" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Training data</text>
+  <rect x="220" y="44" width="150" height="50" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="295" y="64" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">Bootstrap 1</text>
+  <text x="295" y="83" text-anchor="middle" font-size="11" fill="#4a5568">random rows + features</text>
+  <rect x="420" y="44" width="150" height="50" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="495" y="64" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Deep tree 1</text>
+  <text x="495" y="83" text-anchor="middle" font-size="11" fill="#4a5568">low bias, high variance</text>
+  <polyline points="162,129 190,129 190,69 218,69" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="372,69 418,69" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="572,69 610,69 610,129 638,129" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="220" y="106" width="150" height="50" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="295" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">Bootstrap 2</text>
+  <text x="295" y="145" text-anchor="middle" font-size="11" fill="#4a5568">random rows + features</text>
+  <rect x="420" y="106" width="150" height="50" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="495" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Deep tree 2</text>
+  <text x="495" y="145" text-anchor="middle" font-size="11" fill="#4a5568">low bias, high variance</text>
+  <polyline points="162,129 190,129 190,131 218,131" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="372,131 418,131" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="572,131 610,131 610,129 638,129" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="220" y="168" width="150" height="50" rx="8" fill="#eef2f6" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="295" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#52606d">Bootstrap 3</text>
+  <text x="295" y="207" text-anchor="middle" font-size="11" fill="#4a5568">random rows + features</text>
+  <rect x="420" y="168" width="150" height="50" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="495" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Deep tree 3</text>
+  <text x="495" y="207" text-anchor="middle" font-size="11" fill="#4a5568">low bias, high variance</text>
+  <polyline points="162,129 190,129 190,193 218,193" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="372,193 418,193" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <polyline points="572,193 610,193 610,129 638,129" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="640" y="100" width="220" height="58" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="750" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">Average or vote</text>
+  <text x="750" y="143" text-anchor="middle" font-size="11" fill="#4a5568">cancels variance</text>
+  <rect x="10" y="260" width="880" height="150" rx="14" fill="#f6f8fa" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="26" y="280" font-size="10" font-weight="600" letter-spacing="1.2" fill="#52606d">BOOSTING · XGBOOST · TREES IN SEQUENCE</text>
+  <rect x="30" y="300" width="140" height="54" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="100" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Shallow tree 1</text>
+  <text x="100" y="341" text-anchor="middle" font-size="11" fill="#4a5568">rough fit</text>
+  <rect x="200" y="300" width="140" height="54" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="270" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Shallow tree 2</text>
+  <text x="270" y="341" text-anchor="middle" font-size="11" fill="#4a5568">fits tree 1&#x27;s errors</text>
+  <polyline points="172,327 198,327" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="185" y="376" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">residuals</text>
+  <rect x="370" y="300" width="140" height="54" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="440" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">Shallow tree 3</text>
+  <text x="440" y="341" text-anchor="middle" font-size="11" fill="#4a5568">fits what&#x27;s left</text>
+  <polyline points="342,327 368,327" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="355" y="376" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">residuals</text>
+  <rect x="540" y="300" width="140" height="54" rx="8" fill="#dce8f5" stroke="#3a6f9a" stroke-width="1.5"/>
+  <text x="610" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a4f">… tree N</text>
+  <text x="610" y="341" text-anchor="middle" font-size="11" fill="#4a5568">until early stop</text>
+  <polyline points="512,327 538,327" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="525" y="376" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">residuals</text>
+  <rect x="700" y="298" width="160" height="58" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="780" y="322" text-anchor="middle" font-size="13" font-weight="700" fill="#713f12">Weighted sum</text>
+  <text x="780" y="341" text-anchor="middle" font-size="11" fill="#4a5568">cancels bias</text>
+  <polyline points="682,327 698,327" fill="none" stroke="#3a6f9a" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="450" y="398" text-anchor="middle" font-size="11" fill="#4a5568" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">early stopping picks how many trees · each one adds learning_rate × its fit</text>
+</svg>

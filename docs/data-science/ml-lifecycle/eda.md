@@ -1,143 +1,177 @@
 ---
+title: Exploratory Data Analysis
+sidebar_label: Exploratory Data Analysis
 sidebar_position: 1
 ---
 
 # Exploratory Data Analysis
 
-EDA is not tourism. Wandering through plots until something looks interesting is how notebooks grow to 200 cells with no decisions in them. EDA is hypothesis generation with a deadline: every plot should either change a decision downstream or get deleted.
+> Docs: [pandas group by](https://pandas.pydata.org/docs/user_guide/groupby.html) · [Missing data](https://pandas.pydata.org/docs/user_guide/missing_data.html) · [Visualization](https://pandas.pydata.org/docs/user_guide/visualization.html) · Real data: [AI4I 2020 Predictive Maintenance](https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset), [UCI Bike Sharing](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset)
 
-Timebox it. A day of focused EDA on a new problem, half a day on a familiar one. The output is a written list of findings and decisions, not the notebook itself.
+## Overview
 
----
+EDA is hypothesis generation with a deadline. Every plot either changes a decision downstream or gets deleted. Timebox it: a day on a new problem, half a day on a familiar one. The output is a half-page decision log, not the notebook. The failure people hit is tourism: a 200-cell notebook with no decisions in it, and a broken label discovered in week three.
 
-## Cheatsheet
+## Key concepts
+
+### Decisions at a glance
 
 | Question | Look at | You're hunting for | #1 failure mode |
 |---|---|---|---|
 | **Is the target sane?** | Base rate, label counts over time | Impossible labels, base-rate jumps | Modelling a broken label for two weeks |
-| **What shape is each feature?** | Histograms, log-scale for counts/hours | Skew, bimodality, impossible values | Trusting `df.describe()` means on skewed data |
+| **What shape is each feature?** | Histograms, log scale for counts and hours | Skew, bimodality, impossible values | Trusting `describe()` means on skewed data |
 | **Where are the gaps?** | Missingness rate and pattern per column | Structure in what's missing | Treating all gaps as random noise |
 | **Which machines fail?** | Failure rate by segment | Segments with 3× the base rate | Reporting one global rate |
 | **What predicts too well?** | Feature-vs-target separation | Leaks disguised as signal | Celebrating instead of auditing |
 | **Is the data stable?** | Distributions by month | Shifts, pipeline changes, regime breaks | Training across an undetected break |
 
----
+### Start with the target
 
-## Start With the Target
+Ten minutes on the label beats ten hours on the features. "Failed" is not a fact of nature. It's a definition from the [framing stage](./index.md#the-label) plus a join between the CMMS and the ERP, and it inherits their bugs.
 
-> **Remember one thing:** ten minutes on the label beats ten hours on the features. If the target is broken, everything downstream is decoration.
-
-Before any feature work, interrogate the label the [framing stage](./index.md#2-what-exactly-is-the-label) defined:
-
-```python
-df.failed.value_counts(normalize=True)   # base rate: 0.03
-df.groupby(df.snapshot_date.dt.to_period("M")).failed.mean()  # stable ~3% per month?
-```
-
-Three checks on the plant data:
-
-1. **Base rate: 3%.** This single number sets the metric ([PR-AUC, never accuracy](../supervised/classification.md#running-example-machine-failure)), the imbalance handling, and stakeholder expectations.
-2. **Base rate by month.** Ours runs 2.7–3.3%: stable. A month at 8% means a data bug or a real event (a heatwave, a bad parts batch), and either one changes the project.
-3. **Label sanity.** We found 14 machines marked failed that logged production output *after* their breakdown date. Fourteen rows won't move the model. The broken join with the ERP that produced them might. Trace it before modelling.
-
-:::warning[The label is a query someone wrote]
-"Failed" is not a fact of nature. It's the output of a definition and a join between the CMMS and the ERP, written by a person, and it inherits their bugs. Auditing it first is the cheapest insurance in the whole lifecycle.
-:::
-
----
-
-## Distributions, One Feature at a Time
-
-> **Remember one thing:** `df.describe()` lies on skewed data. The mean of `load_cycles_30d` is 41,000; the median is 3,400. Plot everything.
-
-```python
-df.load_cycles_30d.hist(bins=50)              # a wall at zero
-np.log1p(df.load_cycles_30d).hist(bins=50)    # bimodal: single-shift vs 24/7 lines
-```
-
-What the histograms bought us on the plant data:
-
-- **`load_cycles_30d`** looks like a wall at zero until you log it. Then it's cleanly bimodal: single-shift machines and 24/7 production lines are different populations, which becomes a segment hypothesis, not just a transform decision.
-- **`machine_age_days`** has three negative values. Impossible, therefore a bug (an ERP install-date error): logged for the [preprocessing page](./data-preprocessing.md#outliers) to fix at the source.
-- **The 24/7 tail** is real data, the plant's most critical assets. Noted so nobody "cleans" it later.
-
-EDA finds the shape. The *fixes* (transforms, capping, imputation) are [preprocessing decisions](./data-preprocessing.md): keep the two jobs separate, and hand findings across in writing.
-
----
-
-## Missingness Has a Pattern
-
-> **Remember one thing:** don't just count the gaps. Ask which machines have them.
-
-```python
-df.isna().mean().sort_values(ascending=False)   # rate per column
-df.groupby(df.oil_analysis_score.isna()).failed.mean()  # 0.08 vs 0.027
-```
-
-Two columns are missing values on the plant data, and they are not the same problem. `vibration_rms_30d` is missing for 0.3% of rows scattered randomly across March: a sensor-gateway outage, ignorable. `oil_analysis_score` is missing for 11%, and every one of those machines was installed in the last 90 days (the first oil-sample cycle hasn't run yet). That's structure, and the failure-rate split (8% missing vs 2.7% present) says the gap itself predicts failure. Reliability engineers know why: new machines fail more. That's the infant-mortality end of the bathtub curve, and the missingness flag just encoded it.
-
-The mechanism taxonomy (MCAR/MAR/MNAR) and the imputation menu live on the [preprocessing page](./data-preprocessing.md#missing-values). EDA's job is the diagnosis: for each gappy column, *which machines* are missing it and *does the target differ*. Two groupbys per column, and the imputation strategy writes itself.
-
----
-
-## Segments: Which Machines Actually Fail
-
-> **Remember one thing:** one global failure rate hides the three different fleets inside your plant.
-
-```python
-df.groupby("duty_cycle").failed.mean()   # continuous 0.055, single-shift 0.015
-df.groupby(pd.cut(df.machine_age_days, [0, 90, 2000, 5000])).failed.mean()
-```
-
-The plant data's segment table, the single most useful EDA artifact for the maintenance planners:
-
-| Segment | Failure rate | vs base (3%) |
+| Check | On the plant data | Decision it drives |
 |---|---|---|
-| Continuous (24/7) duty | 5.5% | 1.8× |
-| Single shift | 1.5% | 0.5× |
-| First 90 days after install | 8% | 2.7× |
-| Pumps | 1.2% | 0.4× |
+| **Base rate** | 3% | Metric ([PR-AUC, never accuracy](../supervised/classification.md#running-example-machine-failure)), imbalance handling, stakeholder expectations |
+| **Base rate by month** | 2.7–3.3%, stable | None needed. A month at 8% would mean a data bug or a real event, and either changes the project |
+| **Label sanity** | 14 machines marked failed logged output *after* their breakdown date | Trace the broken ERP join before modelling. Fourteen rows won't move the model; the join might |
 
-Each row is a hypothesis for the [feature page](./feature-engineering.md) (duty cycle and machine age will be strong features) and a slice for the [evaluation stage](./model-training.md#evaluate-and-sign-off) (the model must be checked on the CNC spindles separately). These numbers are also your sanity anchors: when a model says a freshly-serviced single-shift pump is at 0.9 failure risk, one of you is wrong, and it's probably the model.
+### Distributions, one feature at a time
 
----
+`describe()` lies on skewed data. The mean of `load_cycles_30d` is 41,000; the median is 3,400. Plot every feature, on a log scale for counts and hours.
 
-## Relationships and the Leak Scan
+<svg className="ml-diagram wide" viewBox="0 0 640 240" role="img" aria-label="Two histograms of load cycles: raw values pile up in one bar at zero with a long tail; on a log scale they split into two humps, single-shift machines and 24/7 lines">
+  <line className="axis-line" x1="40" y1="200" x2="300" y2="200" strokeWidth="1.5" />
+  <line className="axis-line" x1="40" y1="30" x2="40" y2="200" strokeWidth="1.5" />
+  <line className="axis-line" x1="360" y1="200" x2="620" y2="200" strokeWidth="1.5" />
+  <line className="axis-line" x1="360" y1="30" x2="360" y2="200" strokeWidth="1.5" />
+  <text className="axis-label" x="170" y="20" textAnchor="middle" fontSize="12" fontFamily="sans-serif">raw load_cycles_30d</text>
+  <text className="axis-label" x="490" y="20" textAnchor="middle" fontSize="12" fontFamily="sans-serif">log(1 + load_cycles_30d)</text>
+  <rect className="pt-blue" x="44" y="40" width="18" height="160" />
+  <rect className="pt-blue" x="64" y="182" width="18" height="18" />
+  <rect className="pt-blue" x="84" y="192" width="18" height="8" />
+  <rect className="pt-blue" x="104" y="195" width="18" height="5" />
+  <rect className="pt-blue" x="124" y="197" width="18" height="3" />
+  <rect className="pt-blue" x="144" y="198" width="18" height="2" />
+  <rect className="pt-blue" x="164" y="198" width="18" height="2" />
+  <rect className="pt-blue" x="184" y="199" width="18" height="1" />
+  <rect className="pt-blue" x="204" y="199" width="18" height="1" />
+  <rect className="pt-blue" x="224" y="199" width="18" height="1" />
+  <rect className="pt-blue" x="244" y="199" width="18" height="1" />
+  <rect className="pt-blue" x="264" y="199" width="18" height="1" />
+  <rect className="pt-blue" x="364" y="196" width="18" height="4" />
+  <rect className="pt-blue" x="384" y="190" width="18" height="10" />
+  <rect className="pt-blue" x="404" y="178" width="18" height="22" />
+  <rect className="pt-blue" x="424" y="155" width="18" height="45" />
+  <rect className="pt-blue" x="444" y="130" width="18" height="70" />
+  <rect className="pt-blue" x="464" y="138" width="18" height="62" />
+  <rect className="pt-blue" x="484" y="165" width="18" height="35" />
+  <rect className="pt-blue" x="504" y="185" width="18" height="15" />
+  <rect className="pt-blue" x="524" y="188" width="18" height="12" />
+  <rect className="pt-blue" x="544" y="175" width="18" height="25" />
+  <rect className="pt-blue" x="564" y="158" width="18" height="42" />
+  <rect className="pt-blue" x="584" y="170" width="18" height="30" />
+  <rect className="pt-blue" x="604" y="188" width="18" height="12" />
+  <text className="axis-label" x="200" y="80" textAnchor="middle" fontSize="12" fontFamily="sans-serif">median 3,400</text>
+  <text className="axis-label" x="200" y="98" textAnchor="middle" fontSize="12" fontFamily="sans-serif">mean 41,000</text>
+  <text className="axis-label" x="453" y="122" textAnchor="middle" fontSize="12" fontFamily="sans-serif">single-shift</text>
+  <text className="axis-label" x="573" y="150" textAnchor="middle" fontSize="12" fontFamily="sans-serif">24/7 lines</text>
+  <text className="axis-label" x="170" y="222" textAnchor="middle" fontSize="12" fontFamily="sans-serif">0 → 2.1M cycles</text>
+  <text className="axis-label" x="490" y="222" textAnchor="middle" fontSize="12" fontFamily="sans-serif">log scale</text>
+  <text className="axis-label" x="20" y="115" textAnchor="middle" fontSize="12" fontFamily="sans-serif" transform="rotate(-90,20,115)">machines</text>
+</svg>
 
-> **Remember one thing:** in EDA, "wow" and "uh-oh" are the same signal. A feature that separates classes beautifully is a leak until proven otherwise.
+*Figure L1-1: The same column, plotted raw and on a log scale. Only the log view shows two populations.*
 
-```python
-df.corr(numeric_only=True).failed.sort_values()   # quick target-correlation scan
-df.groupby("failed").avg_vibration_last_30d.describe() # near-perfect separation? audit it
-```
+| Feature | What the histogram showed | Handed to |
+|---|---|---|
+| `load_cycles_30d` | A wall at zero, then bimodal on a log scale: single-shift vs 24/7 lines | A segment hypothesis, and a [transform decision](./data-preprocessing.md#skew-and-scaling) |
+| `machine_age_days` | Three negative values. Impossible, so an ERP bug | [Outlier handling](./data-preprocessing.md#outliers): fix at source |
+| 24/7 tail | Real data, the plant's most critical assets | A note so nobody "cleans" it later |
 
-Scan feature-vs-target relationships in one pass. On the plant data, most features correlate weakly with failure (|r| under 0.2), which is normal. Real signal on hard problems is diffuse. One column stood out: `avg_vibration_last_30d` separated failed machines almost perfectly.
+EDA finds the shape. Fixes are [preprocessing decisions](./data-preprocessing.md). Keep the two jobs separate and hand findings across in writing.
 
-That column became [the AUC 0.99 leakage bug](./data-preprocessing.md#the-leakage-bug-that-scores-099). EDA is where it should have been caught: the habit is a standing **leak scan**, where any feature with suspicious separation gets its lineage traced before it's allowed near a model. Ask where the column came from, when it's computed, and whether it could know the future.
+### Missingness has a pattern
 
-Also check feature-vs-feature correlation. The vibration windows correlate at 0.9+, which previews the [Ridge/ElasticNet decision](../supervised/regression.md#ridge-regression-l2) before any model is trained.
+Don't just count the gaps. Ask which machines have them, and whether the target differs.
 
----
+| Column | Missing | Which machines | Failure rate missing vs present | Verdict |
+|---|---|---|---|---|
+| `vibration_rms_30d` | 0.3% | Scattered across March: a sensor-gateway outage | No difference | Random. Ignorable |
+| `oil_analysis_score` | 11% | Every machine installed in the last 90 days | 8% vs 2.7% | Structure. The gap predicts failure (infant mortality on the bathtub curve) |
 
-## Stability Over Time
+The mechanism taxonomy (MCAR/MAR/MNAR) and the imputation menu live on the [preprocessing page](./data-preprocessing.md#missing-values). EDA's job is the diagnosis.
 
-> **Remember one thing:** your training data spans months. Anything that shifted during that window will shift again after you ship.
+### Segments: which machines actually fail
 
-```python
-df.groupby(df.snapshot_date.dt.to_period("M")).load_cycles_30d.median()
-```
+One global failure rate hides the different fleets inside the plant. The segment table is the most useful EDA artifact for the maintenance planners.
 
-Plot key feature medians and the base rate by month. On the plant data this caught one thing worth catching: `vibration_rms_30d` drops in March (the gateway outage again) and a slow upward drift in load as order volume grew. Neither killed the project. Both went into the notes, because the [drift monitors](./inference-and-production.md#monitoring-and-drift) built at the production stage should watch exactly the things that already moved during training.
+<svg className="ml-diagram" viewBox="0 0 480 220" role="img" aria-label="Failure rate by segment against the 3% base rate: first 90 days 8%, 24/7 duty 5.5%, single shift 1.5%, pumps 1.2%">
+  <text className="axis-label" x="170" y="42" textAnchor="end" fontSize="12" fontFamily="sans-serif">First 90 days</text>
+  <rect className="pt-orange" x="180" y="24" width="260" height="26" />
+  <text className="axis-label" x="446" y="42" fontSize="12" fontFamily="sans-serif">8%</text>
+  <text className="axis-label" x="170" y="84" textAnchor="end" fontSize="12" fontFamily="sans-serif">24/7 duty</text>
+  <rect className="pt-orange" x="180" y="66" width="178.75" height="26" />
+  <text className="axis-label" x="364.75" y="84" fontSize="12" fontFamily="sans-serif">5.5%</text>
+  <text className="axis-label" x="170" y="126" textAnchor="end" fontSize="12" fontFamily="sans-serif">Single shift</text>
+  <rect className="pt-blue" x="180" y="108" width="48.75" height="26" />
+  <text className="axis-label" x="234.75" y="126" fontSize="12" fontFamily="sans-serif">1.5%</text>
+  <text className="axis-label" x="170" y="168" textAnchor="end" fontSize="12" fontFamily="sans-serif">Pumps</text>
+  <rect className="pt-blue" x="180" y="150" width="39" height="26" />
+  <text className="axis-label" x="225" y="168" fontSize="12" fontFamily="sans-serif">1.2%</text>
+  <line className="axis-line" x1="277.5" y1="16" x2="277.5" y2="190" strokeWidth="1.5" strokeDasharray="5,4" />
+  <text className="axis-label" x="277.5" y="208" textAnchor="middle" fontSize="12" fontFamily="sans-serif">base rate 3%</text>
+</svg>
 
-A regime break in the training window (a line upgrade, a new shift pattern) is worse than drift after shipping: it means your training rows aren't all from the same world, and it's an argument for the [time-based validation split](./model-training.md#choosing-the-validation-split).
+*Figure L1-2: Failure rate by segment. Orange segments fail above the 3% base rate, blue below.*
 
----
+Each bar is a hypothesis for the [feature page](./feature-engineering.md) and a slice for [sign-off](./model-training.md#evaluate-and-sign-off). The bars are also sanity anchors. When a model scores a freshly serviced single-shift pump at 0.9, one of you is wrong, and it's probably the model.
 
-## The Deliverable: A Decision Log, Not a Notebook
+### Relationships and the leak scan
 
-> **Remember one thing:** nobody reads your notebook. They read your conclusions.
+In EDA, "wow" and "uh-oh" are the same signal. A feature that separates classes beautifully is a leak until proven otherwise.
 
-The 200-cell notebook is scaffolding. What survives is half a page:
+<svg className="ml-diagram wide" viewBox="0 0 640 240" role="img" aria-label="Two feature distributions split by outcome. Vibration trend: failed and healthy machines overlap, a real but partial signal. Average vibration last 30 days: every failed machine sits at zero, far from the healthy ones, a near-perfect split that turned out to be leakage">
+  <line className="axis-line" x1="30" y1="200" x2="300" y2="200" strokeWidth="1.5" />
+  <line className="axis-line" x1="30" y1="30" x2="30" y2="200" strokeWidth="1.5" />
+  <line className="axis-line" x1="340" y1="200" x2="610" y2="200" strokeWidth="1.5" />
+  <line className="axis-line" x1="340" y1="30" x2="340" y2="200" strokeWidth="1.5" />
+  <text className="axis-label" x="165" y="20" textAnchor="middle" fontSize="12" fontFamily="sans-serif">vibration_trend: overlap</text>
+  <text className="axis-label" x="475" y="20" textAnchor="middle" fontSize="12" fontFamily="sans-serif">avg_vibration_last_30d: clean split</text>
+  <path className="pt-blue" d="M40,200 C90,200 100,50 140,50 C180,50 190,200 240,200 Z" opacity="0.55" />
+  <path className="pt-orange" d="M110,200 C150,200 160,110 190,110 C220,110 230,200 270,200 Z" opacity="0.55" />
+  <path className="pt-orange" d="M350,200 C356,200 358,40 364,40 C370,40 372,200 378,200 Z" opacity="0.55" />
+  <path className="pt-blue" d="M430,200 C480,200 490,70 525,70 C560,70 570,200 610,200 Z" opacity="0.55" />
+  <text className="class0-label" x="120" y="44" fontSize="12" fontFamily="sans-serif">ran</text>
+  <text className="highlight-label" x="210" y="104" fontSize="12" fontFamily="sans-serif">failed</text>
+  <text className="highlight-label" x="372" y="52" fontSize="12" fontFamily="sans-serif">failed ≈ 0</text>
+  <text className="class0-label" x="515" y="62" fontSize="12" fontFamily="sans-serif">ran</text>
+  <text className="axis-label" x="165" y="222" textAnchor="middle" fontSize="12" fontFamily="sans-serif">real signal: keep</text>
+  <text className="axis-label" x="475" y="222" textAnchor="middle" fontSize="12" fontFamily="sans-serif">too good: trace lineage</text>
+</svg>
+
+*Figure L1-3: Each feature's distribution split by outcome. Blue is machines that ran, orange is machines that failed. Overlap is what real signal looks like; a clean split is a leak until its lineage is traced.*
+
+| Scan | On the plant data | Verdict |
+|---|---|---|
+| Feature vs target | Most features correlate weakly (\|r\| under 0.2) | Normal. Real signal on hard problems is diffuse |
+| Feature vs target | `avg_vibration_last_30d` separates failures almost perfectly | ❌ [The AUC 0.99 leakage bug](./data-preprocessing.md#the-leakage-bug-that-scores-099). Trace its lineage before it nears a model |
+| Feature vs feature | Vibration windows correlate at 0.9+ | Previews the [Ridge/ElasticNet decision](../supervised/regression.md#ridge-regression-l2) |
+
+For any suspicious feature, ask three things: where the column came from, when it's computed, and whether it could know the future.
+
+### Stability over time
+
+Anything that shifted during the training window will shift again after you ship. Plot key feature medians and the [base rate](../start-here/glossary.md#base-rate) by month.
+
+| Finding | What it is | Where it goes |
+|---|---|---|
+| `vibration_rms_30d` dips in March | The gateway outage again | Drift monitor list |
+| Load drifts upward | Order volume growing | [Drift monitors](./inference-and-production.md#monitoring-and-drift) |
+| A regime break (line upgrade, new shift pattern) | Training rows from two different worlds | An argument for the [time-based split](./model-training.md#choosing-the-validation-split) |
+
+### The deliverable: a decision log
+
+Nobody reads your notebook. They read your conclusions. Every row ties a finding to a decision and an owner page.
 
 | Finding | Decision | Owner page |
 |---|---|---|
@@ -145,23 +179,81 @@ The 200-cell notebook is scaffolding. What survives is half a page:
 | `load_cycles_30d` bimodal, log-normal | `log1p` transform for linear models | [Preprocessing](./data-preprocessing.md) |
 | `oil_analysis_score` missing = new installs, 8% failure | Impute + indicator, never drop | [Preprocessing](./data-preprocessing.md) |
 | `avg_vibration_last_30d` separates too well | Leak. Rebuild from raw sensor events | [Preprocessing](./data-preprocessing.md) |
-| 24/7 duty 5.5%, first-90-days 8% | Feature hypotheses + evaluation slices | [Features](./feature-engineering.md), [Training](./model-training.md) |
+| 24/7 duty 5.5%, first 90 days 8% | Feature hypotheses + evaluation slices | [Features](./feature-engineering.md), [Training](./model-training.md) |
 | 3 negative ages, 14 label conflicts | Fix at source before training | Data owners |
 
-Every row is a finding tied to a decision and a home. That table is what you present, and it's the test of whether the EDA was worth the day: no decisions, no EDA.
+If a plot doesn't produce a row here, it was tourism.
 
-:::tip[Practice on real data]
-This series uses a fictional plant so the numbers can teach cleanly. To run the lifecycle on real data, two classics map directly onto these pages: the [AI4I 2020 Predictive Maintenance Dataset](https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset) (10,000 machines, ~3.4% failure rate, an almost exact match for this series) and the [UCI Bike Sharing Dataset](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset) for the [regression page](../supervised/regression.md). Every technique in this section applies verbatim.
-:::
+## Gotchas
+
+- **Starting with features.** A broken label wastes everything downstream. Audit the target first.
+- **Reading means off `describe()`.** Skewed columns hide their shape. Plot histograms on a log scale.
+- **Counting missing values without grouping.** The rate hides the pattern. Split the failure rate by missing vs present.
+- **Celebrating a perfect separator.** It's usually a leak. Trace the column's lineage before it reaches a model.
+- **Fixing data inside EDA.** Fixes made in the notebook don't reach production. Log the finding; preprocessing owns the fix.
+
+## Scenario questions
+
+**Q1 ★ You have one day of EDA on a new failure dataset. What do you look at first?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** how is "failed" defined, and which systems produce the label?
+- **Observe:** the base rate (3%), the base rate by month (stable 2.7–3.3%), and any impossible labels (14 machines producing output after breakdown).
+- **Hypothesise:** the label join with the ERP is the likeliest source of trouble.
+- **Fix:** trace and fix the join before any feature work.
+- **Prevent:** the label audit is the first row of every decision log. The trade-off is an hour less on features.
+
+</details>
+
+**Q2 ★★ One feature separates failed machines almost perfectly. Your manager is thrilled. What do you do?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** where does the column come from, and when is it computed?
+- **Observe:** `avg_vibration_last_30d` comes from a dashboard query, computed at query time, not at the [snapshot date](../start-here/glossary.md#snapshot-date).
+- **Hypothesise:** the window crosses the breakdown, so the feature sees the outcome.
+- **Fix:** mark it as a leak in the decision log; preprocessing rebuilds it from raw events.
+- **Prevent:** a standing leak scan where every suspicious separator gets its lineage traced. The trade-off is telling the manager the good news isn't real.
+
+</details>
+
+**Q3 ★★ `oil_analysis_score` is missing for 11% of rows. A colleague proposes dropping them. Your view?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** which machines are missing it?
+- **Observe:** all of them were installed in the last 90 days. They fail at 8% vs 2.7%.
+- **Hypothesise:** the gap encodes machine newness. It isn't random noise.
+- **Fix:** keep the rows; preprocessing imputes and adds a missing-indicator.
+- **Prevent:** every gappy column gets the missing-vs-present failure split. The trade-off is two more groupbys per column.
+
+</details>
+
+**Q4 ★★★ The base rate is 3% every month except April, which is 8%. How do you proceed?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** did anything change in April: plant, data pipeline, label definition?
+- **Observe:** check whether the spike sits in one site or segment, and whether the label join or a source system changed.
+- **Hypothesise:** a data bug (duplicated failure records, a changed join) or a real event (heatwave, a bad parts batch).
+- **Fix:** a bug gets fixed at source. A real event gets documented and the training window or validation split reconsidered.
+- **Prevent:** base rate by month is a standing check, and later a production monitor. The trade-off is delaying modelling until April is explained.
+
+</details>
+
+## Summary
+
+- **Target first.** Base rate, stability, label sanity. A broken label wastes everything downstream.
+- **Plot, don't describe.** Means lie on skewed data. Histograms don't.
+- **Ask which machines, not how many.** Missingness and failure rates by segment, never just overall.
+- **Run the leak scan.** Any feature that separates too well gets its lineage traced before it touches a model.
+- **Ship a decision log.** Half a page of finding → decision → owner. The notebook is scaffolding.
 
 ---
 
-## The Five Rules
-
-1. **Target first.** Base rate, stability, label sanity. A broken label wastes everything downstream.
-2. **Plot, don't describe.** Means lie on skewed data. Histograms don't.
-3. **Ask which machines, not how many.** Missingness and failure rates by segment, never just overall.
-4. **Run the leak scan.** Any feature that separates too well gets its lineage traced before it touches a model.
-5. **Ship a decision log.** Half a page of finding → decision → owner. The notebook is scaffolding.
-
-If a plot doesn't produce a row in the decision log, it was tourism.
+**Next →** [Data Preprocessing](./data-preprocessing.md)

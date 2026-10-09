@@ -1,16 +1,20 @@
 ---
+title: Classification Models
+sidebar_label: Classification
 sidebar_position: 2
 ---
 
 # Classification Models
 
-You're predicting a category. Spam or not. Fraud or legit. Which product a customer will buy. The right model depends on how complex the boundary between your classes actually is.
+> Docs: [Linear models](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression) · [Ensembles](https://scikit-learn.org/stable/modules/ensemble.html) · [SVM](https://scikit-learn.org/stable/modules/svm.html) · [Nearest neighbours](https://scikit-learn.org/stable/modules/neighbors.html) · [Naive Bayes](https://scikit-learn.org/stable/modules/naive_bayes.html) · [Classification metrics](https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics) · [Probability calibration](https://scikit-learn.org/stable/modules/calibration.html)
 
-The mistake most people make is jumping straight to gradient boosting. Start with logistic regression. If it's good enough, you're done.
+## Overview
 
----
+Use classification when the target is a category: fails or runs, fraud or legit, which product a customer buys. The right model depends on how complex the boundary between classes is, so start with logistic regression and move on only when it falls short. The failure people hit on real, imbalanced data is reporting accuracy: on the machine-failure problem, predicting "nothing fails" scores 97% accuracy and catches zero breakdowns.
 
-## Cheatsheet
+## Key concepts
+
+### Cheatsheet
 
 | Model | Reach for it when | Avoid when | Scaling? | Key knobs | #1 failure mode |
 |---|---|---|---|---|---|
@@ -23,104 +27,93 @@ The mistake most people make is jumping straight to gradient boosting. Start wit
 | **Naive Bayes** | Text, small data, need it *now* | You need calibrated probabilities | No | `alpha` | Trusting the raw probability output |
 | **MLP** | Large data, boosting has plateaued | Small data, need interpretability | Yes | layers, `early_stopping` | Unscaled inputs → won't converge |
 
----
+### Running example: machine failure
 
-## Running Example: Machine Failure
-
-Every model below is applied to the same problem: **predict which machines in a plant will have an unplanned breakdown in the next 30 days** from vibration, temperature, load cycles, service history, and maintenance work orders. 10,000 machines, ~300 failures per window. A 3% positive class, because real classification problems are imbalanced.
-
-First, the trap. A model that predicts "nothing fails" scores **97% accuracy** and catches zero breakdowns. That single fact drives everything else on this page: the metric is PR-AUC (or recall at a chosen precision), never accuracy.
-
-Illustrative results (typical pattern, not one specific run):
+Every model is applied to one problem: **predict which machines will have an unplanned breakdown in the next 30 days** from vibration, temperature, load cycles, service history and work orders. 10,000 machines, ~300 failures per window: a 3% positive class. The metric is [PR-AUC](../start-here/glossary.md#pr-auc), never accuracy. Numbers show the typical pattern, not one specific run.
 
 | Model | ROC-AUC | PR-AUC | Notes |
 |---|---|---|---|
-| Predict "no failure" always | 0.50 | 0.03 | 97% accuracy. Useless. |
-| Logistic Regression | 0.79 | 0.31 | 2 minutes of work; coefficients explain *why* machines fail |
+| Predict "no failure" always | 0.50 | 0.03 | ❌ 97% accuracy. Useless |
+| Logistic Regression | 0.79 | 0.31 | Two minutes; coefficients explain *why* machines fail |
 | Decision Tree (depth 4) | 0.75 | 0.26 | Weakest, but the maintenance crew can read it |
 | Random Forest | 0.84 | 0.40 | Big jump: failure drivers interact |
 | **XGBoost (tuned)** | **0.87** | **0.46** | Best; needed `scale_pos_weight` and early stopping |
-| SVM (RBF) | 0.80 | 0.33 | Slowest to train; not its home turf (that's text) |
-| KNN (k=15) | 0.77 | 0.28 | OK, but 50ms per prediction at serving time |
-| Naive Bayes | 0.72 | 0.22 | Sensors aren't independent; wrong tool here (its home is also text) |
+| SVM (RBF) | 0.80 | 0.33 | Slowest to train; its home is text |
+| KNN (k = 15) | 0.77 | 0.28 | 50 ms per prediction at serving time |
+| Naive Bayes | 0.72 | 0.22 | Sensors aren't independent; its home is also text |
 | MLP (2 layers) | 0.85 | 0.42 | Close to XGBoost, needed the most babysitting |
 
-Same story as regression: linear gets you most of the way instantly, boosting wins if you tune it. Two models (SVM, Naive Bayes) underperform here because sensor data isn't their turf. Knowing where each model wins is the whole game.
+Linear gets you most of the way instantly; tuned boosting wins. SVM and Naive Bayes underperform because sensor data isn't their turf.
 
----
+### Evaluation metrics
 
-## Evaluation Metrics
-
-Stop reporting accuracy. On imbalanced datasets it's meaningless: see the failure table above.
-
-| Metric | Formula | Reach for it when |
+| Metric | In plain words | Use when |
 |---|---|---|
-| **Precision** | `TP / (TP + FP)` | False positives are expensive (flagging innocent users as fraud) |
-| **Recall** | `TP / (TP + FN)` | False negatives are expensive (missing a cancer diagnosis) |
-| **F1 Score** | `2 × P × R / (P + R)` | You need a single number that balances both |
-| **ROC-AUC** | Area under ROC curve | Comparing models without committing to a threshold |
-| **PR-AUC** | Area under Precision-Recall curve | Your positive class is rare: ROC-AUC flatters bad models here |
+| **Precision** | Of the machines flagged, the share that really failed | False alarms are expensive |
+| **Recall** | Of the machines that failed, the share flagged | Misses are expensive |
+| **F1** | One number balancing precision and recall | You must report a single number |
+| **ROC-AUC** | How well the model ranks positives above negatives, over all thresholds | Comparing models on balanced data |
+| **PR-AUC** | Precision across all recall levels | Rare positive class. ROC-AUC flatters bad models here |
 
-|  | Predicted Positive | Predicted Negative |
+The threshold is a business decision. The tuned XGBoost on a 2,000-machine test set with 60 real breakdowns:
+
+| Threshold | Flagged | Caught (TP) | False alarms (FP) | Missed (FN) | Precision | Recall |
+|---|---|---|---|---|---|---|
+| 0.50 (default) | 40 | 30 | 10 | 30 | 0.75 | 0.50 |
+| 0.25 | 150 | 48 | 102 | 12 | 0.32 | 0.80 |
+
+An inspection costs $500; an unplanned breakdown costs $50,000. Lowering the threshold adds 110 inspections ($55k) and prevents 18 more breakdowns ($900k). The model produces scores; the cost ratio picks the operating point.
+
+### Handling class imbalance
+
+A model that ignores imbalance is confidently wrong on the class that matters.
+
+| Technique | Use when | Result |
 |---|---|---|
-| **Actual Positive** | TP ✓ | FN: missed it |
-| **Actual Negative** | FP: false alarm | TN ✓ |
+| `class_weight="balanced"` / `scale_pos_weight` (≈ 32 here) | First thing to try; built into most models | ✅ Cheap, no new data |
+| Threshold tuning | Always, after training | ✅ Matches the operating point to the cost ratio |
+| PR-AUC as the metric | Always, when positives are rare | ✅ Honest ranking of models |
+| SMOTE (synthetic oversampling) | Minority class is tiny | ⚠️ Inside the CV fold only, or it leaks |
+| Undersampling the majority | Majority class is huge | ⚠️ Faster training, throws data away |
+| Accuracy as the metric | — | ❌ 97% for a model that catches nothing |
 
-**Worked example: the threshold is a business decision.** Take the XGBoost failure model on a 2,000-machine test set containing 60 real breakdowns:
+### Linear vs non-linear
 
-At the default **threshold 0.5** it flags 40 machines:
-
-|  | Predicted fail | Predicted run |
+| | Linear classifiers | Non-linear classifiers |
 |---|---|---|
-| **Actually failed (60)** | TP = 30 | FN = 30 |
-| **Actually ran fine (1,940)** | FP = 10 | TN = 1,930 |
+| **Examples** | Logistic Regression, Linear SVM, Naive Bayes (approx.) | Trees, Random Forest, Gradient Boosting, KNN, MLP |
+| **Boundary** | Straight hyperplane | Arbitrary shape |
+| **Interpretability** | Coefficients readable | Black box (shallow trees excepted) |
+| **Scaling required** | Yes | Not for trees |
+| **Probabilities** | Calibrated (logistic regression) | Need a calibration wrapper |
 
-Precision = 30/40 = **0.75**, Recall = 30/60 = **0.50**. The model is right when it speaks up, but it misses half the breakdowns.
+Go non-linear when the linear model plateaus and the boundary depends on interactions. Here, rising vibration predicts failure only when temperature is also climbing.
 
-Lower the **threshold to 0.25** and it flags 150 machines:
+### Choosing a model
 
-|  | Predicted fail | Predicted run |
-|---|---|---|
-| **Actually failed (60)** | TP = 48 | FN = 12 |
-| **Actually ran fine (1,940)** | FP = 102 | TN = 1,838 |
+<div className="mermaid-scroll" style={{maxWidth: "900px", margin: "0 auto"}}>
 
-Precision = 48/150 = **0.32**, Recall = 48/60 = **0.80**. Now you catch four in five breakdowns, but two-thirds of your inspections find nothing wrong.
+```mermaid
+flowchart LR
+    S["<b>Logistic regression</b><br/><small>baseline, read coefficients</small>"]
+    S --> A["<b>Good enough</b><br/><small>ship it</small>"]
+    S --> B["<b>Must explain to non-experts</b><br/><small>shallow Decision Tree</small>"]
+    S --> C["<b>Tabular, non-linear</b><br/><small>Random Forest, then boosting</small>"]
+    S --> D["<b>Text or sparse features</b><br/><small>Linear SVM or Naive Bayes</small>"]
+    S --> E["<b>Tiny data, local structure</b><br/><small>KNN</small>"]
+    C --> F["<b>50k+ rows, boosting plateaued</b><br/><small>MLP</small>"]
 
-Which threshold is right? That's not an ML question. An inspection costs \$500; an unplanned breakdown costs \$50,000 in downtime. The 110 extra inspections cost \$55k and prevent 18 more breakdowns worth \$900k. The 0.25 threshold wins by a mile. The model produces scores; *you* pick the operating point.
+    classDef accent stroke-width:1.5px
+    class S accent
+```
 
----
+</div>
 
-## Linear vs Non-Linear Classifiers
+*Figure M2-1: Classification model selection. Amber is the starting point for every classification problem.*
 
-Same decision as regression: start linear, go non-linear only when the data forces you to.
+### Logistic regression
 
-| | Linear Classifiers | Non-Linear Classifiers |
-|---|---|---|
-| **Examples** | Logistic Regression, Linear SVM, Naive Bayes (approx) | Decision Tree, Random Forest, Gradient Boosting, KNN, MLP |
-| **Decision boundary** | Straight hyperplane | Arbitrary shape |
-| **Interpretability** | Coefficients directly readable | Black box (trees are a partial exception) |
-| **Scaling required** | Yes | No (tree models) |
-| **Works well when** | Classes are roughly linearly separable | Complex, non-linear boundaries |
-| **Probability output** | Calibrated (Logistic Regression) | Needs calibration wrapper for trees |
-
-**Start linear when:**
-- A scatter plot suggests the classes can be separated by a line or plane
-- You need to explain the model to a regulator or auditor
-- Your dataset is small: linear models generalise better with limited data
-- You're building a fast baseline (logistic regression trains in seconds)
-
-**Go non-linear when:**
-- Linear model accuracy has plateaued and residuals show systematic errors
-- Class boundaries depend on feature interactions (e.g. failure that's only likely given *both* rising vibration and rising temperature)
-- You have enough data to support a more complex model without overfitting
-
----
-
-## Logistic Regression
-
-> **Remember one thing:** a linear model pushed through a sigmoid. The only model here whose probabilities are calibrated out of the box.
-
-Despite the name, this is a classifier. It runs your features through a linear combination, then squashes the output through a sigmoid to get a probability between 0 and 1.
+A linear model pushed through a sigmoid. The only model here whose probabilities are calibrated out of the box.
 
 <svg className="ml-diagram" viewBox="0 0 480 260" role="img" aria-label="Logistic regression: sigmoid curve maps linear score to probability with 0.5 threshold">
   <line className="axis-line" x1="50" y1="230" x2="450" y2="230" strokeWidth="1.5" />
@@ -140,162 +133,68 @@ Despite the name, this is a classifier. It runs your features through a linear c
   <text className="highlight-label" x="255" y="112" fontSize="11" fontFamily="sans-serif">threshold</text>
 </svg>
 
-:::tip[Use this when]
-The classes are roughly linearly separable and you need to understand what's driving the prediction. The coefficients tell you directly: this feature pushes toward class 1, that one pushes against it. That interpretability is genuinely valuable in production.
-:::
+*Figure M2-2: The sigmoid turns a linear score into a probability. Green is the curve, amber marks the default 0.5 threshold, which is almost never the right one.*
 
-:::note[What you need to get it right]
-- Scale your features. The L2 regularisation penalises all weights equally, so a feature in thousands will dominate one in single digits.
-- The default threshold is 0.5, but it's almost never optimal. Tune it on your validation set based on the precision/recall tradeoff you actually care about.
-- Class imbalance? Add `class_weight="balanced"` before doing anything more complex.
-:::
+| | |
+|---|---|
+| **Use when** | Always first. Also when you need honest probabilities for threshold maths |
+| **Get it right** | Scale features: L2 penalises all weights equally. Add `class_weight="balanced"` before anything more complex. Tune the threshold on validation, using `predict_proba` scores |
+| **On the plant data** | ROC-AUC 0.79 in two minutes. Rising vibration trend is the strongest failure signal, a recent service the strongest protective one. That's the answer when a planner asks "why was this machine flagged?" |
 
-```python
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+### Decision tree classifier
 
-model = make_pipeline(
-    StandardScaler(),
-    LogisticRegression(class_weight="balanced", max_iter=1000)
-)
-model.fit(X_train, y_train)
-proba = model.predict_proba(X_test)[:, 1]  # tune YOUR threshold on these
-```
+The model is the documentation, and it should almost never be the final model.
 
-**On the plant data:** ROC-AUC 0.79 in two minutes, and the coefficients are the deliverable. Rising vibration trend is the strongest failure signal, a recent service the strongest protective one. When a planner asks "why was this machine flagged?", you have an answer. No other model on this page gives you that plus honest probabilities for free.
-
----
-
-## Decision Tree Classifier
-
-> **Remember one thing:** the model *is* the documentation. And it should almost never be the final model.
-
-At each node, the tree picks the feature and threshold that best separates your classes (Gini impurity or entropy). It keeps splitting until leaves are pure or you hit a depth limit.
+<div className="mermaid-scroll" style={{maxWidth: "900px", margin: "0 auto"}}>
 
 ```mermaid
-graph TD
-    A{"Temperature > 80°C?"}
-    A -->|Yes| B{"Hours since service > 5,000?"}
-    A -->|No| C["✅ OK"]
-    B -->|Yes| D{"Vibration trend > 1.3?"}
-    B -->|No| E["✅ OK"]
-    D -->|Yes| F["⚠️ Inspect"]
-    D -->|No| G["✅ OK"]
+flowchart LR
+    A["<b>Temperature > 80°C?</b>"] -->|No| C["<b>OK</b>"]
+    A -->|Yes| B["<b>Over 5,000 h since service?</b>"]
+    B -->|No| E["<b>OK</b>"]
+    B -->|Yes| D["<b>Vibration trend > 1.3?</b>"]
+    D -->|No| G["<b>OK</b>"]
+    D -->|Yes| F["<b>Inspect</b>"]
+
+    classDef accent stroke-width:1.5px
+    class F accent
 ```
 
-:::tip[Use this when]
-You need to hand a printed rule set to a compliance team, a regulator, or a domain expert who needs to verify the logic. A depth-3 tree fits on a whiteboard. No other model gives you that.
-:::
+</div>
 
-:::note[What you need to get it right]
-- Constrain `max_depth` to 3–5. An unconstrained tree memorises training data and fails on anything new.
-- No feature scaling needed: splits work on rank thresholds.
-- Never use a single decision tree as your final model if accuracy matters. Use it to understand your data, then move to Random Forest.
-:::
+*Figure M2-3: The depth-3 tree that became the crew's walk-down checklist. Amber is the leaf that sends a technician.*
 
-```python
-from sklearn.tree import DecisionTreeClassifier, export_text
+| | |
+|---|---|
+| **Use when** | A compliance team, regulator or domain expert must verify the logic |
+| **Get it right** | `max_depth` 3–5. No scaling. Use it to understand the data, then move to an ensemble |
+| **On the plant data** | AUC 0.75, the weakest. But the printed rules became the walk-down checklist, worth more to the business than the 0.12 AUC that tuned XGBoost added |
 
-tree = DecisionTreeClassifier(max_depth=4, class_weight="balanced")
-tree.fit(X_train, y_train)
-print(export_text(tree, feature_names=list(X_train.columns)))
-```
+### Random forest classifier
 
-**On the plant data:** weakest scores (AUC 0.75), but the printed rules ("temp > 80°C AND over 5,000h since service AND vibration rising → fail") became the maintenance crew's walk-down checklist. That rule set delivered more business value than the 0.12 AUC the tuned XGBoost added on top. Sometimes the diagnostic *is* the product.
+Hundreds of overfit trees and a majority vote. → See [bagging vs boosting](./index.md#ensembles-bagging-vs-boosting).
 
----
+| | |
+|---|---|
+| **Use when** | You need a strong non-linear baseline fast |
+| **Get it right** | Start at 100–300 trees with `oob_score=True` for a free validation estimate. Set `class_weight="balanced"` first. Built-in `feature_importances_` favour high-cardinality features: use [permutation importance](../ml-lifecycle/feature-engineering.md#selecting-features). Probabilities cluster mid-range: wrap in `CalibratedClassifierCV` for threshold maths |
+| **On the plant data** | AUC 0.79 → 0.84 with no tuning: failure drivers interact |
 
-## Random Forest Classifier
+### Gradient boosting classifiers
 
-> **Remember one thing:** hundreds of overfit trees, majority vote. Bagging kills the variance that kills single trees.
-
-Hundreds of decision trees, each on a different random bootstrap sample with a random subset of features. Final prediction is majority vote.
-
-```mermaid
-graph LR
-    D["Training Data"] --> T1["Tree 1 → Fail"]
-    D --> T2["Tree 2 → Fail"]
-    D --> T3["Tree 3 → OK"]
-    T1 & T2 & T3 --> V["Majority vote → Fail"]
-```
-
-:::tip[Use this when]
-You need a strong baseline fast. Random Forest is robust, handles mixed feature types without much preprocessing, and rarely collapses completely even with mediocre hyperparameters. It's your first non-linear move.
-:::
-
-:::note[What you need to get it right]
-- Start with 100 trees. Enable `oob_score=True`: each tree is validated on the data it didn't see, so you get a free accuracy estimate.
-- The built-in `feature_importances_` attribute is biased toward high-cardinality features. Use permutation importance for honest rankings.
-- For imbalanced data, set `class_weight="balanced"` before anything else.
-:::
-
-```python
-from sklearn.ensemble import RandomForestClassifier
-
-rf = RandomForestClassifier(
-    n_estimators=300, class_weight="balanced", oob_score=True, n_jobs=-1
-)
-rf.fit(X_train, y_train)
-print(f"OOB accuracy: {rf.oob_score_:.3f}")
-```
-
-**On the plant data:** AUC jumps from 0.79 to 0.84 with no tuning. Evidence that failure drivers interact: rising vibration only predicts failure when temperature is also climbing. The one catch: its probability outputs cluster around the middle. If you need honest probabilities for the threshold math above, wrap it in `CalibratedClassifierCV`.
-
----
-
-## Gradient Boosting Classifiers
-
-> **Remember one thing:** each tree trains on the previous ensemble's mistakes. Boosting kills bias, and early stopping is non-negotiable.
-
-Each tree corrects the residual errors of the ensemble so far. Sequential and slow by design, and that's what makes it accurate.
-
-```mermaid
-graph TD
-    T1["Tree 1: Coarse classification"] --> E1["Misclassified examples"]
-    E1 --> T2["Tree 2: Focus on hard cases"]
-    T2 --> E2["Remaining errors"]
-    E2 --> T3["Tree 3: Refine boundary"]
-    T1 & T2 & T3 --> F["Final = weighted vote"]
-```
+Each tree trains on the previous ensemble's mistakes. [Early stopping](../start-here/glossary.md#early-stopping) is non-negotiable. → See [bagging vs boosting](./index.md#ensembles-bagging-vs-boosting).
 
 | Library | Reach for it when |
 |---|---|
-| **XGBoost** | General purpose, strong regularisation, widely supported |
-| **LightGBM** | Large datasets (100k+ rows), need speed |
+| **XGBoost** | General purpose, strong regularisation |
+| **LightGBM** | 100k+ rows, need speed (`is_unbalance=True` for imbalance) |
 | **CatBoost** | Many categorical features, minimal preprocessing |
 
-:::tip[Use this when]
-Accuracy is what matters and your data is tabular. Gradient boosting is the dominant algorithm in production classification: e-commerce, credit scoring, fraud detection. When Random Forest isn't good enough, this is where you go.
-:::
+The settings for the failure model live in [hyperparameter search](../ml-lifecycle/model-training.md#hyperparameter-search). On the plant data: AUC 0.87, PR-AUC 0.46, with early stopping picking ~700 rounds. Without `scale_pos_weight` the first run barely beat the forest. The PR-AUC gap over logistic regression is ~18 more breakdowns caught per 2,000 machines at the same precision, about $900k.
 
-:::note[What you need to get it right]
-- Use early stopping with a validation set. The model knows when to stop. Don't guess the number of rounds.
-- Low `learning_rate` (0.01–0.05) with more rounds beats high LR with fewer every single time.
-- For imbalanced classes: `scale_pos_weight = n_negatives / n_positives` (XGBoost) or `is_unbalance=True` (LightGBM).
-- Tune order: `max_depth` (3–6) → `learning_rate` + `n_estimators` → sampling params last.
-:::
+### Support vector machine (SVM)
 
-```python
-import xgboost as xgb
-
-model = xgb.XGBClassifier(
-    n_estimators=2000, learning_rate=0.03, max_depth=4,
-    scale_pos_weight=9700 / 300,  # n_negatives / n_positives
-    early_stopping_rounds=50, eval_metric="aucpr"
-)
-model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
-```
-
-**On the plant data:** best model (AUC 0.87, PR-AUC 0.46), but only after setting `scale_pos_weight` and letting early stopping pick ~700 rounds. Without `scale_pos_weight`, the first run barely beat Random Forest. That PR-AUC gap over logistic regression means catching ~18 more breakdowns per 2,000 machines at the same precision, worth about $900k in avoided downtime. That's the number that justifies the tuning time.
-
----
-
-## Support Vector Machine (SVM)
-
-> **Remember one thing:** only the support vectors, the points at the margin, define the boundary. Everything else could be deleted.
-
-Finds the hyperplane that maximises the margin between classes. The kernel trick lets it draw non-linear boundaries in the original feature space without you defining them.
+Only the support vectors, the points at the margin, define the boundary. The kernel trick draws non-linear boundaries without you building the features.
 
 <svg className="ml-diagram" viewBox="0 0 480 260" role="img" aria-label="SVM: two classes separated by a hyperplane with maximum margin; support vectors are highlighted">
   <line className="axis-line" x1="50" y1="240" x2="450" y2="240" strokeWidth="1.5" />
@@ -329,35 +228,17 @@ Finds the hyperplane that maximises the margin between classes. The kernel trick
   <line className="axis-line" x1="338" y1="103" x2="352" y2="150" strokeWidth="1" strokeDasharray="3,2" opacity="0.5" />
 </svg>
 
-:::tip[Use this when]
-Your features are high-dimensional and sparse: TF-IDF text vectors are the canonical case. A linear SVM on text features is fast, effective, and beats fancier models more often than people expect. Also strong on small datasets where margin maximisation is a meaningful inductive bias.
-:::
+*Figure M2-4: The maximum-margin boundary. Blue and orange are the two classes, the green line is the boundary, dashed lines are the margin, and circled points are the support vectors.*
 
-:::note[What you need to get it right]
-- Scale with `StandardScaler`. SVM is more sensitive to feature scale than almost any other model.
-- For text with large vocabularies, use `LinearSVC`: it's much faster than `SVC(kernel='linear')`.
-- Training scales as O(n²) to O(n³). Above 50k samples it becomes impractical.
-- Tune `C` first: `[0.01, 0.1, 1, 10, 100]`. For RBF kernel, also tune `gamma`.
-:::
+| | |
+|---|---|
+| **Use when** | High-dimensional sparse features. TF-IDF text is the canonical case; `LinearSVC` is fast there |
+| **Get it right** | Standardise features. Training cost grows with the square of the rows or worse: impractical above ~50k. Tune `C` over 0.01–100, and `gamma` for RBF |
+| **On the plant data** | AUC 0.80, slowest to train. Where it wins: classifying failure modes from technicians' work-order text, 30,000 sparse dimensions where trees choke |
 
-```python
-# SVM's home turf: sparse text, not tabular sensor data
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
+### K-nearest neighbours (KNN)
 
-model = make_pipeline(TfidfVectorizer(), LinearSVC(C=1.0))
-model.fit(texts_train, y_train)
-```
-
-**On the plant data:** AUC 0.80. Slightly better than logistic regression, worse than every tree ensemble, slowest to train. Expected: dense tabular sensor data with 20 features is not SVM territory. Where it wins is the opposite regime, the free text of the maintenance work orders. TF-IDF them into 30,000 sparse dimensions and a `LinearSVC` classifying failure modes from technician notes beats the tree models that choke on sparse input.
-
----
-
-## K-Nearest Neighbours (KNN)
-
-> **Remember one thing:** there is no model. The training set *is* the model, and all cost is paid at prediction time.
-
-No training. At prediction time: find the k most similar examples in your training set by distance, return the majority class. That's the whole algorithm.
+There is no model. The training set is the model, and all cost is paid at prediction time.
 
 <svg className="ml-diagram" viewBox="0 0 480 260" role="img" aria-label="KNN: query point finds k=3 nearest neighbours and classifies by majority vote">
   <line className="axis-line" x1="50" y1="240" x2="450" y2="240" strokeWidth="1.5" />
@@ -383,150 +264,109 @@ No training. At prediction time: find the k most similar examples in your traini
   <line className="knn-line-blue"   x1="245" y1="132" x2="185" y2="105" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.8" />
   <polygon className="query-pt" points="245,120 253,138 237,138" />
   <text className="highlight-label" x="258" y="118" fontSize="12" fontFamily="sans-serif" fontWeight="bold">?</text>
-  <polygon className="query-pt" points="68,38 74,50 62,50" opacity="0.9" />
-  <text className="highlight-label" x="82" y="44" fontSize="11" fontFamily="sans-serif">Query point</text>
-  <text className="axis-label"    x="82" y="60" fontSize="11" fontFamily="sans-serif">k=3: 2 orange, 1 blue → orange</text>
+  <text className="axis-label"    x="250" y="256" textAnchor="middle" fontSize="11" fontFamily="sans-serif">▲ query · 3 nearest: 2 orange, 1 blue → orange</text>
 </svg>
 
-:::tip[Use this when]
-Your dataset is small and "similar input → similar output" is genuinely true in your domain. KNN works well when local structure matters more than global patterns. Recommendation-style problems are a natural fit.
-:::
+*Figure M2-5: KNN with k = 3. The amber triangle is the machine to classify; the dashed circle holds its three nearest neighbours, and the majority (orange) wins.*
 
-:::note[What you need to get it right]
-- Scale your features. Euclidean distance is meaningless when one feature is in thousands and another is in decimals.
-- Remove irrelevant features before fitting. Every irrelevant dimension adds noise to every distance calculation.
-- Use an odd `k` for binary classification to avoid ties. Tune `k` with cross-validation.
-- Prediction is slow: O(n·d) per query. Use `algorithm='auto'` in sklearn for Ball Tree or KD Tree on larger sets.
-:::
-
-```python
-from sklearn.neighbors import KNeighborsClassifier
-
-model = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=15))
-model.fit(X_train, y_train)  # "training" just stores the data
-```
-
-**On the plant data:** AUC 0.77. "Machines that look like past failures fail" holds well enough. Two practical problems: scoring the fleet means a distance computation against all 10,000 training rows per machine, and one badly-scaled feature (machine age in days vs alarms in single digits) silently dominated every distance until we scaled. KNN's real niche is small datasets where "find me similar cases" is itself the product, like pulling comparable historical breakdowns for a technician.
-
----
-
-## Naive Bayes
-
-> **Remember one thing:** assumes every feature is independent given the class. Almost always false. Works on text anyway.
-
-Apply Bayes' theorem and assume all features are conditionally independent given the class.
-
-| Variant | Distribution assumed | Best for |
-|---|---|---|
-| **GaussianNB** | Continuous, Gaussian | Sensor readings, numeric features |
-| **MultinomialNB** | Count data | Text (word counts, TF-IDF) |
-| **BernoulliNB** | Binary features | Text with binary term presence |
-
-:::tip[Use this when]
-You need a text classifier trained on a few thousand examples and you need it now. Naive Bayes trains in milliseconds, often punches above its weight on short-text classification, and is trivially explainable.
-:::
-
-:::note[What you need to get it right]
-- For text: `MultinomialNB` on word counts or TF-IDF. For continuous features: `GaussianNB`.
-- Always set `alpha > 0` (Laplace smoothing) to handle words that appear in test but not in training. Default `alpha=1.0` is usually fine.
-- Do not trust the raw probability outputs: they are not calibrated. Wrap with `CalibratedClassifierCV` if you need real probabilities.
-:::
-
-```python
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-
-model = make_pipeline(CountVectorizer(), MultinomialNB(alpha=1.0))
-model.fit(texts_train, y_train)  # trains in milliseconds
-```
-
-**On the plant data:** worst real model in the table (AUC 0.72). Vibration, temperature, and load are strongly correlated, exactly what Naive Bayes assumes away. But feed it the *text* of work orders to flag which ones describe bearing problems and it trains in milliseconds on a few thousand labelled notes, hitting 90%+ before you've finished setting up XGBoost. Naive Bayes isn't a weak model. It's a specialist.
-
----
-
-## Neural Network (MLP) Classifier
-
-> **Remember one thing:** a universal approximator that boosting still usually beats on tabular data. Earn it, don't start with it.
-
-Stack linear layers with non-linear activations (ReLU) and train with backprop. Each layer learns a progressively more abstract representation.
-
-```mermaid
-graph LR
-    In["Input layer\n80+ features"] --> H1["Hidden layer 1\n64 neurons · ReLU"]
-    H1 --> H2["Hidden layer 2\n32 neurons · ReLU"]
-    H2 --> Out["Output\nσ → P(y=1)"]
-```
-
-:::tip[Use this when]
-You have a large tabular dataset (50k+ rows) and gradient boosting has plateaued. Or you need a starting point you can extend later: an MLP is the foundation for full deep learning pipelines.
-:::
-
-:::note[What you need to get it right]
-- Scale all features with `StandardScaler`. Gradient descent converges poorly on unscaled inputs.
-- Start simple: one hidden layer of 64–128 neurons, `relu` activation, `adam` solver. Add layers only if that plateaus.
-- Set `early_stopping=True`. Without it, you will overfit.
-- Switch from sklearn's `MLPClassifier` to PyTorch or TensorFlow when you need GPU training, custom architectures, or a production serving pipeline, not just because you have more layers.
-:::
-
-```python
-from sklearn.neural_network import MLPClassifier
-
-model = make_pipeline(
-    StandardScaler(),  # non-negotiable for neural nets
-    MLPClassifier(hidden_layer_sizes=(64, 32), early_stopping=True)
-)
-model.fit(X_train, y_train)
-```
-
-**On the plant data:** AUC 0.85, between Random Forest and XGBoost, and it needed the most babysitting: scaling, learning-rate warnings, two convergence failures before `early_stopping` and a smaller first layer settled it. On 10k rows it can't beat tuned boosting. The calculus flips at scale and with unstructured inputs: a fleet of 500k machines, or raw vibration waveforms fed through an embedding into the same network.
-
----
-
-## Handling Class Imbalance
-
-Don't ignore this. Most real classification problems are imbalanced: fraud is rare, breakdowns are rare, disease is rare. A model that ignores imbalance will be confidently wrong on the class that matters.
-
-| Technique | When to use |
+| | |
 |---|---|
-| `class_weight="balanced"` | First thing to try: built into most sklearn models |
-| SMOTE (oversampling) | Minority class is very small; synthesises new examples |
-| Undersampling | Majority class is huge; faster than oversampling |
-| Threshold tuning | After training: see the worked example above |
-| PR-AUC as your metric | Always, when your positive class is rare |
+| **Use when** | Small data where "similar input → same class" is true, or where "find similar cases" is itself the product |
+| **Get it right** | Scale features: one unscaled column dominates every distance. Drop irrelevant features. Odd `k` for binary problems, tuned with CV. Prediction compares against every training row |
+| **On the plant data** | AUC 0.77. Machine age in days dominated every distance until scaling. Its real niche: pulling comparable historical breakdowns for a technician |
+
+### Naive Bayes
+
+Assumes every feature is independent given the class. Almost always false. Works on text anyway.
+
+| Variant | Assumes | Best for |
+|---|---|---|
+| **GaussianNB** | Continuous, bell-shaped features | Numeric features |
+| **MultinomialNB** | Counts | Word counts, TF-IDF |
+| **BernoulliNB** | Binary features | Word presence |
+
+Keep `alpha` above 0 (default 1.0) so unseen words don't zero a probability. Raw probabilities are not calibrated. On the plant data it scores AUC 0.72, the worst real model, because vibration, temperature and load are strongly correlated. On work-order text it trains in milliseconds and flags bearing problems at 90%+.
+
+### Neural network (MLP) classifier
+
+A universal approximator that boosting still usually beats on tabular data. Earn it, don't start with it.
+
+| | |
+|---|---|
+| **Use when** | 50k+ rows and boosting has plateaued, or you'll extend to deep learning later |
+| **Get it right** | Scale all features. One hidden layer of 64–128 ReLU units with Adam to start. `early_stopping=True`. Move to PyTorch for GPUs or custom architectures, not just for more layers |
+| **On the plant data** | AUC 0.85, between the forest and XGBoost, after two convergence failures. It wins with scale or unstructured inputs: 500k machines, or raw vibration waveforms |
+
+## Gotchas
+
+- **Reporting accuracy on imbalanced data.** A do-nothing model scores 97%. Report PR-AUC and the confusion matrix.
+- **Keeping the 0.5 threshold.** It ignores what a miss and a false alarm cost. Pick the threshold from the cost ratio.
+- **Unscaled features for logistic regression, SVM, KNN or MLP.** The largest units dominate. Scale inside the pipeline.
+- **Oversampling before the split.** Synthetic rows leak into validation. Resample inside each training fold only.
+- **Trusting tree or Naive Bayes probabilities.** They're not calibrated. Wrap with `CalibratedClassifierCV` before threshold maths.
+
+## Scenario questions
+
+**Q1 ★ Your failure model is 97% accurate. Is that good?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** what's the [base rate](../start-here/glossary.md#base-rate) of failures?
+- **Observe:** 3%. Predicting "no failure" for every machine also scores 97%.
+- **Hypothesise:** accuracy is dominated by the majority class and says nothing about catching failures.
+- **Fix:** report PR-AUC (0.46 for tuned XGBoost against 0.03 for the do-nothing model) and precision and recall at the chosen threshold.
+- **Prevent:** agree the metric before modelling. The trade-off is a less familiar number for stakeholders.
+
+</details>
+
+**Q2 ★★ How do you choose the decision threshold?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** what does an inspection cost, and what does a missed breakdown cost?
+- **Observe:** $500 vs $50,000. At 0.5 the model catches 30 of 60 breakdowns; at 0.25 it catches 48, with 110 more inspections.
+- **Hypothesise:** with a 100:1 cost ratio, recall is worth a lot of false alarms.
+- **Fix:** pick 0.25: $55k of extra inspections prevents ~$900k of downtime. Check the inspection budget can absorb 150 flags.
+- **Prevent:** the threshold is reviewed with the business whenever costs or capacity change. The trade-off is many inspections that find nothing.
+
+</details>
+
+**Q3 ★★ Logistic regression scores 0.79 AUC, Random Forest 0.84. What does the gap tell you?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** same features, same split?
+- **Observe:** the forest's gain comes mostly from vibration and temperature together.
+- **Hypothesise:** failure drivers interact. Rising vibration matters only when temperature also climbs, which a linear model can't express without an explicit interaction term.
+- **Fix:** move to tree ensembles, or add the interaction term if the linear model's explainability matters.
+- **Prevent:** compare linear and forest baselines on every new problem. The trade-off is less readable coefficients.
+
+</details>
+
+**Q4 ★★★ The plant wants to classify failure modes from technicians' free-text notes. Which model?**
+
+<details>
+<summary>Model answer</summary>
+
+- **Clarify:** how many labelled notes, how many classes, and how fast is it needed?
+- **Observe:** a few thousand notes; TF-IDF gives ~30,000 sparse dimensions.
+- **Hypothesise:** tree ensembles struggle on sparse text. Linear SVM and Naive Bayes are built for it.
+- **Fix:** Naive Bayes as a same-day baseline, then `LinearSVC` on TF-IDF. A transformer only if they plateau and there's enough data.
+- **Prevent:** match the model family to the data shape before tuning. The trade-off is uncalibrated scores that need calibration before threshold maths.
+
+</details>
+
+## Summary
+
+- **Accuracy lies on imbalanced data.** Report PR-AUC and the confusion matrix.
+- **The threshold is a business decision.** The cost ratio of misses to false alarms picks it, not 0.5.
+- **Start with logistic regression.** Calibrated probabilities and readable coefficients in two minutes.
+- **Tuned boosting wins on tabular data.** `scale_pos_weight` and early stopping, or it barely beats the forest.
+- **Match the model to the data shape.** SVM and Naive Bayes lose on sensors and win on text.
 
 ---
 
-## Model Selection Guide
-
-```
-Is the decision boundary probably linear?
-├── Yes → Logistic Regression. Start here every time.
-└── No → tree-based
-    ├── Accuracy matters most? → Gradient Boosting
-    ├── Want robustness without tuning? → Random Forest
-    ├── Text or high-dim sparse features? → Linear SVM or Naive Bayes
-    └── Tiny dataset, local structure matters? → KNN
-
-Need to explain the model to a non-technical person?
-└── Decision Tree (shallow) or Logistic Regression
-
-50k+ rows and boosting has plateaued?
-└── Try MLP
-```
-
----
-
-## Practical Checklist
-
-- [ ] Scale features for Logistic Regression, SVM, KNN, and MLP. Non-negotiable
-- [ ] Check class distribution before training anything
-- [ ] Use stratified k-fold so each fold has the same class ratio
-- [ ] Tune the decision threshold after training: 0.5 is almost never right
-- [ ] Look at the confusion matrix, not just F1 or AUC
-- [ ] For text: try Naive Bayes and LinearSVC before reaching for anything heavier
-
----
-
-## Where the Machine-Failure Example Goes Next
-
-Picking the model was one stage. The same 10,000-machine problem continues through the [ML Project Lifecycle](../ml-lifecycle/index.md): how the label and snapshot date were [defined](../ml-lifecycle/index.md#frame-the-problem-first), the [leakage bug that scored AUC 0.99](../ml-lifecycle/data-preprocessing.md), why [random k-fold lies on this problem](../ml-lifecycle/model-training.md#choosing-the-validation-split), and what happens [after it ships](../ml-lifecycle/inference-and-production.md).
+**Next →** [Model Landscape](../landscape.md)

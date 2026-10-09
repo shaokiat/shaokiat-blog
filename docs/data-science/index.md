@@ -1,147 +1,73 @@
-# The Machine Learning Landscape
+---
+title: Data Science
+sidebar_label: Overview
+---
 
-A map of the major ML model classes, when to use each, and what problems they solve. Every section answers: _"What kind of problem is this model class built for?"_
+# Data Science
 
-Two ways in:
+Study notes for applied machine learning, written for interviews: every page ends in scenario questions answered out loud, and every number comes from one of two running examples. The pages are for reading, not running. Start with the [Learning Path](./start-here/learning-path.md); look terms up in the [Glossary](./start-here/glossary.md).
 
-- **Follow a project end to end** → [ML Project Lifecycle](./ml-lifecycle/index.md). One machine-failure problem from the factory floor, from framing to production. Start here.
-- **Pick a model for a problem** → [Supervised Learning](./supervised/index.md). Cheatsheets and per-model decision guides for regression and classification.
+## Running examples
 
-The rest of this page is the wider map: the paradigms and model families those sections don't cover yet.
+- **Machine failure** — 10,000 machines, 3% fail in any 30-day window. Used by the [ML Project Lifecycle](./ml-lifecycle/index.md), [Classification](./supervised/classification.md) and the [Predictive Maintenance scenario](./scenarios/predictive-maintenance.md).
+- **Bike-rental demand** — hourly rentals from weather and time. Used by [Regression](./supervised/regression.md).
 
 ---
 
-## Learning Paradigms
+## Section 1: ML Project Lifecycle
 
-Before picking a model, identify the learning paradigm — it narrows your choices immediately.
+### 1.1 Frame the problem → [ML Project Lifecycle](./ml-lifecycle/index.md)
+- The decision, the label and the snapshot date → [The snapshot date](./ml-lifecycle/index.md#the-snapshot-date)
+- Rule baseline vs model → [Is ML needed?](./ml-lifecycle/index.md#is-ml-needed)
 
-| Paradigm            | Data you have                         | Goal                                                        |
-| ------------------- | ------------------------------------- | ----------------------------------------------------------- |
-| **Supervised**      | Labeled input-output pairs            | Predict a label or value for new inputs                     |
-| **Unsupervised**    | Unlabeled data only                   | Find structure, patterns, or groups                         |
-| **Semi-supervised** | Mostly unlabeled + small labeled set  | Leverage unlabeled data to improve supervised learning      |
-| **Reinforcement**   | Rewards from environment interactions | Learn a policy that maximises cumulative reward             |
-| **Self-supervised** | Unlabeled data with synthetic labels  | Pre-train representations (foundation models, transformers) |
+### 1.2 Explore → [Exploratory Data Analysis](./ml-lifecycle/eda.md)
+- Label audit → [Start with the target](./ml-lifecycle/eda.md#start-with-the-target)
+- Leak scan → [Relationships and the leak scan](./ml-lifecycle/eda.md#relationships-and-the-leak-scan)
+- Deliverable → [Decision log](./ml-lifecycle/eda.md#the-deliverable-a-decision-log)
 
----
+### 1.3 Preprocess → [Data Preprocessing](./ml-lifecycle/data-preprocessing.md)
+- Leakage → [The leakage bug that scores 0.99](./ml-lifecycle/data-preprocessing.md#the-leakage-bug-that-scores-099)
+- Missing values, outliers, scaling, encoding → [Missing values](./ml-lifecycle/data-preprocessing.md#missing-values) · [Outliers](./ml-lifecycle/data-preprocessing.md#outliers) · [Encoding](./ml-lifecycle/data-preprocessing.md#encoding-categoricals)
+- One fitted object → [The pipeline pattern](./ml-lifecycle/data-preprocessing.md#the-pipeline-pattern)
 
-## Supervised Learning
+### 1.4 Features → [Feature Engineering & Selection](./ml-lifecycle/feature-engineering.md)
+- Windows and ratios → [Creating features](./ml-lifecycle/feature-engineering.md#creating-features)
+- Deletion → [Selecting features](./ml-lifecycle/feature-engineering.md#selecting-features)
+- SHAP → [Explaining the model](./ml-lifecycle/feature-engineering.md#explaining-the-model)
 
-Labeled data, predict a value or a class. This section has its own deep-dive pages — each with a cheatsheet table, a running example, and per-model decision guidance — so the details live there, not here:
+### 1.5 Train and evaluate → [Model Training & Evaluation](./ml-lifecycle/model-training.md)
+- Baselines → [Baseline first](./ml-lifecycle/model-training.md#baseline-first)
+- Time-based splits → [Choosing the validation split](./ml-lifecycle/model-training.md#choosing-the-validation-split)
+- Sign-off → [Evaluate and sign off](./ml-lifecycle/model-training.md#evaluate-and-sign-off)
 
-- **[Regression](./supervised/regression.md)** — target is continuous (price, demand, sensor reading). Covers Linear/Ridge/Lasso/ElasticNet, polynomial, trees, Random Forest, gradient boosting, SVR. Rule of thumb: start linear, and on tabular data expect gradient boosting to win once tuned.
-- **[Classification](./supervised/classification.md)** — target is a class label (spam, machine failure, fraud). Covers Logistic Regression, trees, ensembles, SVM, KNN, Naive Bayes, MLP. Rule of thumb: start with logistic regression, never report plain accuracy on imbalanced data.
+### 1.6 Production → [Inference & Production](./ml-lifecycle/inference-and-production.md)
+- Batch vs online → [Batch vs online inference](./ml-lifecycle/inference-and-production.md#batch-vs-online-inference)
+- Skew and drift → [Training/serving skew](./ml-lifecycle/inference-and-production.md#trainingserving-skew) · [Monitoring and drift](./ml-lifecycle/inference-and-production.md#monitoring-and-drift)
+- Impact → [Delayed labels and proving impact](./ml-lifecycle/inference-and-production.md#delayed-labels-and-proving-impact)
 
-See also the [Supervised Learning intro](./supervised/index.md) for train/validation/test splits, cross-validation, bias–variance, and regularisation.
+## Section 2: Models
 
----
+### 2.1 Shared concepts → [Supervised Learning](./supervised/index.md)
+- Splits and cross-validation → [Cross-validation](./supervised/index.md#cross-validation)
+- Bias–variance → [Bias–variance trade-off](./supervised/index.md#biasvariance-trade-off)
+- Ensembles → [Bagging vs boosting](./supervised/index.md#ensembles-bagging-vs-boosting)
 
-## Unsupervised Learning
+### 2.2 Regression → [Regression](./supervised/regression.md)
+- Metrics → [Evaluation metrics](./supervised/regression.md#evaluation-metrics)
+- Penalties → [Ridge](./supervised/regression.md#ridge-regression-l2) · [Lasso](./supervised/regression.md#lasso-regression-l1) · [ElasticNet](./supervised/regression.md#elasticnet)
 
-### Clustering
+### 2.3 Classification → [Classification](./supervised/classification.md)
+- Thresholds → [Evaluation metrics](./supervised/classification.md#evaluation-metrics)
+- Imbalance → [Handling class imbalance](./supervised/classification.md#handling-class-imbalance)
 
-Groups data points without predefined labels.
+### 2.4 Beyond supervised → [Model Landscape](./landscape.md)
+- Unsupervised → [Clustering](./landscape.md#clustering) · [Anomaly detection](./landscape.md#anomaly-detection)
+- Deep learning and RL → [Deep learning](./landscape.md#deep-learning) · [Reinforcement learning](./landscape.md#reinforcement-learning)
 
-| Algorithm                         | When to use                                                  |
-| --------------------------------- | ------------------------------------------------------------ |
-| **K-Means**                       | Known number of clusters, spherical clusters, large datasets |
-| **DBSCAN**                        | Unknown K, arbitrary shapes, handles noise/outliers          |
-| **Hierarchical (Agglomerative)**  | Small datasets, want a dendrogram, unknown K                 |
-| **Gaussian Mixture Models (GMM)** | Soft cluster assignments, elliptical cluster shapes          |
+## Section 3: Scenarios
 
-### Dimensionality Reduction
-
-Reduces features while preserving information.
-
-| Algorithm        | Purpose                                                             |
-| ---------------- | ------------------------------------------------------------------- |
-| **PCA**          | Linear compression, remove correlated features, preprocessing       |
-| **t-SNE**        | 2D/3D visualisation of high-dimensional data                        |
-| **UMAP**         | Faster than t-SNE, better preserves global structure, visualisation |
-| **Autoencoders** | Non-linear compression, anomaly detection via reconstruction error  |
-
-### Anomaly Detection
-
-Identifies data points that deviate significantly from the norm.
-
-| Algorithm                              | When to use                                                |
-| -------------------------------------- | ---------------------------------------------------------- |
-| **Isolation Forest**                   | Fast, scales well, tree-based, no distribution assumptions |
-| **One-Class SVM**                      | High-dimensional space, known normal distribution          |
-| **Autoencoder (reconstruction error)** | Complex data (images, sequences), unsupervised             |
-| **LOF (Local Outlier Factor)**         | Density-based, detects local anomalies                     |
+- [Predictive Maintenance](./scenarios/predictive-maintenance.md) — the whole failure project as one interview answer
 
 ---
 
-## Ensemble Methods
-
-Combine multiple models to reduce variance, bias, or both.
-
-| Method       | Mechanism                                                  | Examples                              |
-| ------------ | ---------------------------------------------------------- | ------------------------------------- |
-| **Bagging**  | Train models in parallel on random subsets; average output | Random Forest                         |
-| **Boosting** | Train models sequentially; each corrects prior errors      | XGBoost, LightGBM, AdaBoost, CatBoost |
-| **Stacking** | Train a meta-learner on predictions of base models         | Custom pipelines                      |
-
-**Rule of thumb:** Bagging reduces variance (fixes overfitting). Boosting reduces bias (fixes underfitting).
-
----
-
-## Deep Learning
-
-Neural networks with multiple layers. Required when data is high-dimensional and unstructured (images, text, audio) or when tabular model accuracy plateaus.
-
-| Architecture                      | Best for                                                       |
-| --------------------------------- | -------------------------------------------------------------- |
-| **Feedforward (MLP)**             | Tabular data, classification/regression when features are rich |
-| **CNN (Convolutional)**           | Images, spatial data, time series with local patterns          |
-| **RNN / LSTM / GRU**              | Sequential data, time series, NLP before transformers          |
-| **Transformer**                   | NLP, vision (ViT), multimodal; state of the art for most tasks |
-| **GAN**                           | Generative tasks — image synthesis, data augmentation          |
-| **VAE (Variational Autoencoder)** | Generative modelling with latent space control                 |
-| **Diffusion Models**              | High-quality image/audio generation (e.g. Stable Diffusion)    |
-
----
-
-## Reinforcement Learning
-
-An agent learns a **policy** by taking actions in an environment and receiving rewards.
-
-| Algorithm class               | Approach                                  | Examples            |
-| ----------------------------- | ----------------------------------------- | ------------------- |
-| **Model-free (value-based)**  | Learns Q-values; derives policy from them | DQN, Double DQN     |
-| **Model-free (policy-based)** | Directly optimises the policy             | REINFORCE, PPO, A3C |
-| **Actor-Critic**              | Combines value and policy; lower variance | A2C, SAC, TD3       |
-| **Model-based**               | Builds a world model; plans inside it     | AlphaZero, Dreamer  |
-
-Use RL when: reward signal is available, environment is simulatable, and the optimal policy isn't known upfront.
-
----
-
-## Choosing a Model — Decision Guide
-
-```
-Is your data labeled?
-├── Yes → Supervised
-│   ├── Target is continuous? → Regression
-│   └── Target is categorical? → Classification
-│       ├── Tabular data → Gradient Boosting (XGBoost/LightGBM) first
-│       ├── Images → CNN or Vision Transformer
-│       └── Text → Transformer (BERT, etc.)
-└── No → Unsupervised
-    ├── Want groups? → Clustering (K-Means / DBSCAN)
-    ├── Want compression? → PCA / Autoencoder
-    └── Want to find outliers? → Isolation Forest / Autoencoder
-
-Is data partially labeled?
-└── Semi-supervised (self-training, pseudo-labeling, contrastive learning)
-
-Is there an environment with rewards?
-└── Reinforcement Learning
-```
-
----
-
-## Roadmap
-
-Planned deep-dive pages, in rough priority order: Anomaly Detection & Clustering (unsupervised methods on plant sensor data), Time Series Forecasting (demand and sensor forecasting), Neural Networks & Deep Learning (backprop, CNNs, Transformers), Dimensionality Reduction (PCA math, t-SNE vs UMAP).
+Serving the model behind an API lives in [AI Engineering](../ai-engineering/index.md). This section owns the decisions; that one owns the code.
