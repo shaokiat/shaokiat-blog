@@ -2,6 +2,91 @@
 
 My second nemesis 🥵!
 
+## Common Approaches to Graph Questions
+
+Most graph questions are disguised: a grid, a list of prerequisites, a set of emails. Build the adjacency list first, then pick the traversal.
+
+| Pattern | Use when | Cost | Example |
+| --- | --- | --- | --- |
+| BFS | Shortest path in an **unweighted** graph; spread from many sources at once | O(V + E) | [01 Matrix](./dynamic-programming.mdx#01-matrix), [Rotting Oranges](https://leetcode.com/problems/rotting-oranges/) |
+| DFS / flood fill | Connected components, islands, "can I reach" | O(V + E) | [Number of Islands](https://leetcode.com/problems/number-of-islands/), [Accounts Merge](#accounts-merge) |
+| Topological sort | Dependencies, ordering, cycle in a **directed** graph | O(V + E) | [Course Schedule](#topological-sort-detecting-cycle-in-directed-graph) |
+| Union-Find | Connectivity that changes as edges arrive; cycle in an **undirected** graph | ~O(1) per op | [Redundant Connection](https://leetcode.com/problems/redundant-connection/), [Accounts Merge](#accounts-merge) |
+| Dijkstra | Shortest path with **non-negative** weights | O(E log V) | [Network Delay Time](https://leetcode.com/problems/network-delay-time/) |
+| Leaf peeling | Centre of a tree-shaped graph | O(V) | [Minimum Height Trees](#minimum-height-trees) |
+| Eulerian path (Hierholzer) | Use every **edge** exactly once | O(E log E) | [Reconstruct Itinerary](#reconstruct-itinerary) |
+
+| Question says | Reach for | Not |
+| --- | --- | --- |
+| "minimum steps", all edges cost 1 | BFS | ❌ DFS: finds *a* path, not the shortest |
+| "minimum cost", weights differ | Dijkstra | ❌ BFS: counts edges, ignores weights |
+| Negative weights | Bellman-Ford | ❌ Dijkstra: settles nodes too early |
+| "is there a cycle", directed | Topological sort / DFS colours | ❌ Union-Find: ignores direction |
+
+### BFS shortest path
+
+Mark a node visited when you **enqueue** it, not when you pop it, or the same node gets queued many times.
+
+```py
+from collections import deque
+
+def shortestPath(graph, start, target):
+    q, seen = deque([(start, 0)]), {start}
+    while q:
+        node, dist = q.popleft()
+        if node == target:
+            return dist
+        for nxt in graph[node]:
+            if nxt not in seen:
+                seen.add(nxt) # mark on enqueue
+                q.append((nxt, dist + 1))
+    return -1
+```
+
+For a grid, `graph[node]` becomes the four neighbours `(r ± 1, c)`, `(r, c ± 1)` that are in bounds.
+
+### Union-Find
+
+```py
+parent = list(range(n))
+
+def find(x):
+    while parent[x] != x:
+        parent[x] = parent[parent[x]] # path compression
+        x = parent[x]
+    return x
+
+def union(a, b): # False if a and b were already connected → this edge closes a cycle
+    ra, rb = find(a), find(b)
+    if ra == rb:
+        return False
+    parent[ra] = rb
+    return True
+```
+
+### Dijkstra
+
+A min-heap of `(distance, node)`. Skip stale entries instead of decreasing keys.
+
+```py
+import heapq
+
+def dijkstra(graph, src): # graph[u] = [(v, weight), ...]
+    dist = {src: 0}
+    heap = [(0, src)]
+    while heap:
+        d, u = heapq.heappop(heap)
+        if d > dist.get(u, float("inf")):
+            continue # stale entry: a shorter path was already found
+        for v, w in graph[u]:
+            if d + w < dist.get(v, float("inf")):
+                dist[v] = d + w
+                heapq.heappush(heap, (d + w, v))
+    return dist
+```
+
+## Example Solutions
+
 ### Topological Sort (Detecting cycle in directed graph)
 
 :::tip TIP

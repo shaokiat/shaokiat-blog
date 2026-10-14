@@ -4,8 +4,73 @@
 
 - [Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/description/)
 - [Minimum Height Trees](https://leetcode.com/problems/minimum-height-trees/)
+- [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/)
+- [Diameter of Binary Tree](https://leetcode.com/problems/diameter-of-binary-tree/)
+- [Path Sum II](https://leetcode.com/problems/path-sum-ii/)
 
 :::
+
+> Binary *search* trees, traversal orders and their complexity: → See [Binary Search Trees](./binary-search-trees.mdx)
+
+## Common Approaches to Tree Questions
+
+Almost every tree question is one of two DFS shapes or a BFS. Decide which way information flows first.
+
+| Pattern | Information flows | Use when | Example |
+| --- | --- | --- | --- |
+| DFS returning a value (post-order) | Up, from children to parent | Answer combines the subtrees: height, diameter, balanced, LCA | [Lowest Common Ancestor](#lowest-common-ancestor-of-a-binary-tree) |
+| DFS carrying state (pre-order) | Down, from parent to children | Path sums, root-to-leaf paths, bounds for BST validation | [Path Sum II](https://leetcode.com/problems/path-sum-ii/) |
+| BFS level order | Level by level | Anything "per level": right side view, minimum depth, zigzag | [Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/) |
+| Peel the leaves | Outside in | Find the centre of an undirected tree | [Minimum Height Trees](#minimum-height-trees) |
+| Global answer + local return | Up, but the answer can bend through a node | Diameter, max path sum: return one branch, record both | [Diameter of Binary Tree](https://leetcode.com/problems/diameter-of-binary-tree/) |
+
+### DFS returning a value
+
+Ask: "if I knew the answer for my left and right subtree, could I compute mine?" If yes, recurse and combine. When the best path can pass *through* a node, return the best single branch to the parent and update a global with both branches.
+
+```py
+def diameterOfBinaryTree(root):
+    best = 0
+    def height(node):
+        nonlocal best
+        if not node:
+            return 0
+        l, r = height(node.left), height(node.right)
+        best = max(best, l + r)   # path bending through this node
+        return 1 + max(l, r)      # parent can only extend one branch
+    height(root)
+    return best
+```
+
+### BFS level order
+
+Process the queue one level at a time by fixing its length before the inner loop.
+
+```py
+from collections import deque
+
+def levelOrder(root):
+    res, q = [], deque([root] if root else [])
+    while q:
+        level = []
+        for _ in range(len(q)): # exactly the nodes on this level
+            node = q.popleft()
+            level.append(node.val)
+            if node.left: q.append(node.left)
+            if node.right: q.append(node.right)
+        res.append(level)
+    return res
+```
+
+Right side view is `level[-1]` per level. Minimum depth is the first level with a leaf, which is why BFS beats DFS there: it stops early.
+
+| Gotcha | Result |
+| --- | --- |
+| Recursing on a 10⁵-node skewed tree in Python | ❌ `RecursionError`. Go iterative or raise the limit |
+| Minimum depth as `1 + min(left, right)` | ❌ A node with one child reports depth 1. Only leaves end a path |
+| Appending `path` instead of `path[:]` in path questions | ❌ Every result aliases the same list |
+
+## Example Solutions
 
 ### [Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/description/)
 

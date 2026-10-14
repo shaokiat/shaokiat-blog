@@ -24,6 +24,76 @@ Fantastic [explanation](https://www.youtube.com/watch?v=5dRGRueKU3M) by [Abdul B
 on Top Down Approach using Fibonacci example.
 :::
 
+### Spotting a DP question
+
+| Signal | Example wording |
+| --- | --- |
+| Optimise over choices | "minimum cost", "maximum profit", "longest" |
+| Count the ways | "how many distinct ways", "number of paths" |
+| Is it possible | "can you reach", "can you partition" |
+| Choices now limit choices later | Robbing a house blocks its neighbour; fuel now limits the next leg |
+
+If the same subproblem gets solved more than once in the recursion tree, memoise it. In Python, `@functools.cache` on the recursive function turns step 2 into step 3 of the approach above.
+
+## Common Approaches to DP Questions
+
+Most interview DP questions belong to a handful of families. Name the family and the state falls out.
+
+| Family | State | Transition, in words | Examples |
+| --- | --- | --- | --- |
+| 1D linear | `dp[i]` = best answer using the first `i` items | Take from `i − 1` or `i − 2` | [House Robber](#house-robber), [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/), [Decode Ways](https://leetcode.com/problems/decode-ways/) |
+| 0/1 knapsack | `dp[c]` = best with capacity `c` | Each item: skip it, or take it once | [Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/), [Target Sum](https://leetcode.com/problems/target-sum/) |
+| Unbounded knapsack | `dp[c]` | Each item: skip it, or take it again | [Coin Change](https://leetcode.com/problems/coin-change/), [Coin Change II](https://leetcode.com/problems/coin-change-ii/) |
+| 2D grid | `dp[r][c]` | From the cell above and the cell to the left | [Unique Paths](https://leetcode.com/problems/unique-paths/), [01 Matrix](#01-matrix) |
+| Two sequences | `dp[i][j]` = answer for prefixes `a[:i]`, `b[:j]` | Characters match → diagonal; else best of dropping one | [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/), [Edit Distance](https://leetcode.com/problems/edit-distance/) |
+| Interval | `dp[i][j]` = answer for `s[i..j]` | Grow from shorter intervals to longer | [Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/), [Burst Balloons](https://leetcode.com/problems/burst-balloons/) |
+| State machine | `dp[i][state]` | Extra dimension for "holding", "cooling down", "fuel left" | [Stock with Cooldown](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/), [Road Trip](#road-trip) |
+| Digit DP | `dp[position][tight][…]` | Build the number digit by digit | [Count Digits 0, 2 and 4](#count-digits-0-2-and-4) |
+
+### Knapsack: the loop direction is the whole difference
+
+With a 1D array, iterating capacity **downwards** uses each item at most once; **upwards** lets it be reused.
+
+```py
+def canPartition(nums): # 0/1: each number used once
+    total = sum(nums)
+    if total % 2:
+        return False
+    dp = [True] + [False] * (total // 2) # dp[c]: can some subset sum to c?
+    for n in nums:
+        for c in range(total // 2, n - 1, -1): # downwards
+            dp[c] = dp[c] or dp[c - n]
+    return dp[-1]
+
+def coinChange(coins, amount): # unbounded: each coin reused
+    dp = [0] + [float("inf")] * amount # dp[c]: fewest coins to make c
+    for coin in coins:
+        for c in range(coin, amount + 1): # upwards
+            dp[c] = min(dp[c], dp[c - coin] + 1)
+    return dp[amount] if dp[amount] != float("inf") else -1
+```
+
+| Loop direction | On `nums = [3]`, target 6 | Result |
+| --- | --- | --- |
+| Downwards (0/1) | `dp[6]` reads the old `dp[3]` = False | ✅ 3 can't be used twice |
+| Upwards | `dp[3]` becomes True, then `dp[6]` reads it | ❌ Counts 3 + 3 for a single 3 |
+
+### Two sequences
+
+```py
+def longestCommonSubsequence(a, b):
+    dp = [[0] * (len(b) + 1) for _ in range(len(a) + 1)] # row/col 0 = empty prefix
+    for i in range(1, len(a) + 1):
+        for j in range(1, len(b) + 1):
+            if a[i - 1] == b[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1               # extend the diagonal
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])   # drop a char from one side
+    return dp[-1][-1]
+```
+
+Edit Distance is the same table with `1 + min(insert, delete, replace)` in the else branch.
+
 ## Example Solutions
 
 ### Road Trip
@@ -45,13 +115,47 @@ Hardest part is identifying the recurrence relation
 
 #### Recurrence Relation
 
-<div style={{ textAlign: "center" }}>
-  <img
-    src="/shaokiat-blog/img/algo/dp-road-trip.png"
-    alt="roadtrip"
-    width="600"
-  />
-</div>
+<svg className="ml-diagram" viewBox="0 0 400 200" role="img" aria-label="Road trip state: at station j with k litres, top up i, then drive d and arrive with k − d + i">
+  <rect x="90" y="30" width="44" height="26" className="box-fill" />
+  <text x="82" y="47.0" textAnchor="end" fontSize="10" className="axis-label">4</text>
+  <rect x="90" y="56" width="44" height="26" className="box-fill" />
+  <text x="82" y="73.0" textAnchor="end" fontSize="10" className="axis-label">3</text>
+  <rect x="90" y="82" width="44" height="26" className="box-fill" />
+  <text x="82" y="99.0" textAnchor="end" fontSize="10" className="axis-label">2</text>
+  <rect x="90" y="108" width="44" height="26" className="box-fill" />
+  <text x="82" y="125.0" textAnchor="end" fontSize="10" className="axis-label">1</text>
+  <rect x="90" y="134" width="44" height="26" className="box-fill" />
+  <text x="82" y="151.0" textAnchor="end" fontSize="10" className="axis-label">0</text>
+  <rect x="300" y="30" width="44" height="26" className="box-fill" />
+  <text x="352" y="47.0" textAnchor="start" fontSize="10" className="axis-label">4</text>
+  <rect x="300" y="56" width="44" height="26" className="box-fill" />
+  <text x="352" y="73.0" textAnchor="start" fontSize="10" className="axis-label">3</text>
+  <rect x="300" y="82" width="44" height="26" className="box-fill" />
+  <text x="352" y="99.0" textAnchor="start" fontSize="10" className="axis-label">2</text>
+  <rect x="300" y="108" width="44" height="26" className="box-fill" />
+  <text x="352" y="125.0" textAnchor="start" fontSize="10" className="axis-label">1</text>
+  <rect x="300" y="134" width="44" height="26" className="box-fill" />
+  <text x="352" y="151.0" textAnchor="start" fontSize="10" className="axis-label">0</text>
+  <text x="112" y="180" textAnchor="middle" fontSize="11" fontWeight="600" className="box-text">station j</text>
+  <text x="322" y="180" textAnchor="middle" fontSize="11" fontWeight="600" className="box-text">station j+1</text>
+  <text x="112" y="139.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <text x="112" y="113.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <text x="112" y="87.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <text x="112" y="61.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <path d="M136 43.0 L 296 95.0" className="overfit-line" strokeWidth="2" markerEnd="url(#rt2)" />
+  <path d="M136 69.0 L 296 121.0" className="overfit-line" strokeWidth="2" markerEnd="url(#rt2)" />
+  <path d="M136 95.0 L 296 147.0" className="overfit-line" strokeWidth="2" markerEnd="url(#rt2)" />
+  <text x="144" y="22" textAnchor="start" fontSize="10.5" className="axis-label">top up i litres ↑</text>
+  <text x="216" y="172" textAnchor="middle" fontSize="10.5" className="overfit-label">drive d = 2: lose 2 litres</text>
+  <text x="60" y="18" textAnchor="start" fontSize="10" className="axis-label">litres</text>
+  <defs>
+    <marker id="rt2" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--ml-overfit)" />
+    </marker>
+  </defs>
+</svg>
+
+*Figure DP-1: The state is (station, litres in tank). Each ↑ tops up one litre at station j; red arrows are the drive to station j+1, which costs d litres whatever you arrive with.*
 
 ```
 for each possible i: C(station j, k) = C(station j+1, k - d + i) + cost(station j) * i

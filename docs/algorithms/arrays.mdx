@@ -32,20 +32,163 @@
 
 ## Common Approaches to Arrays and Subarrays Questions
 
+| Pattern | Use when | Cost |
+| --- | --- | --- |
+| [Prefix Sum](#prefix-sum) | Many range-sum queries on an array that doesn't change | O(n) build, O(1) per query |
+| [Sliding Window](#sliding-window) | Best contiguous subarray/substring where shrinking the window can only help or only hurt | O(n) |
+| [Subarray Sum](#subarray-sum) | Count subarrays summing to `k`, with negative numbers allowed | O(n) time, O(n) space |
+| [Kadane's Algorithm](#kadanes-algorithm) | Maximum sum of a contiguous subarray | O(n) time, O(1) space |
+
 ### Prefix Sum
 
-```py
-nums = [10, 20, 5, 15]
-prefixSum = [10, 30, 35, 50]
+`prefix[i]` is the sum of `nums[0..i]`. Any range sum is then one subtraction instead of a loop.
 
-prefixSum[i] = prefixSum[i - 1] + arr[i]
+<svg className="ml-diagram" viewBox="0 0 420 140" role="img" aria-label="Prefix sum: any range sum is the difference of two prefix values">
+  <text x="142" y="14" textAnchor="middle" fontSize="10" className="axis-label">0</text>
+  <text x="186" y="14" textAnchor="middle" fontSize="10" className="axis-label">1</text>
+  <text x="230" y="14" textAnchor="middle" fontSize="10" className="axis-label">2</text>
+  <text x="274" y="14" textAnchor="middle" fontSize="10" className="axis-label">3</text>
+  <text x="110" y="40.0" textAnchor="end" fontSize="11" className="axis-label">nums</text>
+  <rect x="120" y="22" width="44" height="28" className="box-fill" />
+  <text x="142.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">10</text>
+  <rect x="164" y="22" width="44" height="28" className="box-accent" />
+  <text x="186.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">20</text>
+  <rect x="208" y="22" width="44" height="28" className="box-accent" />
+  <text x="230.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">5</text>
+  <rect x="252" y="22" width="44" height="28" className="box-fill" />
+  <text x="274.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">15</text>
+  <text x="110" y="90.0" textAnchor="end" fontSize="11" className="axis-label">prefix</text>
+  <rect x="120" y="72" width="44" height="28" className="box-accent" />
+  <text x="142.0" y="90.0" textAnchor="middle" fontSize="12" className="box-text-accent">10</text>
+  <rect x="164" y="72" width="44" height="28" className="box-fill" />
+  <text x="186.0" y="90.0" textAnchor="middle" fontSize="12" className="box-text">30</text>
+  <rect x="208" y="72" width="44" height="28" className="box-accent" />
+  <text x="230.0" y="90.0" textAnchor="middle" fontSize="12" className="box-text-accent">35</text>
+  <rect x="252" y="72" width="44" height="28" className="box-fill" />
+  <text x="274.0" y="90.0" textAnchor="middle" fontSize="12" className="box-text">50</text>
+  <text x="208" y="128" textAnchor="middle" fontSize="11" className="highlight-label">sum(nums[1..2]) = prefix[2] − prefix[0] = 35 − 10 = 25</text>
+</svg>
+
+*Figure ARR-1: `sum(nums[i..j]) = prefix[j] − prefix[i − 1]`. Amber marks the range being summed and the two prefix values that produce it.*
+
+```py
+prefix = [0] * (len(nums) + 1) # prefix[0] = 0 removes the i == 0 special case
+for i, n in enumerate(nums):
+    prefix[i + 1] = prefix[i] + n
+# sum(nums[i..j]) == prefix[j + 1] - prefix[i]
 ```
 
 ### Sliding Window
 
+Two pointers bound a window. `right` grows it until it's valid; `left` then shrinks it while it stays valid, recording the best answer. Each index enters and leaves once, so the whole scan is O(n).
+
+<svg className="ml-diagram wide" viewBox="0 0 482 108" role="img" aria-label="Sliding window over ADOBECODEBANC: right grows the window, left shrinks it">
+  <text x="37.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">0</text>
+  <text x="71.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">1</text>
+  <text x="105.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">2</text>
+  <text x="139.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">3</text>
+  <text x="173.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">4</text>
+  <text x="207.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">5</text>
+  <text x="241.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">6</text>
+  <text x="275.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">7</text>
+  <text x="309.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">8</text>
+  <text x="343.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">9</text>
+  <text x="377.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">10</text>
+  <text x="411.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">11</text>
+  <text x="445.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">12</text>
+  <rect x="20" y="22" width="34" height="28" className="box-fill" />
+  <text x="37.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">A</text>
+  <rect x="54" y="22" width="34" height="28" className="box-fill" />
+  <text x="71.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">D</text>
+  <rect x="88" y="22" width="34" height="28" className="box-fill" />
+  <text x="105.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">O</text>
+  <rect x="122" y="22" width="34" height="28" className="box-fill" />
+  <text x="139.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">B</text>
+  <rect x="156" y="22" width="34" height="28" className="box-fill" />
+  <text x="173.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">E</text>
+  <rect x="190" y="22" width="34" height="28" className="box-fill" />
+  <text x="207.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">C</text>
+  <rect x="224" y="22" width="34" height="28" className="box-fill" />
+  <text x="241.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">O</text>
+  <rect x="258" y="22" width="34" height="28" className="box-fill" />
+  <text x="275.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">D</text>
+  <rect x="292" y="22" width="34" height="28" className="box-fill" />
+  <text x="309.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">E</text>
+  <rect x="326" y="22" width="34" height="28" className="box-accent" />
+  <text x="343.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">B</text>
+  <rect x="360" y="22" width="34" height="28" className="box-accent" />
+  <text x="377.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">A</text>
+  <rect x="394" y="22" width="34" height="28" className="box-accent" />
+  <text x="411.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">N</text>
+  <rect x="428" y="22" width="34" height="28" className="box-accent" />
+  <text x="445.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">C</text>
+  <path d="M343.0 84 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#sw)" />
+  <path d="M445.0 84 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#sw)" />
+  <text x="343.0" y="98" textAnchor="middle" fontSize="10.5" className="axis-label">left: shrink while valid</text>
+  <text x="445.0" y="98" textAnchor="middle" fontSize="10.5" className="axis-label">right: grow</text>
+  <defs>
+    <marker id="sw" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--mermaid-edge)" />
+    </marker>
+  </defs>
+</svg>
+
+*Figure ARR-2: [Minimum Window Substring](#minimum-window-substring) on `ADOBECODEBANC` with `t = "ABC"`. Amber is the final window, `BANC`.*
+
+```py
+left = 0
+for right, x in enumerate(nums):
+    add(x)                 # grow
+    while window_valid():  # shrink while it still holds
+        best = update(best, left, right)
+        remove(nums[left])
+        left += 1
+```
+
+It only works when validity is monotonic: adding an element never fixes a broken window, removing one never breaks a valid one. Negative numbers break that for sums. Use [Subarray Sum](#subarray-sum) instead.
+
 ### Subarray Sum
 
+Count subarrays summing to `k` ([Subarray Sum Equals K](https://leetcode.com/problems/subarray-sum-equals-k/)). A subarray ending at `i` sums to `k` when some earlier prefix equals `prefix[i] − k`, so keep a count of prefixes seen so far.
+
+```py
+def subarraySum(nums, k):
+    count, total = 0, 0
+    seen = {0: 1} # the empty prefix, so a subarray starting at 0 counts
+    for n in nums:
+        total += n
+        count += seen.get(total - k, 0)
+        seen[total] = seen.get(total, 0) + 1
+    return count
+```
+
+Trace for `nums = [1, 2, 3]`, `k = 3`:
+
+| n | total | total − k | seen before | count |
+| --- | --- | --- | --- | --- |
+| 1 | 1 | −2 | `{0: 1}` | 0 |
+| 2 | 3 | 0 | `{0: 1, 1: 1}` | 1 (`[1, 2]`) |
+| 3 | 6 | 3 | `{0: 1, 1: 1, 3: 1}` | 2 (`[3]`) |
+
+[Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/) is the same loop keyed on `total % k`.
+
 ### Kadane's Algorithm
+
+At each index, either extend the best subarray ending at the previous index or start fresh here. Start fresh when the running sum has gone negative: it can only drag the next element down.
+
+| i | nums[i] | cur = max(nums[i], cur + nums[i]) | best |
+| --- | --- | --- | --- |
+| 0 | −2 | −2 | −2 |
+| 1 | 1 | 1 (restart) | 1 |
+| 2 | −3 | −2 | 1 |
+| 3 | 4 | 4 (restart) | 4 |
+| 4 | −1 | 3 | 4 |
+| 5 | 2 | 5 | 5 |
+| 6 | 1 | **6** | **6** |
+| 7 | −5 | 1 | 6 |
+| 8 | 4 | 5 | 6 |
+
+The answer is `[4, −1, 2, 1] = 6`. Code is in [Maximum Subarray](#maximum-subarray) below. [Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/) tracks both the max and the min, because a negative number flips them.
 
 ## Example Solutions
 
@@ -421,18 +564,19 @@ Space Complexity: `O(1)`, only constant space used.
 def threeSum(self, nums):
     res = set()
     nums.sort()
-    for index, i in enumerate(nums):
-        target = 0 - i
-        seen = {}
-        for j in nums[i+1:]:
-            diff = target - j
-            if diff in seen:
-                res.add(tuple([i, j, diff]))
-            seen[j] = j
-    return res
+    for i, a in enumerate(nums):
+        if i > 0 and a == nums[i - 1]: # same first number, same triplets
+            continue
+        seen = set()
+        for b in nums[i + 1:]:
+            c = -a - b
+            if c in seen:
+                res.add((a, c, b)) # sorted, so set dedupes the rest
+            seen.add(b)
+    return [list(t) for t in res]
 ```
 
-Time Complexity: `O(n*2)`
+Time Complexity: `O(n^2)`
 
 Space Complexity: `O(n)`
 
@@ -451,14 +595,14 @@ Idea:
 def nextPermutation(self, nums):
     i = j = len(nums) - 1
     # Find last ascending position
-    while i > 0 and nums[i-1] > nums[i]: 
+    while i > 0 and nums[i-1] >= nums[i]: # >= so duplicates are skipped
         i -= 1
     if i == 0: # nums is sorted in decreasing order
         nums.reverse()
         return
     k = i - 1
     # Find min nums[j] that is greater than nums[k]
-    while nums[j] < nums[k]:
+    while nums[j] <= nums[k]:
         j -= 1
     nums[j], nums[k] = nums[k], nums[j] # swap
     
