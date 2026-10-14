@@ -3,8 +3,134 @@
 :::tip common questions
 
 - [Task Scheduler](https://leetcode.com/problems/task-scheduler/)
+- [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/)
+- [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/)
+- [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
 
 :::
+
+Use a heap when you repeatedly need the smallest (or largest) item of a collection that keeps changing. Sorting once is cheaper if the collection doesn't change.
+
+<svg className="ml-diagram" viewBox="0 0 480 272" role="img" aria-label="Min-heap stored as an array: index 1 has children at indexes 3 and 4">
+  <path d="M226 36 L 144 80" className="flow-line" strokeWidth="1.5" />
+  <path d="M254 36 L 336 80" className="flow-line" strokeWidth="1.5" />
+  <path d="M119 100 L 86 136" className="overfit-line" strokeWidth="2" />
+  <path d="M141 100 L 174 136" className="overfit-line" strokeWidth="2" />
+  <path d="M339 100 L 306 136" className="flow-line" strokeWidth="1.5" />
+  <path d="M361 100 L 394 136" className="flow-line" strokeWidth="1.5" />
+  <circle cx="240" cy="28" r="15" className="box-fill" />
+  <text x="240" y="32" textAnchor="middle" fontSize="12" fontWeight="600" className="box-text">1</text>
+  <text x="240" y="57" textAnchor="middle" fontSize="9.5" className="axis-label">[0]</text>
+  <circle cx="130" cy="88" r="15" className="box-accent" />
+  <text x="130" y="92" textAnchor="middle" fontSize="12" fontWeight="600" className="box-text-accent">3</text>
+  <text x="130" y="117" textAnchor="middle" fontSize="9.5" className="axis-label">[1]</text>
+  <circle cx="350" cy="88" r="15" className="box-fill" />
+  <text x="350" y="92" textAnchor="middle" fontSize="12" fontWeight="600" className="box-text">2</text>
+  <text x="350" y="117" textAnchor="middle" fontSize="9.5" className="axis-label">[2]</text>
+  <circle cx="75" cy="148" r="15" className="box-accent" />
+  <text x="75" y="152" textAnchor="middle" fontSize="12" fontWeight="600" className="box-text-accent">7</text>
+  <text x="75" y="177" textAnchor="middle" fontSize="9.5" className="axis-label">[3]</text>
+  <circle cx="185" cy="148" r="15" className="box-accent" />
+  <text x="185" y="152" textAnchor="middle" fontSize="12" fontWeight="600" className="box-text-accent">4</text>
+  <text x="185" y="177" textAnchor="middle" fontSize="9.5" className="axis-label">[4]</text>
+  <circle cx="295" cy="148" r="15" className="box-fill" />
+  <text x="295" y="152" textAnchor="middle" fontSize="12" fontWeight="600" className="box-text">5</text>
+  <text x="295" y="177" textAnchor="middle" fontSize="9.5" className="axis-label">[5]</text>
+  <circle cx="405" cy="148" r="15" className="box-fill" />
+  <text x="405" y="152" textAnchor="middle" fontSize="12" fontWeight="600" className="box-text">8</text>
+  <text x="405" y="177" textAnchor="middle" fontSize="9.5" className="axis-label">[6]</text>
+  <text x="107.0" y="206" textAnchor="middle" fontSize="10" className="axis-label">0</text>
+  <text x="151.0" y="206" textAnchor="middle" fontSize="10" className="axis-label">1</text>
+  <text x="195.0" y="206" textAnchor="middle" fontSize="10" className="axis-label">2</text>
+  <text x="239.0" y="206" textAnchor="middle" fontSize="10" className="axis-label">3</text>
+  <text x="283.0" y="206" textAnchor="middle" fontSize="10" className="axis-label">4</text>
+  <text x="327.0" y="206" textAnchor="middle" fontSize="10" className="axis-label">5</text>
+  <text x="371.0" y="206" textAnchor="middle" fontSize="10" className="axis-label">6</text>
+  <text x="75" y="230.0" textAnchor="end" fontSize="11" className="axis-label">heap</text>
+  <rect x="85" y="212" width="44" height="28" className="box-fill" />
+  <text x="107.0" y="230.0" textAnchor="middle" fontSize="12" className="box-text">1</text>
+  <rect x="129" y="212" width="44" height="28" className="box-accent" />
+  <text x="151.0" y="230.0" textAnchor="middle" fontSize="12" className="box-text-accent">3</text>
+  <rect x="173" y="212" width="44" height="28" className="box-fill" />
+  <text x="195.0" y="230.0" textAnchor="middle" fontSize="12" className="box-text">2</text>
+  <rect x="217" y="212" width="44" height="28" className="box-accent" />
+  <text x="239.0" y="230.0" textAnchor="middle" fontSize="12" className="box-text-accent">7</text>
+  <rect x="261" y="212" width="44" height="28" className="box-accent" />
+  <text x="283.0" y="230.0" textAnchor="middle" fontSize="12" className="box-text-accent">4</text>
+  <rect x="305" y="212" width="44" height="28" className="box-fill" />
+  <text x="327.0" y="230.0" textAnchor="middle" fontSize="12" className="box-text">5</text>
+  <rect x="349" y="212" width="44" height="28" className="box-fill" />
+  <text x="371.0" y="230.0" textAnchor="middle" fontSize="12" className="box-text">8</text>
+  <text x="240" y="262" textAnchor="middle" fontSize="10.5" className="highlight-label">children of i: 2i + 1, 2i + 2 · parent of i: (i − 1) // 2</text>
+</svg>
+
+*Figure HEAP-1: A min-heap is a complete binary tree stored as an array. Every parent is ≤ its children; siblings are in no order. Amber is index 1 and its children, found by arithmetic rather than pointers.*
+
+## Time Complexity
+
+| Operation | Big-O | Python `heapq` |
+| --- | --- | --- |
+| Peek min | O(1) | `heap[0]` |
+| Push | O(log(n)) | `heappush` |
+| Pop min | O(log(n)) | `heappop` |
+| Push then pop | O(log(n)) | `heappushpop` |
+| Build from list | O(n) | `heapify`, not n pushes |
+| Search / remove arbitrary | O(n) | Use lazy deletion instead |
+
+`heapq` is a **min**-heap only. For a max-heap, push `-x`. For objects, push tuples `(priority, tiebreak, item)`: without the tiebreak, equal priorities make Python compare the items and raise.
+
+## Common Approaches to Heap Questions
+
+| Pattern | Use when | Cost | Example |
+| --- | --- | --- | --- |
+| Top-k with a size-k heap | k largest/closest from n items, or a stream | O(n log k) | [K Closest Points](./arrays.mdx#k-closest-points-to-origin), [Kth Largest](https://leetcode.com/problems/kth-largest-element-in-an-array/) |
+| Two heaps | Running median, or balancing two halves | O(log n) per add | [Find Median from Data Stream](https://leetcode.com/problems/find-median-from-data-stream/) |
+| K-way merge | Merge k sorted lists/arrays; kth smallest in a sorted matrix | O(N log k) | [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/) |
+| Greedy scheduling | Always run the most urgent or most frequent next | O(n log n) | [Task Scheduler](#task-scheduler), [Meeting Rooms II](https://leetcode.com/problems/meeting-rooms-ii/) |
+| Shortest path | Dijkstra: pop the closest unsettled node | O(E log V) | [Graphs → Dijkstra](./graph.mdx#dijkstra) |
+
+### Top-k: keep the opposite heap
+
+For the k **largest**, keep a **min**-heap of size k: its root is the smallest of the winners, so it's the one to evict.
+
+```py
+import heapq
+
+def kthLargest(nums, k):
+    heap = []
+    for n in nums:
+        heapq.heappush(heap, n)
+        if len(heap) > k:
+            heapq.heappop(heap) # drop the smallest; the k largest remain
+    return heap[0]
+```
+
+`heapq.nlargest(k, nums)` does the same in one line.
+
+### Two heaps: running median
+
+A max-heap holds the lower half, a min-heap the upper half. Keep their sizes within one, and the median is at the roots.
+
+```py
+import heapq
+
+class MedianFinder:
+    def __init__(self):
+        self.lo, self.hi = [], [] # lo: max-heap via negation, hi: min-heap
+
+    def addNum(self, num):
+        heapq.heappush(self.lo, -num)
+        heapq.heappush(self.hi, -heapq.heappop(self.lo)) # largest of lo moves up
+        if len(self.hi) > len(self.lo):
+            heapq.heappush(self.lo, -heapq.heappop(self.hi)) # rebalance
+
+    def findMedian(self):
+        if len(self.lo) > len(self.hi):
+            return -self.lo[0]
+        return (-self.lo[0] + self.hi[0]) / 2
+```
+
+## Example Solutions
 
 ### [Task Scheduler](https://leetcode.com/problems/task-scheduler/)
 

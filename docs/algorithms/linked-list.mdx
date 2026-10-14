@@ -21,15 +21,79 @@ contiguous as each element contains an address to the next element.
 
 ## Common Approaches to Linked List Questions
 
-- Counting number of nodes in the linked list O(n)
-- Reversing a linked list in-place
-- Merging two linked lists together
-- Finding the middle node of the linked list using two pointers
+| Pattern | Use when | Example |
+| --- | --- | --- |
+| Dummy head | The head itself might change: merging, removing, inserting at the front | [Merge Two Sorted Lists](#merge-two-sorted-lists) |
+| Fast and slow pointers | Find the middle, detect a cycle, find where the cycle starts | [Linked List Cycle](#linked-list-cycle) |
+| Two pointers with a gap | Something "n from the end", in one pass | [Remove Nth Node From End of List](#remove-nth-node-from-end-of-list) |
+| In-place reversal | Reverse all or part of a list in O(1) space | [Reverse Linked list](#reverse-linked-list) |
+| Split, reverse, merge | Palindrome check, reorder list: middle → reverse second half → walk both | [Reorder List](https://leetcode.com/problems/reorder-list/) |
+| Hashmap of nodes | O(1) lookup into the list, or cloning with extra pointers | [LRU Cache](./lru-cache.mdx), [Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/) |
+
+### Fast and Slow Pointers
+
+`slow` moves one step, `fast` moves two. When `fast` hits the end, `slow` is in the middle. If there is a cycle, `fast` laps `slow` and they meet inside it.
+
+```py
+def middleNode(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow # second middle for even length
+```
+
+To find **where** a cycle starts ([Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)): after they meet, reset one pointer to `head` and step both by one. They meet again at the cycle's entry.
+
+### In-place Reversal
+
+Three pointers: save `curr.next`, point `curr` back at `prev`, advance both.
+
+<svg className="ml-diagram" viewBox="0 0 500 112" role="img" aria-label="Reversing a linked list: nodes 1 and 2 already point backwards, prev is 2, curr is 3">
+  <text x="40" y="44" textAnchor="middle" fontSize="11" className="axis-label">None</text>
+  <rect x="98" y="26" width="44" height="28" rx="4" className="box-accent" />
+  <text x="120" y="44" textAnchor="middle" fontSize="11" className="box-text-accent">1</text>
+  <rect x="178" y="26" width="44" height="28" rx="4" className="box-accent" />
+  <text x="200" y="44" textAnchor="middle" fontSize="11" className="box-text-accent">2</text>
+  <rect x="278" y="26" width="44" height="28" rx="4" className="box-fill" />
+  <text x="300" y="44" textAnchor="middle" fontSize="11" className="box-text">3</text>
+  <rect x="358" y="26" width="44" height="28" rx="4" className="box-fill" />
+  <text x="380" y="44" textAnchor="middle" fontSize="11" className="box-text">4</text>
+  <text x="460" y="44" textAnchor="middle" fontSize="11" className="axis-label">None</text>
+  <path d="M96 40 L 60 40" className="overfit-line" strokeWidth="2" markerEnd="url(#llr)" />
+  <path d="M176 40 L 142 40" className="overfit-line" strokeWidth="2" markerEnd="url(#llr)" />
+  <path d="M324 40 L 356 40" className="flow-line" strokeWidth="1.5" markerEnd="url(#llf)" />
+  <path d="M404 40 L 440 40" className="flow-line" strokeWidth="1.5" markerEnd="url(#llf)" />
+  <path d="M200 88 V 58" className="flow-line" strokeWidth="1.5" markerEnd="url(#llf)" />
+  <text x="200" y="102" textAnchor="middle" fontSize="11" className="axis-label">prev</text>
+  <path d="M300 88 V 58" className="flow-line" strokeWidth="1.5" markerEnd="url(#llf)" />
+  <text x="300" y="102" textAnchor="middle" fontSize="11" className="axis-label">curr</text>
+  <text x="250" y="44" textAnchor="middle" fontSize="13" className="overfit-label">✕</text>
+  <defs>
+    <marker id="llf" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--mermaid-edge)" />
+    </marker>
+  </defs>
+  <defs>
+    <marker id="llr" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--ml-overfit)" />
+    </marker>
+  </defs>
+</svg>
+
+*Figure LL-1: Halfway through reversing `1 → 2 → 3 → 4`. Amber nodes already point backwards (red links); the ✕ is the link being cut next. Losing `curr.next` before you save it drops the rest of the list.*
+
+To reverse only part of a list ([Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)), stop at the node before the range, reverse `right − left + 1` nodes, then reconnect both ends. A dummy head handles `left == 1`.
 
 ### Corner cases
 
-- Empty linked list
-- Cycles in linked list
+| Case | What breaks |
+| --- | --- |
+| Empty list | `head.next` raises on `None` |
+| Single node | Middle, reversal and "remove nth" must all still return a valid list |
+| Removing the head | Return value must change. Use a dummy head |
+| Even vs odd length | Which "middle" you get from fast/slow |
+| Cycle | Any `while node:` loop runs forever |
 
 ## Example Solutions
 

@@ -6,6 +6,95 @@ Inspired by https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/deta
 
 :::
 
+## Common Approaches to Binary Search Questions
+
+Binary search works on anything **monotonic**, not just sorted arrays: if a condition is false up to some point and true after it, you can find that point in O(log n).
+
+| Pattern | Use when | Template |
+| --- | --- | --- |
+| Exact match | Sorted, unique values, return the index or -1 | [Iterative Binary Search](#iterative-binary-search) |
+| Left border (first ≥ target) | Duplicates, insertion point, "first occurrence" | [Find Left Border](#find-left-border), or `bisect_left` |
+| Right border (last ≤ target) | "Last occurrence", "first strictly greater" | [Find Right Border](#find-right-border), or `bisect_right` |
+| Search on the answer | Minimise or maximise a value where "x works" implies "x + 1 works" | [Binary Search on the Answer](#binary-search-on-the-answer) |
+| Rotated or partially sorted | One half of every split is still sorted | [Search In Rotated Sorted Array](#search-in-rotated-sorted-array) |
+| 2D matrix | Rows sorted and each row starts after the previous ends | Treat it as one array: `row, col = divmod(mid, cols)` |
+
+### Binary Search on the Answer
+
+When the question asks for the *smallest* speed, capacity or time that satisfies a condition, don't search the input. Search the range of possible answers, and test each guess with a greedy `feasible(x)` check.
+
+<svg className="ml-diagram" viewBox="0 0 480 136" role="img" aria-label="Binary search on the answer: feasibility flips from false to true once, at k = 4">
+  <text x="80" y="28.0" textAnchor="end" fontSize="11" className="axis-label">speed k</text>
+  <rect x="90" y="10" width="44" height="28" className="box-fill" />
+  <text x="112.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text">1</text>
+  <rect x="134" y="10" width="44" height="28" className="box-fill" />
+  <text x="156.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text">2</text>
+  <rect x="178" y="10" width="44" height="28" className="box-fill" />
+  <text x="200.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text">3</text>
+  <rect x="222" y="10" width="44" height="28" className="box-accent" />
+  <text x="244.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text-accent">4</text>
+  <rect x="266" y="10" width="44" height="28" className="box-fill" />
+  <text x="288.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text">5</text>
+  <rect x="310" y="10" width="44" height="28" className="box-fill" />
+  <text x="332.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text">6</text>
+  <rect x="354" y="10" width="44" height="28" className="box-fill" />
+  <text x="376.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text">7</text>
+  <rect x="398" y="10" width="44" height="28" className="box-fill" />
+  <text x="420.0" y="28.0" textAnchor="middle" fontSize="12" className="box-text">8</text>
+  <text x="80" y="68.0" textAnchor="end" fontSize="11" className="axis-label">feasible?</text>
+  <rect x="90" y="50" width="44" height="28" className="box-fill" />
+  <text x="112.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text">✗</text>
+  <rect x="134" y="50" width="44" height="28" className="box-fill" />
+  <text x="156.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text">✗</text>
+  <rect x="178" y="50" width="44" height="28" className="box-fill" />
+  <text x="200.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text">✗</text>
+  <rect x="222" y="50" width="44" height="28" className="box-accent" />
+  <text x="244.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text-accent">✓</text>
+  <rect x="266" y="50" width="44" height="28" className="box-fill" />
+  <text x="288.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text">✓</text>
+  <rect x="310" y="50" width="44" height="28" className="box-fill" />
+  <text x="332.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text">✓</text>
+  <rect x="354" y="50" width="44" height="28" className="box-fill" />
+  <text x="376.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text">✓</text>
+  <rect x="398" y="50" width="44" height="28" className="box-fill" />
+  <text x="420.0" y="68.0" textAnchor="middle" fontSize="12" className="box-text">✓</text>
+  <path d="M244.0 112 V 82" className="flow-line" strokeWidth="1.5" markerEnd="url(#bsa)" />
+  <text x="244.0" y="126" textAnchor="middle" fontSize="10.5" className="axis-label">first feasible = answer</text>
+  <defs>
+    <marker id="bsa" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--mermaid-edge)" />
+    </marker>
+  </defs>
+</svg>
+
+*Figure BS-2: [Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/) with piles `[3, 6, 7, 11]` and `h = 8`. Feasibility flips once, from ✗ to ✓. Amber is the first feasible speed, which is the answer.*
+
+```py
+def minEatingSpeed(piles, h):
+    def feasible(k): # can Koko finish at speed k?
+        return sum((p + k - 1) // k for p in piles) <= h
+
+    lo, hi = 1, max(piles) # the answer is somewhere in [lo, hi]
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if feasible(mid):
+            hi = mid      # mid works, but a smaller one might too
+        else:
+            lo = mid + 1  # mid fails, so everything below it fails
+    return lo
+```
+
+Same shape: [Capacity To Ship Packages](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/), [Split Array Largest Sum](https://leetcode.com/problems/split-array-largest-sum/), [Minimum Days to Make Bouquets](https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/). Time is `O(n log(range))`.
+
+### Gotchas
+
+| Mistake | Result |
+| --- | --- |
+| `while left <= right` with `right = len(nums)` | ❌ Reads `nums[len(nums)]`: index out of range |
+| `left = mid` in a `[left, right)` loop | ❌ Infinite loop when `right == left + 1` |
+| Mixing interval styles in one function | ❌ Off-by-one at the edges. Pick closed `[l, r]` or half-open `[l, r)` and keep it |
+| Python `bisect_left` / `bisect_right` | ✅ Border searches for free, when the interviewer allows it |
+
 ## Iterative Binary Search
 
 This is the common binary search where a sorted array `nums` is given and we are tasked to find `target` in that array. <br/>
@@ -131,6 +220,8 @@ def bsRightBorder(nums, target):
         return -1
     return left - 1
 ```
+
+## Example Solutions
 
 ### [Search In Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)
 

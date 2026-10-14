@@ -3,8 +3,56 @@
 :::tip common questions
 
 - [Jump Game](https://leetcode.com/problems/jump-game/description/)
+- [Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)
+- [Gas Station](https://leetcode.com/problems/gas-station/)
+- [Partition Labels](https://leetcode.com/problems/partition-labels/)
 
 :::
+
+Greedy takes the locally best choice and never revisits it. It's O(n) or O(n log n) when it works, and silently wrong when it doesn't. Before using it, either find a counterexample or argue that swapping any optimal solution's choice for the greedy one is no worse (the *exchange argument*).
+
+## Common Approaches to Greedy Questions
+
+| Pattern | Use when | Example |
+| --- | --- | --- |
+| Track the furthest reach | Reachability, minimum jumps | [Jump Game](#jump-game), [Jump Game II](https://leetcode.com/problems/jump-game-ii/) |
+| Sort by end, then sweep | Interval scheduling: keep the most non-overlapping intervals | [Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/), [Min Arrows](https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/) |
+| Sort by start, then merge | Merging or inserting intervals | [Merge Intervals](https://leetcode.com/problems/merge-intervals/), [Insert Interval](./arrays.mdx#insert-interval) |
+| Running balance, reset when negative | A deficit can't be recovered from this start point | [Gas Station](https://leetcode.com/problems/gas-station/), [Kadane's](./arrays.mdx#kadanes-algorithm) |
+| Last occurrence | Cut as early as allowed | [Partition Labels](https://leetcode.com/problems/partition-labels/) |
+| Heap of best-so-far | Pick the best option seen so far, only when forced | [Task Scheduler](./heap.mdx#task-scheduler), [IPO](https://leetcode.com/problems/ipo/) |
+| Two pointers from both ends | Pair the largest with the smallest | [Boats to Save People](https://leetcode.com/problems/boats-to-save-people/) |
+
+### Interval scheduling
+
+Sort by **end** time and keep every interval that starts after the last kept one ends. Ending earliest leaves the most room for the rest.
+
+```py
+def eraseOverlapIntervals(intervals):
+    intervals.sort(key=lambda x: x[1]) # by end
+    kept, end = 0, float("-inf")
+    for s, e in intervals:
+        if s >= end: # no overlap with the last kept interval
+            kept += 1
+            end = e
+    return len(intervals) - kept # removed
+```
+
+| Sort by | Example | Result |
+| --- | --- | --- |
+| End | `[[1, 10], [2, 3], [4, 5]]`: keeps `[2, 3]`, `[4, 5]` | ✅ Removes 1 |
+| Start | Same input: keeps `[1, 10]`, which blocks the others | ❌ Removes 2 |
+| Shortest first | `[[1, 4], [3, 5], [4, 7]]`: keeps `[3, 5]`, which blocks both | ❌ Removes 2, optimal removes 1 |
+
+### When greedy is wrong
+
+| Problem | Greedy choice | Counterexample | Use instead |
+| --- | --- | --- | --- |
+| Coin change, coins `[1, 3, 4]` | Largest coin first | Amount 6: greedy 4 + 1 + 1 (3 coins), optimal 3 + 3 (2) | [DP](./dynamic-programming.mdx#common-approaches-to-dp-questions) |
+| 0/1 knapsack | Best value per weight | Capacity 10, items (w 6, v 7), (w 5, v 5), (w 5, v 5): greedy 7, optimal 10 | DP |
+| Jump Game | Furthest reach | None: reach only grows, so greedy is exact | ✅ Greedy |
+
+## Example Solutions
 
 ### [Jump Game](https://leetcode.com/problems/jump-game/description/)
 

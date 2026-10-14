@@ -29,6 +29,56 @@ Space Complexity: `O(n)`.
 For more details on time and space complexity, read this post: https://stackoverflow.com/questions/65526515/how-to-identify-time-and-space-complexity-of-recursive-backtracking-algorithms-w
 :::
 
+## Common Approaches to Backtracking Questions
+
+Every backtracking problem is the template above with three decisions: **what's a choice**, **where the loop starts**, and **when to prune**.
+
+| Pattern | Loop | Record when | Example |
+| --- | --- | --- | --- |
+| Subsets | `range(start, n)`, recurse with `i + 1` | Every node | [Subsets](https://leetcode.com/problems/subsets/) |
+| Combinations | `range(start, n)`, recurse with `i + 1` | Path has length k | [Combinations](#combinations) |
+| Combination sum (reuse allowed) | `range(start, n)`, recurse with `i` | Remaining target is 0 | [Combination Sum](https://leetcode.com/problems/combination-sum/) |
+| Permutations | All of `nums`, skip used ones | Path has length n | [Permutations](#permutations) |
+| Input has duplicates | Sort, skip `nums[i] == nums[i-1]` when `i > start` | — | [Subsets II](#subsets-ii) |
+| Constraint placement | One row/cell per level, prune invalid placements early | Board is full | [N-Queens](https://leetcode.com/problems/n-queens/), [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/) |
+| Grid search | Four neighbours; mark the cell, recurse, unmark | Word fully matched | [Word Search](https://leetcode.com/problems/word-search/) |
+
+| Mistake | Result |
+| --- | --- |
+| `res.append(track)` | ❌ Every result is the same list, empty at the end. Append `track[:]` |
+| Forgetting `track.pop()` | ❌ Later branches inherit earlier choices |
+| `if i in track` for permutations with duplicates | ❌ Treats equal values as one. Track used **indexes** instead |
+| Recursing with `start + 1` instead of `i + 1` | ❌ Re-picks earlier numbers, so `[2, 1]` appears next to `[1, 2]` |
+
+### Backtracking vs DP
+
+Backtracking enumerates every solution, so it's exponential by design. If the question only wants the **count** or the **best** one, and the same `(index, remaining)` state repeats, memoise it: that's [dynamic programming](./dynamic-programming.mdx#common-approaches-to-dp-questions).
+
+| Question | Approach |
+| --- | --- |
+| "Return all subsets / combinations / boards" | Backtracking |
+| "How many ways", "minimum number" | DP |
+| "Is there any way" | Backtracking with early return, or DP if states repeat |
+
+### Grid search
+
+Mark the cell before recursing and restore it after, so one path can't reuse a cell but other paths still can.
+
+```py
+def exist(board, word):
+    rows, cols = len(board), len(board[0])
+    def dfs(r, c, i):
+        if i == len(word):
+            return True
+        if not (0 <= r < rows and 0 <= c < cols) or board[r][c] != word[i]:
+            return False
+        board[r][c] = "#" # mark visited
+        found = any(dfs(r + dr, c + dc, i + 1) for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        board[r][c] = word[i] # unmark
+        return found
+    return any(dfs(r, c, 0) for r in range(rows) for c in range(cols))
+```
+
 ## Example Solutions
 
 ### [Combinations](https://leetcode.com/problems/combinations/)

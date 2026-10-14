@@ -24,6 +24,76 @@ Fantastic [explanation](https://www.youtube.com/watch?v=5dRGRueKU3M) by [Abdul B
 on Top Down Approach using Fibonacci example.
 :::
 
+### Spotting a DP question
+
+| Signal | Example wording |
+| --- | --- |
+| Optimise over choices | "minimum cost", "maximum profit", "longest" |
+| Count the ways | "how many distinct ways", "number of paths" |
+| Is it possible | "can you reach", "can you partition" |
+| Choices now limit choices later | Robbing a house blocks its neighbour; fuel now limits the next leg |
+
+If the same subproblem gets solved more than once in the recursion tree, memoise it. In Python, `@functools.cache` on the recursive function turns step 2 into step 3 of the approach above.
+
+## Common Approaches to DP Questions
+
+Most interview DP questions belong to a handful of families. Name the family and the state falls out.
+
+| Family | State | Transition, in words | Examples |
+| --- | --- | --- | --- |
+| 1D linear | `dp[i]` = best answer using the first `i` items | Take from `i − 1` or `i − 2` | [House Robber](#house-robber), [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/), [Decode Ways](https://leetcode.com/problems/decode-ways/) |
+| 0/1 knapsack | `dp[c]` = best with capacity `c` | Each item: skip it, or take it once | [Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/), [Target Sum](https://leetcode.com/problems/target-sum/) |
+| Unbounded knapsack | `dp[c]` | Each item: skip it, or take it again | [Coin Change](https://leetcode.com/problems/coin-change/), [Coin Change II](https://leetcode.com/problems/coin-change-ii/) |
+| 2D grid | `dp[r][c]` | From the cell above and the cell to the left | [Unique Paths](https://leetcode.com/problems/unique-paths/), [01 Matrix](#01-matrix) |
+| Two sequences | `dp[i][j]` = answer for prefixes `a[:i]`, `b[:j]` | Characters match → diagonal; else best of dropping one | [Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/), [Edit Distance](https://leetcode.com/problems/edit-distance/) |
+| Interval | `dp[i][j]` = answer for `s[i..j]` | Grow from shorter intervals to longer | [Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/), [Burst Balloons](https://leetcode.com/problems/burst-balloons/) |
+| State machine | `dp[i][state]` | Extra dimension for "holding", "cooling down", "fuel left" | [Stock with Cooldown](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/), [Road Trip](#road-trip) |
+| Digit DP | `dp[position][tight][…]` | Build the number digit by digit | [Count Digits 0, 2 and 4](#count-digits-0-2-and-4) |
+
+### Knapsack: the loop direction is the whole difference
+
+With a 1D array, iterating capacity **downwards** uses each item at most once; **upwards** lets it be reused.
+
+```py
+def canPartition(nums): # 0/1: each number used once
+    total = sum(nums)
+    if total % 2:
+        return False
+    dp = [True] + [False] * (total // 2) # dp[c]: can some subset sum to c?
+    for n in nums:
+        for c in range(total // 2, n - 1, -1): # downwards
+            dp[c] = dp[c] or dp[c - n]
+    return dp[-1]
+
+def coinChange(coins, amount): # unbounded: each coin reused
+    dp = [0] + [float("inf")] * amount # dp[c]: fewest coins to make c
+    for coin in coins:
+        for c in range(coin, amount + 1): # upwards
+            dp[c] = min(dp[c], dp[c - coin] + 1)
+    return dp[amount] if dp[amount] != float("inf") else -1
+```
+
+| Loop direction | On `nums = [3]`, target 6 | Result |
+| --- | --- | --- |
+| Downwards (0/1) | `dp[6]` reads the old `dp[3]` = False | ✅ 3 can't be used twice |
+| Upwards | `dp[3]` becomes True, then `dp[6]` reads it | ❌ Counts 3 + 3 for a single 3 |
+
+### Two sequences
+
+```py
+def longestCommonSubsequence(a, b):
+    dp = [[0] * (len(b) + 1) for _ in range(len(a) + 1)] # row/col 0 = empty prefix
+    for i in range(1, len(a) + 1):
+        for j in range(1, len(b) + 1):
+            if a[i - 1] == b[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1               # extend the diagonal
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])   # drop a char from one side
+    return dp[-1][-1]
+```
+
+Edit Distance is the same table with `1 + min(insert, delete, replace)` in the else branch.
+
 ## Example Solutions
 
 ### Road Trip

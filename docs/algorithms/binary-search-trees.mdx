@@ -42,10 +42,39 @@
 
 | Operation | Big-O     | Note |
 | --------- | --------- | ---- |
-| Access    | O(log(n)) |      |
-| Search    | O(log(n)) |      |
-| Insert    | O(log(n)) |      |
-| Remove    | O(log(n)) |      |
+| Access    | O(h) | O(log(n)) when balanced |
+| Search    | O(h) | O(n) when skewed, e.g. inserting 1, 2, 3, … in order |
+| Insert    | O(h) | |
+| Remove    | O(h) | |
+
+## Common Approaches to BST Questions
+
+| Pattern | Use when | Example |
+| --- | --- | --- |
+| In-order = sorted | Kth smallest, validate, two-sum in a BST, "next larger" | [Kth Smallest Element](#kth-smallest-element-in-a-bst) |
+| Reverse in-order (right, node, left) | Kth largest, running sums from the top | [BST to Greater Sum Tree](https://leetcode.com/problems/binary-search-tree-to-greater-sum-tree/) |
+| Prune with the ordering | Search, insert, range sum: skip a subtree that can't contain the answer | [Range Sum of BST](https://leetcode.com/problems/range-sum-of-bst/) |
+| Split point | LCA in a BST: the first node between `p` and `q` | [LCA of a BST](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) |
+| Bounds passed down | Validate a BST: every node must sit inside `(low, high)` from its ancestors | [Validate BST](https://leetcode.com/problems/validate-binary-search-tree/) |
+
+### Validate with bounds
+
+Checking only `node.left.val < node.val < node.right.val` is the classic wrong answer: it misses a grandchild on the wrong side of its grandparent.
+
+```py
+def isValidBST(root):
+    def valid(node, low, high):
+        if not node:
+            return True
+        if not (low < node.val < high):
+            return False
+        return valid(node.left, low, node.val) and valid(node.right, node.val, high)
+    return valid(root, float("-inf"), float("inf"))
+```
+
+| Tree | Parent–child check | Bounds check |
+| --- | --- | --- |
+| `5 → (left 3, right 7 → left 4)` | ❌ Passes: 4 < 7 | ✅ Fails: 4 is in 5's right subtree, must be > 5 |
 
 ### In-order Traversal
 
