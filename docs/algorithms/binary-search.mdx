@@ -56,6 +56,37 @@ The terminating condition for this while loop would be when `left > right`.
 
 ## Find Left Border
 
+With duplicates, the plain search returns *any* matching index. The border searches keep going after a match: left border shrinks `right` onto it, right border pushes `left` past it.
+
+<svg className="ml-diagram" viewBox="0 0 370 110" role="img" aria-label="Sorted array 1,2,2,2,3: left border of 2 is index 1, right border is index 3">
+  <text x="85.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">0</text>
+  <text x="135.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">1</text>
+  <text x="185.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">2</text>
+  <text x="235.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">3</text>
+  <text x="285.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">4</text>
+  <rect x="60" y="22" width="50" height="28" className="box-fill" />
+  <text x="85.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">1</text>
+  <rect x="110" y="22" width="50" height="28" className="box-accent" />
+  <text x="135.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
+  <rect x="160" y="22" width="50" height="28" className="box-accent" />
+  <text x="185.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
+  <rect x="210" y="22" width="50" height="28" className="box-accent" />
+  <text x="235.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
+  <rect x="260" y="22" width="50" height="28" className="box-fill" />
+  <text x="285.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">3</text>
+  <path d="M135.0 86 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#bsb)" />
+  <text x="135.0" y="100" textAnchor="middle" fontSize="10.5" className="axis-label">left border = 1</text>
+  <path d="M235.0 86 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#bsb)" />
+  <text x="235.0" y="100" textAnchor="middle" fontSize="10.5" className="axis-label">right border = 3</text>
+  <defs>
+    <marker id="bsb" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--mermaid-edge)" />
+    </marker>
+  </defs>
+</svg>
+
+*Figure BS-1: Searching for 2 in `[1, 2, 2, 2, 3]`. Amber is the run of matches; the two border searches return its ends.*
+
 ```py
 def bsLeftBorder(nums, target):
     if not nums:

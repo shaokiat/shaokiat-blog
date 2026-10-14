@@ -105,6 +105,31 @@ Time Complexity: `O(n)`. [_See here_](https://leetcode.com/problems/linked-list-
 
 Space Complexity: `O(1)` for 2 constant variables `fast` and `slow`.
 
+### [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
+
+#### Solution: Dummy Head
+
+A dummy node removes the "which list supplies the head?" special case. Splice the smaller node onto `tail` until one list runs out, then attach the rest of the other in one step.
+
+```py
+def mergeTwoLists(self, list1, list2):
+    dummy = tail = ListNode(0)
+    while list1 and list2:
+        if list1.val <= list2.val: # <= keeps equal values in their original order
+            tail.next, list1 = list1, list1.next
+        else:
+            tail.next, list2 = list2, list2.next
+        tail = tail.next
+    tail.next = list1 or list2 # at most one is non-empty
+    return dummy.next
+```
+
+Time Complexity: `O(n + m)`, each node is visited once.
+
+Space Complexity: `O(1)`, nodes are relinked, not copied.
+
+<br />
+
 ### [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
 
 :::tip

@@ -45,13 +45,47 @@ Hardest part is identifying the recurrence relation
 
 #### Recurrence Relation
 
-<div style={{ textAlign: "center" }}>
-  <img
-    src="/shaokiat-blog/img/algo/dp-road-trip.png"
-    alt="roadtrip"
-    width="600"
-  />
-</div>
+<svg className="ml-diagram" viewBox="0 0 400 200" role="img" aria-label="Road trip state: at station j with k litres, top up i, then drive d and arrive with k − d + i">
+  <rect x="90" y="30" width="44" height="26" className="box-fill" />
+  <text x="82" y="47.0" textAnchor="end" fontSize="10" className="axis-label">4</text>
+  <rect x="90" y="56" width="44" height="26" className="box-fill" />
+  <text x="82" y="73.0" textAnchor="end" fontSize="10" className="axis-label">3</text>
+  <rect x="90" y="82" width="44" height="26" className="box-fill" />
+  <text x="82" y="99.0" textAnchor="end" fontSize="10" className="axis-label">2</text>
+  <rect x="90" y="108" width="44" height="26" className="box-fill" />
+  <text x="82" y="125.0" textAnchor="end" fontSize="10" className="axis-label">1</text>
+  <rect x="90" y="134" width="44" height="26" className="box-fill" />
+  <text x="82" y="151.0" textAnchor="end" fontSize="10" className="axis-label">0</text>
+  <rect x="300" y="30" width="44" height="26" className="box-fill" />
+  <text x="352" y="47.0" textAnchor="start" fontSize="10" className="axis-label">4</text>
+  <rect x="300" y="56" width="44" height="26" className="box-fill" />
+  <text x="352" y="73.0" textAnchor="start" fontSize="10" className="axis-label">3</text>
+  <rect x="300" y="82" width="44" height="26" className="box-fill" />
+  <text x="352" y="99.0" textAnchor="start" fontSize="10" className="axis-label">2</text>
+  <rect x="300" y="108" width="44" height="26" className="box-fill" />
+  <text x="352" y="125.0" textAnchor="start" fontSize="10" className="axis-label">1</text>
+  <rect x="300" y="134" width="44" height="26" className="box-fill" />
+  <text x="352" y="151.0" textAnchor="start" fontSize="10" className="axis-label">0</text>
+  <text x="112" y="180" textAnchor="middle" fontSize="11" fontWeight="600" className="box-text">station j</text>
+  <text x="322" y="180" textAnchor="middle" fontSize="11" fontWeight="600" className="box-text">station j+1</text>
+  <text x="112" y="139.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <text x="112" y="113.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <text x="112" y="87.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <text x="112" y="61.0" textAnchor="middle" fontSize="13" className="box-text">↑</text>
+  <path d="M136 43.0 L 296 95.0" className="overfit-line" strokeWidth="2" markerEnd="url(#rt2)" />
+  <path d="M136 69.0 L 296 121.0" className="overfit-line" strokeWidth="2" markerEnd="url(#rt2)" />
+  <path d="M136 95.0 L 296 147.0" className="overfit-line" strokeWidth="2" markerEnd="url(#rt2)" />
+  <text x="144" y="22" textAnchor="start" fontSize="10.5" className="axis-label">top up i litres ↑</text>
+  <text x="216" y="172" textAnchor="middle" fontSize="10.5" className="overfit-label">drive d = 2: lose 2 litres</text>
+  <text x="60" y="18" textAnchor="start" fontSize="10" className="axis-label">litres</text>
+  <defs>
+    <marker id="rt2" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--ml-overfit)" />
+    </marker>
+  </defs>
+</svg>
+
+*Figure DP-1: The state is (station, litres in tank). Each ↑ tops up one litre at station j; red arrows are the drive to station j+1, which costs d litres whatever you arrive with.*
 
 ```
 for each possible i: C(station j, k) = C(station j+1, k - d + i) + cost(station j) * i
