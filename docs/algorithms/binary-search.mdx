@@ -106,42 +106,38 @@ Time complexity is O(logn) as the search range is halved every iteration until t
 give a O(1) space complexity.
 
 :::important Binary Search
-Recurrerence Relation: `T(N) = T(N/2) + O(1)`
+Recurrence Relation: `T(N) = T(N/2) + O(1)`
 :::
 
 ```py
 def binarySearch(nums, target):
-    left, right = 0, len(nums)-1
-    while left <= right: # Search interval = [left, right]
+    left, right = 0, len(nums)
+    while left < right: # Search interval = [left, right)
         mid = (left + right) // 2
         if nums[mid] == target: # target found! Return index
             return mid
-        elif nums[mid] < target: # recurse right -> [mid+1, right]
+        elif nums[mid] < target: # search right -> [mid+1, right)
             left = mid + 1
-        elif nums[mid] > target: # recurse left -> [left, mid-1]
-            right = mid - 1
+        else: # search left -> [left, mid)
+            right = mid
     # Target not found -> return -1
     return -1
 ```
 
 ### Search Interval
 
-```py
-while left <= right:...
-```
+Every template on this page uses the **half-open** interval `[left, right)`: `left` is the first candidate, `right` is one *past* the last. The intuition is that `right` already points at something excluded, so "drop `mid` and everything after it" is just `right = mid`.
 
-This gives us a closed interval of `[left, right]` to search from where both the left and right boundaries are included. This
-also means that our initial `right` boundary would have to be `len(arr) - 1`.
+| | Half-open `[l, r)` (default) | Inclusive `[l, r]` |
+| --- | --- | --- |
+| init `r` | `len(nums)` | `len(nums) - 1` |
+| loop | `l < r` | `l <= r` |
+| shrink right | `r = m` | `r = m - 1` |
+| shrink left | `l = m + 1` | `l = m + 1` |
+| loop ends when | `l == r` (interval empty) | `l == r + 1` (interval empty) |
+| after the loop | `l == r` is the insertion point | `l` is the insertion point, `r = l - 1` |
 
-**Case 1:** `nums[mid] < target`<br />
-Target lies on the right side of `mid` and we would have to set our search interval
-to `[mid + 1, right]`. To do so, we have to set our left interval to `mid + 1`.
-
-**Case 2:** `nums[mid] > target` <br/>
-Target lies on the left side of `mid` and we would have to set our search interval to `[left, mid - 1]`. To do so,
-we have to set our right interval to `mid - 1`.
-
-The terminating condition for this while loop would be when `left > right`.
+Why half-open is the default: the loop exits with `l == r`, a single answer, and that answer is always a valid insertion point in `[0, len]`. The same shape works for the exact match, both borders and [search on the answer](#binary-search-on-the-answer).
 
 ## Find Left Border
 
@@ -176,6 +172,17 @@ With duplicates, the plain search returns *any* matching index. The border searc
 
 *Figure BS-1: Searching for 2 in `[1, 2, 2, 2, 3]`. Amber is the run of matches; the two border searches return its ends.*
 
+**Intuition**: the loop keeps two walls. Everything left of `l` is known to be `< target`; everything from `r` onward is known to be `>= target`. Each step moves one wall to `mid`, and the loop ends when the walls meet. That meeting point is the first index `>= target`.
+
+| `nums[m]` vs `target` | What it tells you | Move |
+| --- | --- | --- |
+| `<` | `m` and everything before it is too small | `l = m + 1` |
+| `==` | `m` could be the first match, but an earlier one may exist | `r = m` (keep looking left) |
+| `>` | `m` and everything after it is too big | `r = m` |
+| loop ends | `l == r` = first index with `nums[i] >= target` | answer is `l` |
+
+The `==` row is the only difference from the plain search: instead of returning, treat a match like "too big" and keep shrinking from the right.
+
 ```py
 def bsLeftBorder(nums, target):
     if not nums:
@@ -200,6 +207,25 @@ def bsLeftBorder(nums, target):
 ```
 
 ## Find Right Border
+
+**Intuition**: same two walls, shifted by one. Everything left of `l` is `<= target`; everything from `r` onward is `> target`. The walls meet at the first index `> target`, so the last match sits one step to its left.
+
+| `nums[m]` vs `target` | What it tells you | Move |
+| --- | --- | --- |
+| `<` | `m` and everything before it is too small | `l = m + 1` |
+| `==` | `m` could be the last match, but a later one may exist | `l = m + 1` (keep looking right) |
+| `>` | `m` and everything after it is too big | `r = m` |
+| loop ends | `l == r` = first index with `nums[i] > target` | answer is `l - 1` |
+
+Mirror of the left border: a match is treated like "too small". Because `l` always lands one *past* the last match, the answer is `l - 1`, and `l == 0` means nothing matched.
+
+| | Left border | Right border |
+| --- | --- | --- |
+| left of `l` is | `< target` | `<= target` |
+| `r` onward is | `>= target` | `> target` |
+| on a match | `r = m` | `l = m + 1` |
+| return | `l` | `l - 1` |
+| Python equivalent | `bisect_left` | `bisect_right - 1` |
 
 ```py
 def bsRightBorder(nums, target):
