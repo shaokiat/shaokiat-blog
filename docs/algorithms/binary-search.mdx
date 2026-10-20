@@ -6,18 +6,120 @@ Inspired by https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/deta
 
 :::
 
+## Concepts
+
+### Search Interval
+
+Every template here uses the **half-open** interval `[l, r)`: `r` points one *past* the last candidate, so dropping `mid` and everything after it is just `r = m`.
+
+| | Half-open `[l, r)` (default) | Inclusive `[l, r]` |
+| --- | --- | --- |
+| init `r` | `len(nums)` | `len(nums) - 1` |
+| loop | `l < r` | `l <= r` |
+| shrink right | `r = m` | `r = m - 1` |
+| exits with | `l == r`, the insertion point | `l == r + 1` |
+
+### Exact Match
+
+Sorted, unique values. Return the index or `-1`. `O(log n)` time, `O(1)` space.
+
+```py
+def binarySearch(nums, target):
+    l, r = 0, len(nums)
+    while l < r:  # [l, r)
+        m = (l + r) // 2
+        if nums[m] == target:
+            return m
+        elif nums[m] < target:
+            l = m + 1  # [m + 1, r)
+        else:
+            r = m      # [l, m)
+    return -1
+```
+
+### Find Left Border
+
+With duplicates, the exact match returns *any* match. The border searches don't stop on a match. They keep two walls, `l` and `r`, and move one to `m` each step until the walls meet.
+
+<svg className="ml-diagram" viewBox="0 0 370 110" role="img" aria-label="Sorted array 1,2,2,2,3: left border of 2 is index 1, right border is index 3">
+  <text x="85.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">0</text>
+  <text x="135.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">1</text>
+  <text x="185.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">2</text>
+  <text x="235.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">3</text>
+  <text x="285.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">4</text>
+  <rect x="60" y="22" width="50" height="28" className="box-fill" />
+  <text x="85.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">1</text>
+  <rect x="110" y="22" width="50" height="28" className="box-accent" />
+  <text x="135.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
+  <rect x="160" y="22" width="50" height="28" className="box-accent" />
+  <text x="185.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
+  <rect x="210" y="22" width="50" height="28" className="box-accent" />
+  <text x="235.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
+  <rect x="260" y="22" width="50" height="28" className="box-fill" />
+  <text x="285.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">3</text>
+  <path d="M135.0 86 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#bsb)" />
+  <text x="135.0" y="100" textAnchor="middle" fontSize="10.5" className="axis-label">left border = 1</text>
+  <path d="M235.0 86 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#bsb)" />
+  <text x="235.0" y="100" textAnchor="middle" fontSize="10.5" className="axis-label">right border = 3</text>
+  <defs>
+    <marker id="bsb" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
+      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--mermaid-edge)" />
+    </marker>
+  </defs>
+</svg>
+
+*Figure BS-1: Searching for 2 in `[1, 2, 2, 2, 3]`. Amber is the run of matches; the two border searches return its ends.*
+
+| | Left border | Right border |
+| --- | --- | --- |
+| left of `l` is | `< target` | `<= target` |
+| `r` onward is | `>= target` | `> target` |
+| on a match | `r = m` (look left) | `l = m + 1` (look right) |
+| walls meet at | first `>= target` | first `> target` |
+| return | `l` | `l - 1` |
+| Python | `bisect_left` | `bisect_right - 1` |
+
+```py
+def bsLeftBorder(nums, target):
+    l, r = 0, len(nums)
+    while l < r:  # [l, r)
+        m = (l + r) // 2
+        if nums[m] < target:
+            l = m + 1
+        else:          # match or too big: shrink right
+            r = m
+    # l = count of elements < target
+    return l if l < len(nums) and nums[l] == target else -1
+```
+
+### Find Right Border
+
+Mirror of the left border: a match counts as "too small", so `l` lands one past the last match.
+
+```py
+def bsRightBorder(nums, target):
+    l, r = 0, len(nums)
+    while l < r:  # [l, r)
+        m = (l + r) // 2
+        if nums[m] <= target:
+            l = m + 1  # match or too small: shrink left
+        else:
+            r = m
+    return l - 1 if l > 0 and nums[l - 1] == target else -1
+```
+
 ## Common Approaches to Binary Search Questions
 
 Binary search works on anything **monotonic**, not just sorted arrays: if a condition is false up to some point and true after it, you can find that point in O(log n).
 
-| Pattern | Use when | Template |
-| --- | --- | --- |
-| Exact match | Sorted, unique values, return the index or -1 | [Iterative Binary Search](#iterative-binary-search) |
-| Left border (first ≥ target) | Duplicates, insertion point, "first occurrence" | [Find Left Border](#find-left-border), or `bisect_left` |
-| Right border (last ≤ target) | "Last occurrence", "first strictly greater" | [Find Right Border](#find-right-border), or `bisect_right` |
-| Search on the answer | Minimise or maximise a value where "x works" implies "x + 1 works" | [Binary Search on the Answer](#binary-search-on-the-answer) |
-| Rotated or partially sorted | One half of every split is still sorted | [Search In Rotated Sorted Array](#search-in-rotated-sorted-array) |
-| 2D matrix | Rows sorted and each row starts after the previous ends | Treat it as one array: `row, col = divmod(mid, cols)` |
+| Signal in the question | Pattern |
+| --- | --- |
+| Sorted, unique, find the index | [Exact match](#exact-match) |
+| Duplicates, "first occurrence", insertion point | [Left border](#find-left-border) |
+| "Last occurrence", "first strictly greater" | [Right border](#find-right-border) |
+| Min/max value where "x works ⇒ x + 1 works" | [Search on the answer](#binary-search-on-the-answer) |
+| Rotated array | [Rotated search](#search-in-rotated-sorted-array) |
+| 2D matrix, rows chain end to end | One array: `row, col = divmod(m, cols)` |
 
 ### Binary Search on the Answer
 
@@ -90,136 +192,10 @@ Same shape: [Capacity To Ship Packages](https://leetcode.com/problems/capacity-t
 
 | Mistake | Result |
 | --- | --- |
-| `while left <= right` with `right = len(nums)` | ❌ Reads `nums[len(nums)]`: index out of range |
-| `left = mid` in a `[left, right)` loop | ❌ Infinite loop when `right == left + 1` |
-| Mixing interval styles in one function | ❌ Off-by-one at the edges. Pick closed `[l, r]` or half-open `[l, r)` and keep it |
-| Python `bisect_left` / `bisect_right` | ✅ Border searches for free, when the interviewer allows it |
-
-## Iterative Binary Search
-
-This is the common binary search where a sorted array `nums` is given and we are tasked to find `target` in that array. <br/>
-Returns the `index` of the target if it exist in the array, else returns `-1`.
-
-**Time Complexity**: `O(logn)` <br/>
-**Space Complexity**: `O(1)` <br/>
-Time complexity is O(logn) as the search range is halved every iteration until target is found. The iterative approach will
-give a O(1) space complexity.
-
-:::important Binary Search
-Recurrerence Relation: `T(N) = T(N/2) + O(1)`
-:::
-
-```py
-def binarySearch(nums, target):
-    left, right = 0, len(nums)-1
-    while left <= right: # Search interval = [left, right]
-        mid = (left + right) // 2
-        if nums[mid] == target: # target found! Return index
-            return mid
-        elif nums[mid] < target: # recurse right -> [mid+1, right]
-            left = mid + 1
-        elif nums[mid] > target: # recurse left -> [left, mid-1]
-            right = mid - 1
-    # Target not found -> return -1
-    return -1
-```
-
-### Search Interval
-
-```py
-while left <= right:...
-```
-
-This gives us a closed interval of `[left, right]` to search from where both the left and right boundaries are included. This
-also means that our initial `right` boundary would have to be `len(arr) - 1`.
-
-**Case 1:** `nums[mid] < target`<br />
-Target lies on the right side of `mid` and we would have to set our search interval
-to `[mid + 1, right]`. To do so, we have to set our left interval to `mid + 1`.
-
-**Case 2:** `nums[mid] > target` <br/>
-Target lies on the left side of `mid` and we would have to set our search interval to `[left, mid - 1]`. To do so,
-we have to set our right interval to `mid - 1`.
-
-The terminating condition for this while loop would be when `left > right`.
-
-## Find Left Border
-
-With duplicates, the plain search returns *any* matching index. The border searches keep going after a match: left border shrinks `right` onto it, right border pushes `left` past it.
-
-<svg className="ml-diagram" viewBox="0 0 370 110" role="img" aria-label="Sorted array 1,2,2,2,3: left border of 2 is index 1, right border is index 3">
-  <text x="85.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">0</text>
-  <text x="135.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">1</text>
-  <text x="185.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">2</text>
-  <text x="235.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">3</text>
-  <text x="285.0" y="14" textAnchor="middle" fontSize="10" className="axis-label">4</text>
-  <rect x="60" y="22" width="50" height="28" className="box-fill" />
-  <text x="85.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">1</text>
-  <rect x="110" y="22" width="50" height="28" className="box-accent" />
-  <text x="135.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
-  <rect x="160" y="22" width="50" height="28" className="box-accent" />
-  <text x="185.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
-  <rect x="210" y="22" width="50" height="28" className="box-accent" />
-  <text x="235.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text-accent">2</text>
-  <rect x="260" y="22" width="50" height="28" className="box-fill" />
-  <text x="285.0" y="40.0" textAnchor="middle" fontSize="12" className="box-text">3</text>
-  <path d="M135.0 86 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#bsb)" />
-  <text x="135.0" y="100" textAnchor="middle" fontSize="10.5" className="axis-label">left border = 1</text>
-  <path d="M235.0 86 V 54" className="flow-line" strokeWidth="1.5" markerEnd="url(#bsb)" />
-  <text x="235.0" y="100" textAnchor="middle" fontSize="10.5" className="axis-label">right border = 3</text>
-  <defs>
-    <marker id="bsb" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto">
-      <path d="M0,0 L5,2.5 L0,5 z" fill="var(--mermaid-edge)" />
-    </marker>
-  </defs>
-</svg>
-
-*Figure BS-1: Searching for 2 in `[1, 2, 2, 2, 3]`. Amber is the run of matches; the two border searches return its ends.*
-
-```py
-def bsLeftBorder(nums, target):
-    if not nums:
-        return -1
-    left = 0
-    right = len(nums)
-    while left < right: # [left, right)
-        mid = (left + right) // 2
-        if nums[mid] == target: # [left, mid)
-            right = mid
-        elif nums[mid] < target: # [mid + 1, right)
-            left = mid + 1
-        elif nums[mid] > target: # [left, mid)
-            right = mid
-
-    print(left) # left => number of elements smaller than target
-
-    # If we want to return -1 when target not found
-    if left >= len(nums) or nums[left] != target:
-        return -1
-    return left # returns index of left border
-```
-
-## Find Right Border
-
-```py
-def bsRightBorder(nums, target):
-    if not nums:
-        return -1
-    left = 0
-    right = len(nums)
-    while left < right: # [left, right), terminating condition: left == right
-        mid = (left + right) // 2
-        if nums[mid] == target: # [mid + 1, right)
-            left = mid + 1
-        elif nums[mid] < target: # [mid + 1, right)
-            left = mid + 1
-        elif nums[mid] > target: # [left, mid)
-            right = mid
-    # nums[left-1] may be the target
-    if left == 0 or nums[left-1] != target:
-        return -1
-    return left - 1
-```
+| `l <= r` with `r = len(nums)` | ❌ Index out of range |
+| `l = m` in a `[l, r)` loop | ❌ Infinite loop when `r == l + 1` |
+| Mixing `[l, r]` and `[l, r)` | ❌ Off-by-one at the edges |
+| `bisect_left` / `bisect_right` | ✅ Borders for free, if allowed |
 
 ## Example Solutions
 
